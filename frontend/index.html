@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Optimization Platform</title>
+    <title>Configurable Business Decision & Optimization Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -37,11 +37,11 @@
         <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="bg-blue-600 text-white px-2.5 py-1.5 rounded font-semibold text-xs tracking-wider">
-                    OPTI-DECISION
+                    DECISION-ENGINE
                 </div>
                 <div>
-                    <h1 class="text-sm font-semibold text-white">Business Optimization Platform</h1>
-                    <p class="text-xs text-slate-400">Configurable Enterprise Decision Workspace</p>
+                    <h1 class="text-sm font-semibold text-white">Configurable Decision & Optimization Platform</h1>
+                    <p class="text-xs text-slate-400">Turn operational rules and constraints into optimal feasible business decisions</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
@@ -50,11 +50,10 @@
                     <select id="currencySelect" onchange="onCurrencyChange()" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded px-2.5 py-1 focus:outline-none focus:border-blue-500">
                         <option value="INR">INR (₹ Lakhs / Crores)</option>
                         <option value="USD">USD ($)</option>
-                        <option value="EUR">EUR (€)</option>
                     </select>
                 </div>
                 <span class="text-xs px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono">
-                    Mode: Configurable Workspace
+                    Model: Configurable Generator
                 </span>
             </div>
         </div>
@@ -65,7 +64,7 @@
 
         <!-- Sidebar Navigation -->
         <aside class="col-span-12 lg:col-span-3 space-y-1">
-            <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-2 tracking-wider">Workspace</div>
+            <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-2 tracking-wider">Workspace Navigation</div>
             
             <button onclick="switchTab('overview')" id="tab-overview" class="nav-item nav-item-active w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
                 <i class="fa-solid fa-chart-pie w-4 text-slate-400"></i>
@@ -74,7 +73,7 @@
 
             <button onclick="switchTab('setup')" id="tab-setup" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
                 <i class="fa-solid fa-sliders w-4 text-slate-400"></i>
-                <span>Business Setup</span>
+                <span>Decision Setup</span>
             </button>
 
             <button onclick="switchTab('data')" id="tab-data" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
@@ -94,7 +93,7 @@
 
             <button onclick="switchTab('optimize')" id="tab-optimize" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
                 <i class="fa-solid fa-gears w-4 text-slate-400"></i>
-                <span>Optimize Operations</span>
+                <span>Decision Engine</span>
             </button>
 
             <button onclick="switchTab('scenarios')" id="tab-scenarios" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
@@ -114,90 +113,88 @@
 
             <div class="pt-6 text-[11px] font-semibold text-slate-500 uppercase px-3 py-2 tracking-wider">System Settings</div>
             <div class="px-3.5 py-2 text-xs text-slate-400 space-y-1 font-mono">
-                <div>Org: <span class="text-slate-200">Enterprise Corp</span></div>
+                <div>Org: <span class="text-slate-200">Apparel & Transport Corp</span></div>
                 <div>Role: <span class="text-blue-400">Operations Manager</span></div>
             </div>
         </aside>
 
-        <!-- Main Workspace Area -->
+        <!-- Main Workspace Content -->
         <main class="col-span-12 lg:col-span-9 space-y-6">
 
             <!-- TAB 1: OVERVIEW -->
             <div id="section-overview" class="space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                    <h2 class="text-sm font-semibold text-white mb-1">Executive Business Health & Overview</h2>
-                    <p class="text-xs text-slate-400 mb-6">Summary of baseline operations, financial contribution margins, and optimization opportunities.</p>
+                    <h2 class="text-sm font-semibold text-white mb-1">Executive Decision Workspace & Overview</h2>
+                    <p class="text-xs text-slate-400 mb-6">Make better operating decisions. Turn your business constraints, resources, and costs into an optimized operating plan.</p>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs mb-6">
                         <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Estimated Revenue</span>
-                            <div id="ovRevenue" class="text-lg font-bold text-slate-200 mt-1">₹22.00 Lakh</div>
+                            <span class="text-slate-400 font-medium">Expected Revenue</span>
+                            <div id="ovRevenue" class="text-lg font-bold text-slate-200 mt-1">₹1.52 Lakh</div>
                         </div>
                         <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Direct Operating Cost</span>
-                            <div id="ovCost" class="text-lg font-bold text-rose-400 mt-1">₹15.96 Lakh</div>
+                            <span class="text-slate-400 font-medium">Production Material Cost</span>
+                            <div id="ovCost" class="text-lg font-bold text-rose-400 mt-1">₹72,900</div>
                         </div>
                         <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Gross Contribution</span>
-                            <div id="ovProfit" class="text-lg font-bold text-emerald-400 mt-1">₹6.04 Lakh</div>
+                            <span class="text-slate-400 font-medium">Expected Contribution</span>
+                            <div id="ovProfit" class="text-lg font-bold text-emerald-400 mt-1">₹79,100</div>
                         </div>
                         <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Contribution Margin</span>
-                            <div id="ovMargin" class="text-lg font-bold text-blue-400 mt-1">27.45%</div>
+                            <span class="text-slate-400 font-medium">Margin Improvement</span>
+                            <div id="ovMargin" class="text-lg font-bold text-blue-400 mt-1">+18.6%</div>
                         </div>
                     </div>
 
                     <div class="bg-slate-950 border border-slate-800 p-4 rounded text-xs space-y-2">
-                        <div class="font-semibold text-slate-200">Active Operational Optimization Opportunities</div>
-                        <ul class="list-disc list-inside text-slate-400 space-y-1">
-                            <li>Material Delivery Route B contribution margin is below target. Recommended minimum quote: ₹21,800.</li>
-                            <li>Fuel expense constitutes 46.1% of direct round cost. Shift 40% allocations to high-mileage vehicle fleet.</li>
-                        </ul>
+                        <div class="font-semibold text-slate-200">Flagship Demonstration Models</div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono pt-1">
+                            <button onclick="loadDemo('apparel')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-left transition">
+                                <div class="text-blue-400 font-bold">1. Designer Clothing</div>
+                                <div class="text-slate-400 text-[11px]">Production planning under tailor, designer & embroidery limits</div>
+                            </button>
+                            <button onclick="loadDemo('logistics')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-left transition">
+                                <div class="text-emerald-400 font-bold">2. Sand Transport</div>
+                                <div class="text-slate-400 text-[11px]">Trip dispatch, diesel mileage & per-round driver pay</div>
+                            </button>
+                            <button onclick="loadDemo('restaurant')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-left transition">
+                                <div class="text-amber-400 font-bold">3. Restaurant Service</div>
+                                <div class="text-slate-400 text-[11px]">Shift staffing & recipe ingredient allocation</div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: BUSINESS SETUP -->
-            <div id="section-setup" class="hidden space-y-6">
+            <!-- TAB 2: DECISION SETUP -->
+            <div id="section-setup" class="space-y-6 hidden">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                    <h2 class="text-sm font-semibold text-white mb-1">Step 1 — Business Model & Cost Engine Builder</h2>
-                    <p class="text-xs text-slate-400 mb-6">Configure how your organization operates, earns revenue, and calculates employee compensation.</p>
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 1 — Decision Problem Setup</h2>
+                    <p class="text-xs text-slate-400 mb-6">What decision are you trying to optimize?</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mb-6">
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Industry Template</label>
-                            <select id="setupIndustry" onchange="onSetupTemplateChange()" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
-                                <option value="logistics">Logistics & Transport</option>
-                                <option value="apparel">Apparel & Fashion</option>
-                                <option value="restaurant">Restaurant / Food Service</option>
-                                <option value="retail">Retail Supermarket</option>
+                            <label class="block font-medium text-slate-300 mb-1.5">Decision Problem Template</label>
+                            <select id="setupProblemType" onchange="onProblemTypeChange()" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                                <option value="production_planning">Production Planning (What to produce, when & how much)</option>
+                                <option value="workforce_scheduling">Workforce Scheduling (Shift & employee skill allocation)</option>
+                                <option value="logistics_dispatch">Logistics & Dispatch (Vehicles, routes & delivery trips)</option>
+                                <option value="pricing_unit_econ">Pricing & Unit Economics (Break-even & target margin pricing)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Operating Model</label>
-                            <input type="text" id="setupOperatingModel" value="Construction Material Haulage (Sand Transport)" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Worker Compensation Model</label>
-                            <select id="setupCompensation" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
-                                <option value="per_round">Per Completed Round (e.g. ₹1,000 / round)</option>
-                                <option value="hourly">Hourly Wage ($/hr)</option>
-                                <option value="per_shift">Per Shift ($/shift)</option>
-                                <option value="monthly">Monthly Salary</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Primary Distance & Weight Units</label>
-                            <select id="setupUnits" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
-                                <option value="metric_in">Kilometers (km), Tonnes, Liters</option>
-                                <option value="metric_std">Kilometers (km), Kilograms (kg), Liters</option>
-                                <option value="imperial">Miles (mi), Tons, Gallons</option>
+                            <label class="block font-medium text-slate-300 mb-1.5">Optimization Goal</label>
+                            <select id="setupGoal" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                                <option value="maximize_profit">Maximize Profit / Net Contribution</option>
+                                <option value="minimize_cost">Minimize Total Cost</option>
+                                <option value="minimize_waste">Minimize Waste & Spoilage</option>
+                                <option value="maximize_utilization">Maximize Resource Utilization %</option>
                             </select>
                         </div>
                     </div>
 
-                    <button onclick="saveBusinessSetup()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded transition">
-                        Save Business Model Configuration
+                    <button onclick="saveDecisionSetup()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded transition">
+                        Configure Model Generator & Proceed
                     </button>
                 </div>
             </div>
@@ -208,7 +205,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h2 class="text-sm font-semibold text-white">Step 2 — Data Center & Quality Readiness</h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Upload operational records or evaluate dataset quality metrics.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Upload operational rules or evaluate dataset quality scorecards.</p>
                         </div>
                         <button onclick="checkDataReadiness()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3.5 py-1.5 rounded transition">
                             Evaluate Data Quality Scorecard
@@ -227,8 +224,8 @@
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <h2 class="text-sm font-semibold text-white">Step 3 — Demand Forecasts</h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Time-series prediction bounds where historical data exists.</p>
+                            <h2 class="text-sm font-semibold text-white">Step 3 — Demand Forecasts (Optional Prediction Layer)</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Time-series demand predictions where historical data exists.</p>
                         </div>
                         <button onclick="generateForecasts()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3.5 py-1.5 rounded transition">
                             Generate Demand Forecast
@@ -301,24 +298,24 @@
                 </div>
             </div>
 
-            <!-- TAB 6: OPTIMIZE -->
+            <!-- TAB 6: DECISION ENGINE OPTIMIZER -->
             <div id="section-optimize" class="hidden space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                    <h2 class="text-sm font-semibold text-white mb-1">Step 5 — Operational Plan Optimizer</h2>
-                    <p class="text-xs text-slate-400 mb-6">Computes mathematically optimal resource, supplier, and shift allocations.</p>
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 5 — Decision Problem Optimizer</h2>
+                    <p class="text-xs text-slate-400 mb-6">Generates mathematically optimal operating decisions using solver adapters (CP-SAT / MIP).</p>
 
                     <button onclick="runMasterOptimizer()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 rounded transition">
-                        Run Mathematical Optimization Engine
+                        Execute Decision Generator Model
                     </button>
                 </div>
 
                 <div id="optOutput" class="hidden space-y-6">
                     <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                        <h3 class="font-semibold text-white">Recommended Operational Plan Summary</h3>
+                        <h3 class="font-semibold text-white">Recommended Production & Operational Plan</h3>
                         <div id="optSummaryText" class="text-slate-300 leading-relaxed bg-slate-950 p-3 rounded border border-slate-800"></div>
                         
                         <div>
-                            <div class="font-medium text-slate-400 uppercase tracking-wider mb-2">Key Decision Actions:</div>
+                            <div class="font-medium text-slate-400 uppercase tracking-wider mb-2">Optimal Decision Breakdown:</div>
                             <ul id="optActionList" class="list-disc list-inside space-y-1 text-slate-300"></ul>
                         </div>
                     </div>
@@ -329,18 +326,18 @@
             <div id="section-scenarios" class="hidden space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
                     <h2 class="text-sm font-semibold text-white mb-1">Step 6 — What-If Scenario Stress Testing</h2>
-                    <p class="text-xs text-slate-400 mb-6">Evaluate plan stability against diesel price hikes, demand shocks, and wage variance.</p>
+                    <p class="text-xs text-slate-400 mb-6">Evaluate plan stability against material cost hikes, demand shocks, and capacity bottlenecks.</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mb-6">
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Diesel Price Shift (%)</label>
+                            <label class="block font-medium text-slate-300 mb-1.5">Material Cost Variance (%)</label>
                             <input type="range" id="scenFuelShift" min="0.8" max="1.5" step="0.05" value="1.15" oninput="updateScenLabels()" class="w-full">
-                            <span id="scenFuelLabel" class="text-[11px] text-amber-400 font-mono">+15% Diesel Price Hike</span>
+                            <span id="scenFuelLabel" class="text-[11px] text-amber-400 font-mono">+15% Raw Material Inflation</span>
                         </div>
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Trip Volume Variance (%)</label>
+                            <label class="block font-medium text-slate-300 mb-1.5">Demand Variance (%)</label>
                             <input type="range" id="scenTripShift" min="0.5" max="1.5" step="0.05" value="1.2" oninput="updateScenLabels()" class="w-full">
-                            <span id="scenTripLabel" class="text-[11px] text-blue-400 font-mono">+20% Trip Volume</span>
+                            <span id="scenTripLabel" class="text-[11px] text-blue-400 font-mono">+20% Demand Surge</span>
                         </div>
                     </div>
 
@@ -372,21 +369,21 @@
             <!-- TAB 9: LEARN & TEMPLATES -->
             <div id="section-learn" class="hidden space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h2 class="text-sm font-semibold text-white">Platform Methodologies & Industry CSV Templates</h2>
-                    <p class="text-slate-400">Download formatted operational templates for your industry:</p>
+                    <h2 class="text-sm font-semibold text-white">Platform Methodologies & Industry Excel Templates</h2>
+                    <p class="text-slate-400">Download formatted operational templates for your decision problem:</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
                         <div class="p-3 bg-slate-950 rounded border border-slate-800">
-                            <div class="text-slate-200 font-bold mb-1">Logistics Templates</div>
-                            <div class="text-slate-400 text-[11px]">vehicles.xlsx, trips.xlsx, materials.xlsx</div>
+                            <div class="text-slate-200 font-bold mb-1">Production Planning</div>
+                            <div class="text-slate-400 text-[11px]">products.xlsx, fabric.xlsx, machines.xlsx</div>
                         </div>
                         <div class="p-3 bg-slate-950 rounded border border-slate-800">
-                            <div class="text-slate-200 font-bold mb-1">Apparel Templates</div>
-                            <div class="text-slate-400 text-[11px]">fabric.xlsx, tailoring.xlsx, batches.xlsx</div>
+                            <div class="text-slate-200 font-bold mb-1">Logistics & Trips</div>
+                            <div class="text-slate-400 text-[11px]">vehicles.xlsx, routes.xlsx, drivers.xlsx</div>
                         </div>
                         <div class="p-3 bg-slate-950 rounded border border-slate-800">
-                            <div class="text-slate-200 font-bold mb-1">Restaurant Templates</div>
-                            <div class="text-slate-400 text-[11px]">recipes.xlsx, ingredients.xlsx, shifts.xlsx</div>
+                            <div class="text-slate-200 font-bold mb-1">Workforce Shift</div>
+                            <div class="text-slate-400 text-[11px]">employees.xlsx, skills.xlsx, shifts.xlsx</div>
                         </div>
                     </div>
                 </div>

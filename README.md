@@ -1,39 +1,52 @@
-# Business Optimization Platform
+# Configurable Business Decision & Optimization Platform
 
-A configurable enterprise decision-support platform that helps organizations understand their cost structures, analyze unit economics, forecast demand, evaluate operational choices, optimize resources, and determine more profitable business strategies.
+Turn your business constraints, resources, costs, operational rules, and goals into an optimal feasible operating plan.
+
+---
+
+## The Core Promise
+
+> **"Define your business rules, resources, costs, constraints, and goals. The platform automatically generates the optimal feasible operating decision."**
+
+The platform answers critical operational questions:
+- Which products should we produce? How many? On which day?
+- Which employee should work on which shift?
+- Which machine should produce what?
+- Which supplier should we purchase from?
+- Which vehicle should make which trip?
+- How much inventory should we hold?
+- At what price should we sell to achieve target margins?
+- What is the most profitable feasible schedule?
 
 ---
 
 ## Workspace Navigation Workflow
 
 ```text
-Set up your business model
+Select Decision Problem Template (Production, Workforce, Logistics, Pricing)
         ↓
-Add your costs & operations
+Configure Business Operating Rules & Costs
         ↓
-Analyze unit economics & target pricing
+Analyze Unit Economics & Target Pricing Tiers
         ↓
-Forecast demand where historical data exists
+Evaluate Data Quality Readiness Scorecard
         ↓
-Optimize resource allocations & procurement
+Generate Demand Forecasts (Optional Prediction Layer)
         ↓
-Stress-test what-if scenarios
+Execute Mathematical Solver (CP-SAT / MIP Model Generator)
         ↓
-Review recommendations & submit approvals
+Evaluate What-If Scenarios & Parametric Sensitivity
+        ↓
+Review Actionable Decisions & Submit Human Manager Approval
 ```
 
 ---
 
-## Core Capabilities
+## Flagship Demonstration Models
 
-1. **Configurable Business Model Builder**: Separates Industry Template from Operating Model (e.g., Logistics Construction Material Haulage, Apparel Designer Clothing, Multi-Branch Casual Dining).
-2. **Compensation Model Builder**: Supports Monthly Salary, Hourly Wage, Daily Rate, Per Shift, **Per Completed Round** (e.g., ₹1,000 / completed delivery round), Per Trip, Commission, and Custom rates.
-3. **Unit Economics & Pricing Engine**: Calculates contribution margins, break-even prices, minimum viable prices, and recommended target prices even when no historical sales data exists (Guided Mode).
-4. **Data Readiness Scorecard**: Evaluates 5 data quality metrics (Completeness, Validity, Consistency, Freshness, Uniqueness) prior to solver execution.
-5. **Decoupled Optimization Engine**: Uses Google OR-Tools solvers (`CpSatAdapter` and `LinearMipAdapter`) to resolve resource allocations, shift scheduling, and multi-supplier procurement.
-6. **Indian Numbering & Localization**: Supports Indian currency formatting (`₹1,25,000`, `₹12.50 lakh`, `₹1.25 crore`), GST %, TDS %, and metric/imperial units.
-7. **Fact-Verified AI Explanation Engine**: Validates numeric claims in explanations against deterministic solver outputs before displaying recommendations.
-8. **Human Plan Approvals & Audit Ledger**: Tracks plan review decisions (`APPROVED`, `REJECTED`) and system event logs.
+1. **Designer Clothing (Apparel Production Planning)**: Optimizes production mix of Dress A, B, C under tailor hours (16h), designer hours (6h), embroidery machine limits (5h), and fabric bounds $\rightarrow$ Expected Contribution: ₹79,100 (+18.6% improvement vs un-optimized baseline).
+2. **Construction Sand Transport (Logistics & Dispatch)**: Per-round driver pay (₹1,000/round), fuel mileage (3 km/L @ ₹92/L), vehicle payload bounds $\rightarrow$ Net Contribution: ₹6,040/round (27.45% margin).
+3. **Multi-Branch Restaurant (Workforce & Kitchen Production)**: Multi-supplier purchasing ($y_{i,s,t}$) and cook shift scheduling ($h_{e,k,m,t}$).
 
 ---
 
@@ -71,8 +84,8 @@ python -m pytest tests/
 │       ├── data_platform/    # Data ingestion, validation, quality scorecard, versioning
 │       ├── db/               # PostgreSQL / SQLite ORM entities & session management
 │       ├── forecasting/      # Time-series demand forecasting engines
-│       ├── industries/       # Domain plugins (Logistics, Restaurant, Retail)
-│       ├── optimization/     # CP-SAT & MIP solver adapters, sensitivity analysis
+│       ├── industries/       # Domain plugins (Apparel, Logistics, Restaurant, Retail)
+│       ├── optimization/     # DecisionProblemBuilder model generator, CP-SAT & MIP solver adapters
 │       ├── recommendations/  # AI explanation engine & numerical fact verifier
 │       └── main.py           # FastAPI application entrypoint
 ├── frontend/

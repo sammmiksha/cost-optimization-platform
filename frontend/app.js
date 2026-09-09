@@ -1,7 +1,8 @@
 const API_BASE = "http://127.0.0.1:8000/api/v1";
 
 let appState = {
-    organization: { name: "Enterprise Operations Corp", industry: "logistics", operating_model: "Construction Material Haulage", currency: "INR" },
+    organization: { name: "Apparel & Transport Corp", problem_type: "production_planning", currency: "INR" },
+    activeDemo: "apparel",
     unitEcon: null,
     forecasts: {},
     chartInstance: null
@@ -38,25 +39,34 @@ function switchTab(sectionId) {
 
 function onCurrencyChange() {
     appState.organization.currency = document.getElementById("currencySelect").value;
-    if (appState.unitEcon) {
-        renderOverviewMetrics();
+    if (appState.unitEcon) renderOverviewMetrics();
+}
+
+function onProblemTypeChange() {
+    appState.organization.problem_type = document.getElementById("setupProblemType").value;
+}
+
+function saveDecisionSetup() {
+    appState.organization.problem_type = document.getElementById("setupProblemType").value;
+    switchTab('optimize');
+    runMasterOptimizer();
+}
+
+async function loadDemo(demoType) {
+    appState.activeDemo = demoType;
+    if (demoType === "apparel") {
+        appState.organization.problem_type = "production_planning";
+        switchTab('optimize');
+        runApparelOptimizer();
+    } else if (demoType === "logistics") {
+        appState.organization.problem_type = "logistics_dispatch";
+        switchTab('unit-econ');
+        calculateUnitEconomics();
+    } else {
+        appState.organization.problem_type = "workforce_scheduling";
+        switchTab('optimize');
+        runMasterOptimizer();
     }
-}
-
-function onSetupTemplateChange() {
-    const ind = document.getElementById("setupIndustry").value;
-    const modelInput = document.getElementById("setupOperatingModel");
-    if (ind === "logistics") modelInput.value = "Construction Material Haulage (Sand Transport)";
-    else if (ind === "apparel") modelInput.value = "Small-Batch Designer Clothing";
-    else if (ind === "restaurant") modelInput.value = "Multi-Branch Casual Dining";
-    else modelInput.value = "Chain Supermarket Retail";
-}
-
-function saveBusinessSetup() {
-    appState.organization.industry = document.getElementById("setupIndustry").value;
-    appState.organization.operating_model = document.getElementById("setupOperatingModel").value;
-    switchTab('unit-econ');
-    calculateUnitEconomics();
 }
 
 async function calculateUnitEconomics() {
@@ -111,15 +121,74 @@ function renderOverviewMetrics() {
     document.getElementById("ovMargin").innerText = `${data.profitability_metrics.contribution_margin_percentage}%`;
 }
 
+async function runApparelOptimizer() {
+    try {
+        const res = await fetch(`${API_BASE}/optimization/apparel/runs`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ days: 1 })
+        });
+
+        const data = await res.json();
+        document.getElementById("optOutput").classList.remove("hidden");
+
+        const fin = data.financials;
+        const cur = appState.organization.currency;
+        document.getElementById("optSummaryText").innerText = `Apparel Designer Production Plan: Expected Revenue ${formatCurrency(fin.expected_revenue, cur)} | Material Cost ${formatCurrency(fin.expected_material_cost, cur)} | Net Contribution ${formatCurrency(fin.expected_contribution, cur)} (${fin.contribution_margin_pct}% margin).`;
+        
+        const plan = data.decisions.production_plan;
+        document.getElementById("optActionList").innerHTML = Object.keys(plan).map(pName => 
+            `<li>Produce <strong>${plan[pName][0]} units</strong> of <strong>${pName}</strong></li>`
+        ).join('');
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function runMasterOptimizer() {
+    if (appState.activeDemo === "apparel") {
+        await runApparelOptimizer();
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/optimization/runs`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                products: [{ name: "Classic Burger", selling_price: 15.0, prep_time_minutes: 10.0 }],
+                ingredients: [{ name: "Beef", purchase_cost: 3.5, current_stock: 50.0 }],
+                suppliers: [{ name: "Supplier A" }],
+                employees: [{ name: "Chef Mario", hourly_cost: 25.0, available_hours: 40.0 }],
+                demand_forecast: { "Classic Burger": [50.0] },
+                objective: "maximize_profit"
+            })
+        });
+
+        const data = await res.json();
+        document.getElementById("optOutput").classList.remove("hidden");
+
+        const fin = data.financials;
+        const cur = appState.organization.currency;
+        document.getElementById("optSummaryText").innerText = `Optimal plan generated expected profit of ${formatCurrency(fin.expected_profit, cur)} with an estimated ROI of ${fin.roi_percentage}%.`;
+        
+        document.getElementById("optActionList").innerHTML = data.ai_explanation.actionable_recommendations.map(r => 
+            `<li>${r}</li>`
+        ).join('');
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 async function checkDataReadiness() {
     try {
         const res = await fetch(`${API_BASE}/datasets/readiness`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                products: [{ name: "Sand Load", selling_price: 22000 }],
-                ingredients: [{ name: "Diesel", current_stock: 500 }],
-                employees: [{ name: "Driver 01", hourly_cost: 1000 }]
+                products: [{ name: "Dress A", selling_price: 8000 }],
+                ingredients: [{ name: "Fabric", current_stock: 500 }],
+                employees: [{ name: "Tailor 1", hourly_cost: 200 }]
             })
         });
         const data = await res.json();
@@ -140,7 +209,7 @@ async function generateForecasts() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                products: [{ name: "Sand Load (20T)" }],
+                products: [{ name: "Dress A" }, { name: "Dress B" }],
                 days_ahead: 7
             })
         });
@@ -180,34 +249,6 @@ function renderForecastChart(forecasts) {
     });
 }
 
-async function runMasterOptimizer() {
-    try {
-        const res = await fetch(`${API_BASE}/optimization/logistics/runs`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                vehicles: [{ name: "Sand Truck 01", mileage_km_l: 3.0, driver_pay_per_round: 1000.0, max_rounds_per_day: 2 }],
-                routes: [{ name: "Sand Quarry -> Customer Site", round_distance_km: 240.0, quoted_price: 22000.0, toll_cost: 800.0 }],
-                fuel_price_per_liter: 92.0,
-                days: 1
-            })
-        });
-
-        const data = await res.json();
-        document.getElementById("optOutput").classList.remove("hidden");
-
-        const fin = data.financials;
-        const cur = appState.organization.currency;
-        document.getElementById("optSummaryText").innerText = `Optimal schedule completed ${fin.total_trips_scheduled} rounds generating expected net contribution of ${formatCurrency(fin.total_expected_contribution, cur)}.`;
-        
-        document.getElementById("optActionList").innerHTML = data.assigned_trips.map(t => 
-            `<li>Assign ${t.vehicle} to ${t.route} for ${t.rounds_completed} rounds (Revenue: ${formatCurrency(t.revenue, cur)}, Net Contribution: ${formatCurrency(t.net_contribution, cur)})</li>`
-        ).join('');
-    } catch (err) {
-        console.error(err);
-    }
-}
-
 function updateScenLabels() {
     const f = document.getElementById("scenFuelShift").value;
     const t = document.getElementById("scenTripShift").value;
@@ -215,12 +256,12 @@ function updateScenLabels() {
     const fPct = Math.round((f - 1.0) * 100);
     const tPct = Math.round((t - 1.0) * 100);
 
-    document.getElementById("scenFuelLabel").innerText = `${fPct >= 0 ? '+' : ''}${fPct}% Diesel Price Variance`;
-    document.getElementById("scenTripLabel").innerText = `${tPct >= 0 ? '+' : ''}${tPct}% Trip Volume Variance`;
+    document.getElementById("scenFuelLabel").innerText = `${fPct >= 0 ? '+' : ''}${fPct}% Material Cost Inflation`;
+    document.getElementById("scenTripLabel").innerText = `${tPct >= 0 ? '+' : ''}${tPct}% Demand Surge`;
 }
 
 async function runScenarioStressTest() {
-    calculateUnitEconomics();
+    runApparelOptimizer();
 }
 
 async function submitApproval(decisionStatus) {
@@ -246,5 +287,5 @@ async function submitApproval(decisionStatus) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    calculateUnitEconomics();
+    runApparelOptimizer();
 });

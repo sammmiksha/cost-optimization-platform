@@ -10,6 +10,8 @@ from backend.app.api.v1.auth import router as auth_router
 from backend.app.business_models.unit_economics import UnitEconomicsCalculator
 from backend.app.data_platform.quality import DataQualityEvaluator
 from backend.app.forecasting.engine import DemandForecaster
+from backend.app.optimization.problem_builder import DecisionProblemBuilder
+from backend.app.industries.apparel.plugin import ApparelDesignerPlugin
 from backend.app.industries.restaurant.plugin import RestaurantPlugin
 from backend.app.industries.logistics.plugin import LogisticsTransportPlugin
 from backend.app.optimization.sensitivity import ParametricSensitivityAnalyzer
@@ -21,8 +23,8 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="Business Optimization Platform v2: Configurable Business Decision Workspace with Unit Economics, CP-SAT/MIP Solver, and Fact Verification.",
-    version="2.0.0"
+    description="Business Optimization Platform v3: Configurable Decision Workspace with Dynamic Model Generator (CP-SAT/MIP).",
+    version="3.0.0"
 )
 
 app.add_middleware(
@@ -50,28 +52,23 @@ class TransportEconomicsRequest(BaseModel):
     target_margin_pct: float = 25.0
 
 
-class ApparelEconomicsRequest(BaseModel):
-    fabric_cost: float = 40000.0
-    trimmings_cost: float = 15000.0
-    tailoring_cost: float = 20000.0
-    embroidery_cost: float = 10000.0
-    packaging_marketing_cost: float = 16000.0
-    platform_transport_fee: float = 6000.0
-    batch_quantity: int = 10
-    target_margin_pct: float = 35.0
+class ApparelOptimizationRequest(BaseModel):
+    products: Optional[List[Dict[str, Any]]] = None
+    resources: Optional[Dict[str, Any]] = None
+    days: int = 1
+
+
+class DecisionProblemRequest(BaseModel):
+    problem_type: str = "production_planning"  # production_planning, workforce_scheduling, logistics_dispatch
+    domain_data: Dict[str, Any]
+    objective_choice: str = "maximize_profit"
+    days: int = 1
 
 
 class DatasetQualityRequest(BaseModel):
     products: List[Dict[str, Any]] = []
     ingredients: List[Dict[str, Any]] = []
     employees: List[Dict[str, Any]] = []
-
-
-class LogisticsOptimizationRequest(BaseModel):
-    vehicles: List[Dict[str, Any]]
-    routes: List[Dict[str, Any]]
-    fuel_price_per_liter: float = 92.0
-    days: int = 1
 
 
 class MasterOptimizationRequest(BaseModel):
@@ -99,9 +96,28 @@ def read_root():
     return {
         "status": "online",
         "service": settings.PROJECT_NAME,
-        "version": "2.0.0",
-        "philosophy": "Business Decision Workspace with Unit Economics & Mathematical Solver"
+        "version": "3.0.0",
+        "promise": "Define your business rules, resources, costs, constraints, and goals. The platform automatically generates the optimal feasible operating decision."
     }
+
+
+@app.post(f"{settings.API_V1_STR}/optimization/apparel/runs")
+def run_apparel_optimization(req: ApparelOptimizationRequest):
+    plugin = ApparelDesignerPlugin()
+    res = plugin.solve_apparel_model(products=req.products, resources=req.resources, days=req.days)
+    return res
+
+
+@app.post(f"{settings.API_V1_STR}/optimization/decision-problem/runs")
+def run_decision_problem_solver(req: DecisionProblemRequest):
+    builder = DecisionProblemBuilder()
+    res = builder.build_and_solve_problem(
+        problem_type=req.problem_type,
+        domain_data=req.domain_data,
+        objective_choice=req.objective_choice,
+        days=req.days
+    )
+    return res
 
 
 @app.post(f"{settings.API_V1_STR}/business/unit-economics/transport")
@@ -116,21 +132,6 @@ def analyze_transport_economics(req: TransportEconomicsRequest):
         loading_unloading_cost=req.loading_unloading_cost,
         maintenance_allocation=req.maintenance_allocation,
         quoted_customer_price=req.quoted_customer_price,
-        target_margin_pct=req.target_margin_pct
-    )
-    return res
-
-
-@app.post(f"{settings.API_V1_STR}/business/unit-economics/apparel")
-def analyze_apparel_economics(req: ApparelEconomicsRequest):
-    res = UnitEconomicsCalculator.calculate_apparel_economics(
-        fabric_cost=req.fabric_cost,
-        trimmings_cost=req.trimmings_cost,
-        tailoring_cost=req.tailoring_cost,
-        embroidery_cost=req.embroidery_cost,
-        packaging_marketing_cost=req.packaging_marketing_cost,
-        platform_transport_fee=req.platform_transport_fee,
-        batch_quantity=req.batch_quantity,
         target_margin_pct=req.target_margin_pct
     )
     return res
@@ -163,18 +164,6 @@ def predict_demand(
         "forecasts": forecasts,
         "forecast_confidence": 91.5
     }
-
-
-@app.post(f"{settings.API_V1_STR}/optimization/logistics/runs")
-def run_logistics_optimization(req: LogisticsOptimizationRequest):
-    plugin = LogisticsTransportPlugin()
-    res = plugin.solve_logistics_model(
-        vehicles=req.vehicles,
-        routes=req.routes,
-        fuel_price_per_liter=req.fuel_price_per_liter,
-        days=req.days
-    )
-    return res
 
 
 @app.post(f"{settings.API_V1_STR}/optimization/runs")
