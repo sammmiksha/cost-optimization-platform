@@ -8,281 +8,388 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        .sidebar-item-active {
+            background-color: #1e293b;
+            border-left: 3px solid #3b82f6;
+            color: #f8fafc;
         }
-        .card-glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .sidebar-item {
+            color: #94a3b8;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-item:hover {
+            background-color: #0f172a;
+            color: #cbd5e1;
+        }
+        .table-header {
+            background-color: #0f172a;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col">
-    <!-- Header -->
-    <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-50 backdrop-blur">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col antialiased">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
-                    <i class="fa-solid me-0 fa-chart-line text-xl text-white"></i>
+                <div class="bg-blue-600 text-white p-2 rounded-lg font-bold text-sm">
+                    <i class="fa-solid fa-chart-nodes"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white">OptiEnterprise</h1>
-                    <p class="text-xs text-slate-400">Multi-Industry Business Optimization Platform</p>
+                    <h1 class="text-base font-semibold text-white tracking-tight">Business Optimization Platform</h1>
+                    <p class="text-xs text-slate-400">Enterprise Decision Engine & Mathematical Optimizer</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
-                <select id="industrySelect" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="restaurant">🍔 Restaurant Model</option>
-                    <option value="retail">🛍️ Retail Model</option>
-                    <option value="manufacturing">🏭 Manufacturing Model</option>
-                    <option value="logistics">🚚 Logistics Model</option>
-                </select>
-                <div class="h-6 w-px bg-slate-800"></div>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> MILP Solver Ready
+                <div class="flex items-center space-x-2 text-xs text-slate-400">
+                    <span>Selected Domain:</span>
+                    <select id="industrySelect" onchange="onIndustryChange()" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-md px-3 py-1.5 focus:outline-none focus:border-blue-500">
+                        <option value="restaurant">Restaurant Operations</option>
+                        <option value="retail">Retail Operations</option>
+                        <option value="manufacturing">Manufacturing Operations</option>
+                        <option value="logistics">Logistics Operations</option>
+                    </select>
+                </div>
+                <span class="text-xs px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono">
+                    MILP Solver: OR-Tools CBC
                 </span>
             </div>
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Main Content Container -->
+    <div class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 grid grid-cols-12 gap-6">
 
         <!-- Navigation Sidebar -->
-        <aside class="lg:col-span-3 space-y-3">
-            <button onclick="switchTab('ingestion')" id="tab-ingestion" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
-                <i class="fa-solid fa-file-csv text-base"></i> 1. Data Ingestion & Cleaning
-            </button>
-            <button onclick="switchTab('forecast')" id="tab-forecast" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-                <i class="fa-solid fa-brain text-base"></i> 2. ML Demand Forecast
-            </button>
-            <button onclick="switchTab('optimization')" id="tab-optimization" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-                <i class="fa-solid fa-sliders text-base"></i> 3. MILP Optimization Workbench
-            </button>
-            <button onclick="switchTab('scenarios')" id="tab-scenarios" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-                <i class="fa-solid fa-code-compare text-base"></i> 4. What-If Scenario Workbench
-            </button>
-            <button onclick="switchTab('network')" id="tab-network" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-                <i class="fa-solid fa-network-wired text-base"></i> 5. Multi-Branch Network
+        <aside class="col-span-12 lg:col-span-3 space-y-1">
+            <div class="text-xs font-semibold text-slate-500 uppercase px-3 py-2">Workflow Stages</div>
+            
+            <button onclick="switchTab('setup')" id="tab-setup" class="sidebar-item sidebar-item-active w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-building text-slate-400 w-4 text-center"></i>
+                <span>1. Organization & Industry</span>
             </button>
 
-            <!-- Quick Info Box -->
-            <div class="card-glass p-5 rounded-2xl mt-6">
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Engine Pipeline</h4>
-                <div class="space-y-2 text-xs text-slate-300">
-                    <div class="flex justify-between py-1 border-b border-slate-800">
-                        <span class="text-slate-400">ML Model:</span>
-                        <span class="font-medium text-slate-200">RandomForestRegressor</span>
-                    </div>
-                    <div class="flex justify-between py-1 border-b border-slate-800">
-                        <span class="text-slate-400">Solver Engine:</span>
-                        <span class="font-medium text-indigo-400">Google OR-Tools CBC</span>
-                    </div>
-                    <div class="flex justify-between py-1">
-                        <span class="text-slate-400">AI Explainer:</span>
-                        <span class="font-medium text-slate-200">Heuristic LLM Layer</span>
-                    </div>
+            <button onclick="switchTab('data')" id="tab-data" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-database text-slate-400 w-4 text-center"></i>
+                <span>2. Data Upload & Validation</span>
+            </button>
+
+            <button onclick="switchTab('forecast')" id="tab-forecast" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-chart-line text-slate-400 w-4 text-center"></i>
+                <span>3. ML Demand Forecasting</span>
+            </button>
+
+            <button onclick="switchTab('optimization')" id="tab-optimization" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-calculator text-slate-400 w-4 text-center"></i>
+                <span>4. MILP Optimization Engine</span>
+            </button>
+
+            <button onclick="switchTab('scenarios')" id="tab-scenarios" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-sliders text-slate-400 w-4 text-center"></i>
+                <span>5. What-If Scenario Simulator</span>
+            </button>
+
+            <button onclick="switchTab('network')" id="tab-network" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-network-wired text-slate-400 w-4 text-center"></i>
+                <span>6. Multi-Branch Network</span>
+            </button>
+
+            <div class="mt-8 p-4 rounded-md bg-slate-900 border border-slate-800 text-xs text-slate-400 space-y-2">
+                <div class="font-semibold text-slate-300">System Architecture</div>
+                <div class="text-[11px] leading-relaxed">
+                    Data Ingestion <i class="fa-solid fa-arrow-right text-slate-600 px-0.5"></i> ML Forecasting <i class="fa-solid fa-arrow-right text-slate-600 px-0.5"></i> MILP Formulation <i class="fa-solid fa-arrow-right text-slate-600 px-0.5"></i> Actionable Rationale.
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <section class="lg:col-span-9 space-y-6">
+        <!-- Stage Workspaces -->
+        <main class="col-span-12 lg:col-span-9 space-y-6">
 
-            <!-- TAB 1: Data Ingestion -->
-            <div id="content-ingestion" class="space-y-6">
-                <div class="card-glass p-6 rounded-2xl">
-                    <h2 class="text-lg font-semibold text-white mb-1">Step 1 — Business Data Ingestion & Quality Cleaning</h2>
-                    <p class="text-sm text-slate-400 mb-6">Upload operational records or load benchmark dataset to validate data integrity before running optimization algorithms.</p>
-                    
-                    <div class="flex gap-4 mb-6">
-                        <button onclick="loadSampleData()" class="px-4 py-2.5 bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600/30 rounded-xl text-sm font-semibold transition">
-                            <i class="fa-solid fa-download mr-2"></i> Load Restaurant Sample Dataset
-                        </button>
-                        <button onclick="validateDataset()" class="px-4 py-2.5 bg-emerald-600 text-white hover:bg-emerald-500 rounded-xl text-sm font-semibold shadow-lg shadow-emerald-600/20 transition">
-                            <i class="fa-solid fa-shield-halved mr-2"></i> Run Data Validation Pipeline
-                        </button>
-                    </div>
+            <!-- STAGE 1: Organization & Industry Setup -->
+            <div id="stage-setup" class="space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 1 — Organization Profile & Objectives</h2>
+                    <p class="text-xs text-slate-400 mb-6">Configure corporate metadata and standard optimization criteria according to roadmap Step 1 & 2.</p>
 
-                    <div id="validationResults" class="hidden space-y-4">
-                        <div class="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-sm">
-                            <div class="font-bold mb-1"><i class="fa-solid fa-circle-check mr-2"></i> Data Validation Pipeline Completed</div>
-                            <span id="validationMsg">All products, raw ingredients, and staffing hours standardized successfully.</span>
-                        </div>
-                        <div id="warningsBox" class="p-4 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-300 text-xs space-y-1">
-                            <div class="font-semibold text-amber-200 mb-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Data Quality Audit Logs:</div>
-                            <ul id="warningsList" class="list-disc list-inside space-y-1"></ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="card-glass p-5 rounded-2xl">
-                        <h3 class="text-sm font-bold text-slate-300 mb-3"><i class="fa-solid fa-utensils text-indigo-400 mr-2"></i> Products</h3>
-                        <div id="productsList" class="space-y-2 text-xs text-slate-400">Load sample data to view products.</div>
-                    </div>
-                    <div class="card-glass p-5 rounded-2xl">
-                        <h3 class="text-sm font-bold text-slate-300 mb-3"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-2"></i> Raw Ingredients</h3>
-                        <div id="ingredientsList" class="space-y-2 text-xs text-slate-400">Load sample data to view ingredients.</div>
-                    </div>
-                    <div class="card-glass p-5 rounded-2xl">
-                        <h3 class="text-sm font-bold text-slate-300 mb-3"><i class="fa-solid fa-users text-emerald-400 mr-2"></i> Staff & Employees</h3>
-                        <div id="employeesList" class="space-y-2 text-xs text-slate-400">Load sample data to view staff.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 2: ML Forecast -->
-            <div id="content-forecast" class="hidden space-y-6">
-                <div class="card-glass p-6 rounded-2xl">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                         <div>
-                            <h2 class="text-lg font-semibold text-white">Step 2 — ML Demand Forecasting Engine</h2>
-                            <p class="text-sm text-slate-400">Predicts future order volumes across product lines based on historical time-series trends.</p>
+                            <label class="block font-medium text-slate-300 mb-1.5">Organization Name</label>
+                            <input type="text" id="orgName" value="Enterprise Operations Corp" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
-                        <button onclick="runForecast()" class="px-4 py-2.5 bg-indigo-600 text-white hover:bg-indigo-500 rounded-xl text-sm font-semibold transition">
-                            <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Generate Demand Forecast
-                        </button>
-                    </div>
-                    <div class="h-72 w-full pt-4">
-                        <canvas id="forecastChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 3: MILP Optimization Workbench -->
-            <div id="content-optimization" class="hidden space-y-6">
-                <div class="card-glass p-6 rounded-2xl">
-                    <h2 class="text-lg font-semibold text-white mb-1">Step 3 — Mathematical Optimization (MILP) Workbench</h2>
-                    <p class="text-sm text-slate-400 mb-6">Set organizational objective function and constraints to solve for the exact profit-maximizing operational plan.</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Optimization Objective</label>
-                            <select id="objSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-200">
-                                <option value="maximize_profit">🎯 Maximize Expected Profit</option>
-                                <option value="minimize_cost">📉 Minimize Total Operating Cost</option>
-                                <option value="minimize_waste">🌿 Minimize Raw Material Waste</option>
-                                <option value="balanced">⚖️ Balanced Multi-Objective Score</option>
+                            <label class="block font-medium text-slate-300 mb-1.5">Industry Segment</label>
+                            <select id="orgIndustry" onchange="onOrgIndustryChange()" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                                <option value="restaurant">Restaurant</option>
+                                <option value="retail">Retail</option>
+                                <option value="manufacturing">Manufacturing</option>
+                                <option value="logistics">Logistics</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Budget Cap Limit ($)</label>
-                            <input type="number" id="budgetInput" value="5000" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-200">
+                            <label class="block font-medium text-slate-300 mb-1.5">Operating Locations Count</label>
+                            <input type="number" id="orgLocations" value="5" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Min Daily Staff Hours</label>
-                            <input type="number" id="staffHoursInput" value="8" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-200">
+                            <label class="block font-medium text-slate-300 mb-1.5">Currency Code</label>
+                            <input type="text" id="orgCurrency" value="USD" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
                     </div>
 
-                    <button onclick="runOptimization()" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/25 transition">
-                        <i class="fa-solid fa-calculator mr-2"></i> Solve Mixed-Integer Linear Programming Model
-                    </button>
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="saveOrgProfile()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded transition">
+                            Save Configuration & Proceed
+                        </button>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Results Output Card -->
-                <div id="optimizationResultsCard" class="hidden space-y-6">
-                    <!-- Key KPI Summary Row -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="card-glass p-5 rounded-2xl border-l-4 border-l-emerald-500">
-                            <span class="text-xs text-slate-400 font-medium">Expected Profit</span>
-                            <div id="kpiProfit" class="text-2xl font-extrabold text-emerald-400 mt-1">$0.00</div>
+            <!-- STAGE 2: Data Upload & Validation -->
+            <div id="stage-data" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-sm font-semibold text-white">Step 2 — Data Ingestion & Data Validation Engine</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Clean and standardize raw operational data (Step 3 & 4 of roadmap).</p>
                         </div>
-                        <div class="card-glass p-5 rounded-2xl border-l-4 border-l-indigo-500">
-                            <span class="text-xs text-slate-400 font-medium">Expected Revenue</span>
-                            <div id="kpiRevenue" class="text-2xl font-extrabold text-indigo-300 mt-1">$0.00</div>
-                        </div>
-                        <div class="card-glass p-5 rounded-2xl border-l-4 border-l-rose-500">
-                            <span class="text-xs text-slate-400 font-medium">Total Operating Cost</span>
-                            <div id="kpiCost" class="text-2xl font-extrabold text-rose-400 mt-1">$0.00</div>
-                        </div>
-                        <div class="card-glass p-5 rounded-2xl border-l-4 border-l-amber-500">
-                            <span class="text-xs text-slate-400 font-medium">Model ROI</span>
-                            <div id="kpiRoi" class="text-2xl font-extrabold text-amber-300 mt-1">0.0%</div>
+                        <div class="flex space-x-2">
+                            <button onclick="loadStandardDataset()" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded transition">
+                                Populate Benchmark Data
+                            </button>
+                            <button onclick="runValidation()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3.5 py-1.5 rounded transition">
+                                Execute Validation Pipeline
+                            </button>
                         </div>
                     </div>
 
-                    <!-- AI Natural Language Explanation Card -->
-                    <div class="card-glass p-6 rounded-2xl border border-indigo-500/30">
-                        <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-sparkles text-indigo-400"></i> AI Explanation & Managerial Rationale
-                        </h3>
-                        <p id="aiSummary" class="text-sm text-slate-300 mb-4 italic bg-slate-900/60 p-3 rounded-xl border border-slate-800"></p>
-                        <div class="space-y-2">
-                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Actionable Recommendations:</h4>
-                            <ul id="aiRecsList" class="space-y-1.5 text-xs text-slate-200"></ul>
+                    <div id="auditLogContainer" class="hidden mb-6 p-4 rounded bg-slate-950 border border-slate-800 text-xs">
+                        <div class="font-medium text-slate-300 mb-2">Validation Audit Trail:</div>
+                        <ul id="auditLogList" class="list-disc list-inside space-y-1 text-slate-400 font-mono text-[11px]"></ul>
+                    </div>
+
+                    <!-- Data Tables -->
+                    <div class="space-y-6 text-xs">
+                        <!-- Products Table -->
+                        <div>
+                            <div class="font-medium text-slate-300 mb-2 flex justify-between items-center">
+                                <span>Products & Selling Prices</span>
+                                <span class="text-slate-500 text-[11px]" id="prodCount">0 Records</span>
+                            </div>
+                            <div class="overflow-x-auto border border-slate-800 rounded">
+                                <table class="w-full text-left">
+                                    <thead class="table-header border-b border-slate-800">
+                                        <tr>
+                                            <th class="px-3 py-2">Product Name</th>
+                                            <th class="px-3 py-2">Selling Price ($)</th>
+                                            <th class="px-3 py-2">Prep Time (min)</th>
+                                            <th class="px-3 py-2">Category</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="prodTableBody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Ingredients Table -->
+                        <div>
+                            <div class="font-medium text-slate-300 mb-2 flex justify-between items-center">
+                                <span>Raw Ingredients & Suppliers</span>
+                                <span class="text-slate-500 text-[11px]" id="ingCount">0 Records</span>
+                            </div>
+                            <div class="overflow-x-auto border border-slate-800 rounded">
+                                <table class="w-full text-left">
+                                    <thead class="table-header border-b border-slate-800">
+                                        <tr>
+                                            <th class="px-3 py-2">Ingredient</th>
+                                            <th class="px-3 py-2">Unit</th>
+                                            <th class="px-3 py-2">Purchase Cost ($)</th>
+                                            <th class="px-3 py-2">Supplier</th>
+                                            <th class="px-3 py-2">Current Stock</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ingTableBody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Employees Table -->
+                        <div>
+                            <div class="font-medium text-slate-300 mb-2 flex justify-between items-center">
+                                <span>Staff & Available Shift Hours</span>
+                                <span class="text-slate-500 text-[11px]" id="empCount">0 Records</span>
+                            </div>
+                            <div class="overflow-x-auto border border-slate-800 rounded">
+                                <table class="w-full text-left">
+                                    <thead class="table-header border-b border-slate-800">
+                                        <tr>
+                                            <th class="px-3 py-2">Employee Name</th>
+                                            <th class="px-3 py-2">Role</th>
+                                            <th class="px-3 py-2">Hourly Cost ($/hr)</th>
+                                            <th class="px-3 py-2">Available Hours</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="empTableBody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 4: What-If Scenarios -->
-            <div id="content-scenarios" class="hidden space-y-6">
-                <div class="card-glass p-6 rounded-2xl">
-                    <h2 class="text-lg font-semibold text-white mb-1">Step 4 — Strategic What-If Scenario Simulator</h2>
-                    <p class="text-sm text-slate-400 mb-6">Stress-test your operational plan against inflation, demand spikes, and labor wage changes.</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- STAGE 3: ML Demand Forecasting -->
+            <div id="stage-forecast" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Demand Multiplier</label>
-                            <input type="range" id="scenDemand" min="0.5" max="2.0" step="0.05" value="1.20" oninput="updateScenLabels()" class="w-full accent-indigo-500">
-                            <span id="labelDemand" class="text-xs text-indigo-400 font-semibold">+20% Demand Surge</span>
+                            <h2 class="text-sm font-semibold text-white">Step 3 — Machine Learning Demand Forecasting</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Predicts product demand trends using time-series regressors (Step 8 of roadmap).</p>
+                        </div>
+                        <button onclick="runForecastModel()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded transition">
+                            Generate Time-Series Forecast
+                        </button>
+                    </div>
+
+                    <div class="h-64 w-full bg-slate-950 p-4 rounded border border-slate-800">
+                        <canvas id="forecastChartCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 4: MILP Optimization Workbench -->
+            <div id="stage-optimization" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 4 — MILP Optimization Engine</h2>
+                    <p class="text-xs text-slate-400 mb-6">Formulate decision variables and evaluate optimal operational strategies (Step 9–13 of roadmap).</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs mb-6">
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Objective Function</label>
+                            <select id="optObjective" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                                <option value="maximize_profit">Maximize Profit</option>
+                                <option value="minimize_cost">Minimize Total Cost</option>
+                                <option value="minimize_waste">Minimize Raw Material Waste</option>
+                                <option value="balanced">Balanced Multi-Objective</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Supplier Cost Inflation</label>
-                            <input type="range" id="scenSupplier" min="0.8" max="1.5" step="0.05" value="1.15" oninput="updateScenLabels()" class="w-full accent-amber-500">
-                            <span id="labelSupplier" class="text-xs text-amber-400 font-semibold">+15% Supplier Price Hike</span>
+                            <label class="block font-medium text-slate-300 mb-1.5">Operating Budget Cap ($)</label>
+                            <input type="number" id="optBudget" value="5000" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hourly Wage Adjustment</label>
-                            <input type="range" id="scenWage" min="0.8" max="1.5" step="0.05" value="1.0" oninput="updateScenLabels()" class="w-full accent-emerald-500">
-                            <span id="labelWage" class="text-xs text-emerald-400 font-semibold">Baseline Wages (0%)</span>
+                            <label class="block font-medium text-slate-300 mb-1.5">Minimum Staffing Hours</label>
+                            <input type="number" id="optStaffHours" value="8" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
                     </div>
 
-                    <button onclick="runScenarioSimulation()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition">
-                        <i class="fa-solid fa-play mr-2"></i> Execute Scenario Stress Test
+                    <button onclick="executeSolver()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 rounded transition">
+                        Run Mathematical Optimization Solver (Google OR-Tools MILP)
                     </button>
                 </div>
 
-                <div id="scenarioResultsCard" class="hidden card-glass p-6 rounded-2xl">
-                    <h3 class="text-base font-bold text-white mb-4">Financial Impact & Variance Diff</h3>
+                <!-- Financial Outcome Cards -->
+                <div id="solverOutput" class="hidden space-y-6">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded text-center">
+                            <span class="text-slate-400 font-medium">Expected Profit</span>
+                            <div id="resProfit" class="text-lg font-bold text-emerald-400 mt-1">$0.00</div>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded text-center">
+                            <span class="text-slate-400 font-medium">Expected Revenue</span>
+                            <div id="resRevenue" class="text-lg font-bold text-slate-200 mt-1">$0.00</div>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded text-center">
+                            <span class="text-slate-400 font-medium">Total Operating Cost</span>
+                            <div id="resCost" class="text-lg font-bold text-rose-400 mt-1">$0.00</div>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded text-center">
+                            <span class="text-slate-400 font-medium">Estimated ROI</span>
+                            <div id="resRoi" class="text-lg font-bold text-blue-400 mt-1">0.0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Explanation Layer -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
+                        <h3 class="font-semibold text-white">AI Decision Explanation & Rationale</h3>
+                        <div id="resSummary" class="text-slate-300 leading-relaxed bg-slate-950 p-3 rounded border border-slate-800"></div>
+                        
+                        <div>
+                            <div class="font-medium text-slate-400 uppercase tracking-wider mb-2">Recommended Operational Decisions:</div>
+                            <ul id="resRecs" class="list-disc list-inside space-y-1 text-slate-300"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 5: What-If Scenario Simulator -->
+            <div id="stage-scenarios" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 5 — What-If Scenario Simulator</h2>
+                    <p class="text-xs text-slate-400 mb-6">Test plan sensitivity against operational parameters (Step 16 of roadmap).</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs mb-6">
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Demand Variance</label>
+                            <input type="range" id="scenDem" min="0.5" max="1.5" step="0.05" value="1.2" oninput="updateScenText()" class="w-full">
+                            <span id="scenDemText" class="text-[11px] text-blue-400 font-mono">+20% Demand</span>
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Supplier Cost Variance</label>
+                            <input type="range" id="scenCost" min="0.5" max="1.5" step="0.05" value="1.15" oninput="updateScenText()" class="w-full">
+                            <span id="scenCostText" class="text-[11px] text-amber-400 font-mono">+15% Raw Cost</span>
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Hourly Wage Variance</label>
+                            <input type="range" id="scenWage" min="0.5" max="1.5" step="0.05" value="1.0" oninput="updateScenText()" class="w-full">
+                            <span id="scenWageText" class="text-[11px] text-slate-400 font-mono">0% Wage Variance</span>
+                        </div>
+                    </div>
+
+                    <button onclick="runScenarioSim()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 rounded transition">
+                        Execute Scenario Simulation
+                    </button>
+                </div>
+
+                <div id="scenOutput" class="hidden bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs">
+                    <h3 class="font-semibold text-white mb-4">Financial Impact Variance</h3>
                     <div class="grid grid-cols-3 gap-4 text-center">
-                        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                            <span class="text-xs text-slate-400">Baseline Profit</span>
-                            <div id="scenBaseProfit" class="text-xl font-bold text-slate-200 mt-1">$0.00</div>
+                        <div class="bg-slate-950 p-3 rounded border border-slate-800">
+                            <span class="text-slate-400">Baseline Profit</span>
+                            <div id="scenBaseProfit" class="text-base font-bold text-slate-200 mt-1">$0.00</div>
                         </div>
-                        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                            <span class="text-xs text-slate-400">Scenario Profit</span>
-                            <div id="scenNewProfit" class="text-xl font-bold text-indigo-400 mt-1">$0.00</div>
+                        <div class="bg-slate-950 p-3 rounded border border-slate-800">
+                            <span class="text-slate-400">Scenario Profit</span>
+                            <div id="scenNewProfit" class="text-base font-bold text-blue-400 mt-1">$0.00</div>
                         </div>
-                        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                            <span class="text-xs text-slate-400">Profit Variance ($\Delta$)</span>
-                            <div id="scenVariance" class="text-xl font-bold text-emerald-400 mt-1">+$0.00</div>
+                        <div class="bg-slate-950 p-3 rounded border border-slate-800">
+                            <span class="text-slate-400">Profit Delta</span>
+                            <div id="scenDelta" class="text-base font-bold text-emerald-400 mt-1">+$0.00</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 5: Multi-Branch Network -->
-            <div id="content-network" class="hidden space-y-6">
-                <div class="card-glass p-6 rounded-2xl">
-                    <h2 class="text-lg font-semibold text-white mb-1">Step 5 — Multi-Branch Network Transfer Optimizer</h2>
-                    <p class="text-sm text-slate-400 mb-6">Optimize stock transfers across store locations (e.g. Mumbai $\rightarrow$ Pune) vs buying new inventory.</p>
-                    <button onclick="runNetworkOptimization()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold transition">
-                        <i class="fa-solid fa-diagram-project mr-2"></i> Compute Optimal Inter-Branch Transfers
+            <!-- STAGE 6: Multi-Branch Network Optimization -->
+            <div id="stage-network" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 6 — Multi-Branch Network Transfers</h2>
+                    <p class="text-xs text-slate-400 mb-6">Optimize stock transfers across operating branches vs external supplier procurement (Step 17 of roadmap).</p>
+
+                    <button onclick="runNetworkTransfers()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded transition">
+                        Compute Network Transfer Plan
                     </button>
-                    <div id="networkResults" class="mt-6 space-y-3 hidden">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Recommended Inventory Transfers:</h4>
-                        <div id="networkTransfersList" class="space-y-2 text-sm text-slate-300"></div>
+
+                    <div id="netOutput" class="hidden mt-6 space-y-2 text-xs">
+                        <div class="font-medium text-slate-400">Optimal Inter-Branch Transfers:</div>
+                        <div id="netTransfersList" class="space-y-1 text-slate-300 font-mono"></div>
                     </div>
                 </div>
             </div>
 
-        </section>
-    </main>
+        </main>
+    </div>
 
     <script src="app.js"></script>
 </body>
