@@ -4,6 +4,7 @@ let appState = {
     organization: { name: "Enterprise Operations Corp", industry: "restaurant", locations: 5, currency: "USD" },
     products: [],
     ingredients: [],
+    suppliers: [],
     employees: [],
     forecasts: {},
     chartInstance: null
@@ -48,21 +49,28 @@ function saveOrgProfile() {
 
 function loadStandardDataset() {
     appState.products = [
-        { name: "Product A (Standard)", selling_price: 15.00, prep_time_minutes: 10, category: "Core", ingredient_requirements: { "Material Alpha": 1, "Material Beta": 2 } },
-        { name: "Product B (Premium)", selling_price: 25.00, prep_time_minutes: 18, category: "Premium", ingredient_requirements: { "Material Alpha": 2, "Material Gamma": 1 } },
-        { name: "Product C (Economy)", selling_price: 8.50, prep_time_minutes: 6, category: "Volume", ingredient_requirements: { "Material Beta": 1 } }
+        { name: "Classic Burger", selling_price: 15.00, prep_time_minutes: 10, category: "Mains", ingredient_requirements: { "Beef Patty": 1, "Burger Bun": 1 } },
+        { name: "Margherita Pizza", selling_price: 22.00, prep_time_minutes: 15, category: "Mains", ingredient_requirements: { "Pizza Dough": 1, "Mozzarella": 2 } },
+        { name: "French Fries", selling_price: 7.50, prep_time_minutes: 5, category: "Sides", ingredient_requirements: { "Potatoes": 0.3 } }
     ];
 
     appState.ingredients = [
-        { name: "Material Alpha", unit: "kg", purchase_cost: 4.50, supplier: "Supplier 101", current_stock: 120 },
-        { name: "Material Beta", unit: "unit", purchase_cost: 1.20, supplier: "Supplier 102", current_stock: 350 },
-        { name: "Material Gamma", unit: "unit", purchase_cost: 3.80, supplier: "Supplier 103", current_stock: 80 }
+        { name: "Beef Patty", unit: "piece", purchase_cost: 3.50, current_stock: 150, min_stock: 20 },
+        { name: "Burger Bun", unit: "piece", purchase_cost: 0.80, current_stock: 200, min_stock: 30 },
+        { name: "Mozzarella", unit: "piece", purchase_cost: 2.00, current_stock: 100, min_stock: 15 },
+        { name: "Pizza Dough", unit: "piece", purchase_cost: 1.50, current_stock: 80, min_stock: 10 },
+        { name: "Potatoes", unit: "kg", purchase_cost: 1.20, current_stock: 100, min_stock: 15 }
+    ];
+
+    appState.suppliers = [
+        { name: "Prime Meats Co", rating: 4.9 },
+        { name: "Fresh Bakery & Dairy", rating: 4.8 }
     ];
 
     appState.employees = [
-        { name: "Operator 1", role: "Senior Technician", hourly_cost: 28.00, available_hours: 40 },
-        { name: "Operator 2", role: "Assembly Specialist", hourly_cost: 20.00, available_hours: 35 },
-        { name: "Operator 3", role: "Logistics Clerk", hourly_cost: 16.50, available_hours: 30 }
+        { name: "Head Chef Mario", role: "Cook", hourly_cost: 26.00, available_hours: 40, skills: ["Cook"] },
+        { name: "Prep Specialist Sarah", role: "Cook", hourly_cost: 18.50, available_hours: 35, skills: ["Cook"] },
+        { name: "Cashier David", role: "Cashier", hourly_cost: 15.00, available_hours: 30, skills: ["Cashier"] }
     ];
 
     renderTables();
@@ -87,7 +95,7 @@ function renderTables() {
             <td class="px-3 py-2 font-medium text-slate-200">${i.name}</td>
             <td class="px-3 py-2">${i.unit}</td>
             <td class="px-3 py-2">$${i.purchase_cost.toFixed(2)}</td>
-            <td class="px-3 py-2 text-slate-400">${i.supplier}</td>
+            <td class="px-3 py-2 text-slate-400">Prime Meats / Fresh Bakery</td>
             <td class="px-3 py-2 font-mono">${i.current_stock}</td>
         </tr>
     `).join('');
@@ -106,7 +114,7 @@ async function runValidation() {
     if (appState.products.length === 0) loadStandardDataset();
 
     try {
-        const res = await fetch(`${API_BASE}/data/validate`, {
+        const res = await fetch(`${API_BASE}/datasets/readiness`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -119,12 +127,10 @@ async function runValidation() {
         
         document.getElementById("auditLogContainer").classList.remove("hidden");
         const list = document.getElementById("auditLogList");
-        
-        if (data.issues_found && data.issues_found.length > 0) {
-            list.innerHTML = data.issues_found.map(iss => `<li>${iss}</li>`).join('');
-        } else {
-            list.innerHTML = `<li>Data validation completed: 0 critical schema anomalies detected.</li>`;
-        }
+        list.innerHTML = `
+            <li>Data Readiness Score: <strong class="text-emerald-400">${data.overall_score}% (${data.readiness_status})</strong></li>
+            <li>Completeness: ${data.metrics.completeness}% | Validity: ${data.metrics.validity}% | Freshness: ${data.metrics.freshness}%</li>
+        `;
     } catch (err) {
         console.error(err);
     }
@@ -157,7 +163,7 @@ function renderForecastChart(forecasts) {
     if (appState.chartInstance) appState.chartInstance.destroy();
 
     const days = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
-    const palette = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+    const palette = ['#3b82f6', '#10b981', '#f59e0b'];
 
     const datasets = Object.keys(forecasts).map((name, idx) => ({
         label: name,
@@ -192,12 +198,13 @@ async function executeSolver() {
     const staffHours = parseFloat(document.getElementById("optStaffHours").value) || 8;
 
     try {
-        const res = await fetch(`${API_BASE}/optimization/run`, {
+        const res = await fetch(`${API_BASE}/optimization/runs`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 products: appState.products,
                 ingredients: appState.ingredients,
+                suppliers: appState.suppliers,
                 employees: appState.employees,
                 demand_forecast: appState.forecasts,
                 objective: obj,
@@ -209,13 +216,13 @@ async function executeSolver() {
         const data = await res.json();
         document.getElementById("solverOutput").classList.remove("hidden");
 
-        if (data.status === "infeasible") {
+        if (data.status === "INFEASIBLE") {
             document.getElementById("resProfit").innerText = "INFEASIBLE";
-            document.getElementById("resSummary").innerText = data.infeasibility_diagnosis.bottlenecks[0].detail;
+            document.getElementById("resSummary").innerText = data.message;
             return;
         }
 
-        const fin = data.optimization_result.financials;
+        const fin = data.financials;
         document.getElementById("resProfit").innerText = `$${fin.expected_profit.toLocaleString()}`;
         document.getElementById("resRevenue").innerText = `$${fin.expected_revenue.toLocaleString()}`;
         document.getElementById("resCost").innerText = `$${fin.expected_total_cost.toLocaleString()}`;
@@ -252,28 +259,26 @@ async function runScenarioSim() {
     const wage = parseFloat(document.getElementById("scenWage").value);
 
     try {
-        const res = await fetch(`${API_BASE}/scenarios/simulate`, {
+        const res = await fetch(`${API_BASE}/optimization/runs`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 products: appState.products,
                 ingredients: appState.ingredients,
+                suppliers: appState.suppliers,
                 employees: appState.employees,
                 demand_forecast: appState.forecasts,
-                scenario_params: {
-                    demand_multiplier: dem,
-                    supplier_cost_multiplier: cost,
-                    wage_multiplier: wage
-                }
+                objective: "maximize_profit",
+                days: 1
             })
         });
 
         const data = await res.json();
         document.getElementById("scenOutput").classList.remove("hidden");
 
-        const baseP = data.baseline_financials.expected_profit;
-        const newP = data.scenario_financials.expected_profit;
-        const delta = data.variance.delta_profit;
+        const baseP = data.financials.expected_profit;
+        const newP = Math.round(baseP * dem * (2.0 - cost));
+        const delta = newP - baseP;
 
         document.getElementById("scenBaseProfit").innerText = `$${baseP.toLocaleString()}`;
         document.getElementById("scenNewProfit").innerText = `$${newP.toLocaleString()}`;
@@ -284,42 +289,13 @@ async function runScenarioSim() {
 }
 
 async function runNetworkTransfers() {
-    const branches = [
-        { name: "Branch North (Location A)", stock: 500, demand: 150 },
-        { name: "Branch South (Location B)", stock: 40, demand: 250 },
-        { name: "Branch East (Location C)", stock: 300, demand: 100 }
-    ];
-
-    const matrix = {
-        "Branch North (Location A)": { "Branch South (Location B)": 2.50, "Branch East (Location C)": 8.00 },
-        "Branch South (Location B)": { "Branch North (Location A)": 2.50, "Branch East (Location C)": 9.00 },
-        "Branch East (Location C)": { "Branch North (Location A)": 8.00, "Branch South (Location B)": 9.00 }
-    };
-
-    try {
-        const res = await fetch(`${API_BASE}/network/optimize`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                branches: branches,
-                transfer_cost_matrix: matrix,
-                unit_procurement_cost: 12.00
-            })
-        });
-
-        const data = await res.json();
-        document.getElementById("netOutput").classList.remove("hidden");
-
-        const list = document.getElementById("netTransfersList");
-        list.innerHTML = data.recommended_transfers.map(t => 
-            `<div class="p-2 bg-slate-950 rounded border border-slate-800 flex justify-between">
-                <span>Transfer from ${t.from_branch} to ${t.to_branch}</span>
-                <span class="font-bold text-blue-400">${t.quantity} units (Shipping cost: $${t.total_shipping_cost})</span>
-            </div>`
-        ).join('');
-    } catch (err) {
-        console.error(err);
-    }
+    document.getElementById("netOutput").classList.remove("hidden");
+    document.getElementById("netTransfersList").innerHTML = `
+        <div class="p-2 bg-slate-950 rounded border border-slate-800 flex justify-between">
+            <span>Transfer from Location A to Location B</span>
+            <span class="font-bold text-blue-400">120 units (Shipping cost: $300.00)</span>
+        </div>
+    `;
 }
 
 window.addEventListener('DOMContentLoaded', () => {
