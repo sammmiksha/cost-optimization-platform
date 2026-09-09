@@ -1,101 +1,84 @@
-# Multi-Industry Business Optimization Platform 🚀
+# Business Optimization Platform
 
-An enterprise optimization platform that combines **Machine Learning (Predictive Demand Forecasting)**, **Mixed-Integer Linear Programming (MILP Solver via Google OR-Tools)**, and an **AI Natural Language Explanation Layer** to generate actionable, cost-effective operational decisions.
+A configurable enterprise decision-support platform that helps organizations understand their cost structures, analyze unit economics, forecast demand, evaluate operational choices, optimize resources, and determine more profitable business strategies.
 
 ---
 
-## 🌟 Architecture Overview
+## Workspace Navigation Workflow
 
 ```text
-                    ORGANIZATION
-                         │
-                         ▼
-                ┌─────────────────┐
-                │ Create Account  │
-                │ & Organization  │
-                └────────┬────────┘
-                         │
-                         ▼
-                ┌─────────────────┐
-                │ Data Ingestion  │
-                │ & Validation    │
-                └────────┬────────┘
-                         │
-                         ▼
-                ┌─────────────────┐
-                │ ML Demand       │
-                │ Forecasting     │
-                └────────┬────────┘
-                         │
-                         ▼
-                ┌─────────────────┐
-                │ MILP Solver     │
-                │ (OR-Tools)      │
-                └────────┬────────┘
-                         │
-                         ▼
-                ┌─────────────────┐
-                │ AI Explanation  │
-                │ & ROI Dashboard │
-                └─────────────────┘
+Set up your business model
+        ↓
+Add your costs & operations
+        ↓
+Analyze unit economics & target pricing
+        ↓
+Forecast demand where historical data exists
+        ↓
+Optimize resource allocations & procurement
+        ↓
+Stress-test what-if scenarios
+        ↓
+Review recommendations & submit approvals
 ```
 
 ---
 
-## 🔑 Core Features
+## Core Capabilities
 
-1. **Multi-Industry Support**: Modular domain models for Restaurant, Retail, Manufacturing, and Logistics operations.
-2. **Data Cleaning & Ingestion Pipeline**: Automated unit conversion, missing field resolution, and anomaly detection.
-3. **ML Demand Forecasting**: Time-series demand predictions powered by `scikit-learn` Random Forest regressors.
-4. **MILP Decision Engine**: Google OR-Tools CBC solver handling complex operational constraints (budget limits, prep time, shelf-life, staff availability, ingredient stock).
-5. **Constraint Infeasibility Diagnosis**: Automated diagnostic feedback when constraints are over-constrained or conflicting.
-6. **"What-If" Scenario Stress Testing**: Interactive parameter perturbation simulator (demand shifts, supplier price inflation, wage adjustments).
-7. **AI Recommendation Layer**: Natural language executive summaries, rationale bullet points, and plan comparisons (Recommended vs Lowest Cost vs Max Revenue).
-8. **Multi-Branch Network Optimizer**: Inter-branch stock transfer optimization vs new supplier procurement.
-9. **Interactive Dashboard**: Modern dark-mode Single Page Application UI with Chart.js visualization.
+1. **Configurable Business Model Builder**: Separates Industry Template from Operating Model (e.g., Logistics Construction Material Haulage, Apparel Designer Clothing, Multi-Branch Casual Dining).
+2. **Compensation Model Builder**: Supports Monthly Salary, Hourly Wage, Daily Rate, Per Shift, **Per Completed Round** (e.g., ₹1,000 / completed delivery round), Per Trip, Commission, and Custom rates.
+3. **Unit Economics & Pricing Engine**: Calculates contribution margins, break-even prices, minimum viable prices, and recommended target prices even when no historical sales data exists (Guided Mode).
+4. **Data Readiness Scorecard**: Evaluates 5 data quality metrics (Completeness, Validity, Consistency, Freshness, Uniqueness) prior to solver execution.
+5. **Decoupled Optimization Engine**: Uses Google OR-Tools solvers (`CpSatAdapter` and `LinearMipAdapter`) to resolve resource allocations, shift scheduling, and multi-supplier procurement.
+6. **Indian Numbering & Localization**: Supports Indian currency formatting (`₹1,25,000`, `₹12.50 lakh`, `₹1.25 crore`), GST %, TDS %, and metric/imperial units.
+7. **Fact-Verified AI Explanation Engine**: Validates numeric claims in explanations against deterministic solver outputs before displaying recommendations.
+8. **Human Plan Approvals & Audit Ledger**: Tracks plan review decisions (`APPROVED`, `REJECTED`) and system event logs.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
 ```bash
-pip install ortools pandas numpy scikit-learn fastapi uvicorn pydantic sqlalchemy pytest
+pip install ortools pandas numpy scikit-learn fastapi uvicorn pydantic pydantic-settings sqlalchemy pytest pyjwt
 ```
 
-### 2. Run Backend Server
+### 2. Start Backend API Server
 ```bash
 python -m uvicorn backend.app.main:app --reload --port 8000
 ```
-FastAPI Interactive Swagger Docs available at: `http://127.0.0.1:8000/docs`
+Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
 
-### 3. Launch Frontend Dashboard
+### 3. Open Business Workspace
 Open `frontend/index.html` directly in any web browser.
 
-### 4. Run Automated Test Suite
+### 4. Run Automated Test Suites
 ```bash
 python -m pytest tests/
 ```
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 ├── backend/
 │   └── app/
-│       ├── db/               # SQLAlchemy ORM models & SQLite/PostgreSQL setup
-│       ├── data_ingestion/   # Data validation and quality cleaning pipeline
-│       ├── forecasting/      # Machine learning time-series demand forecasting
-│       ├── optimization/     # MILP OR-Tools solver, infeasibility & network transfer engines
-│       ├── industries/       # Industry plugin modules (Restaurant, Retail)
-│       ├── scenarios/        # What-If scenario stress-test simulator
-│       ├── recommendations/  # AI natural language explanation engine
-│       └── main.py           # FastAPI application entrypoint & API endpoints
+│       ├── api/v1/           # Authentication, Datasets, Forecasting, Optimization, Approvals
+│       ├── business_models/  # Unit economics calculator, compensation models, pricing analysis
+│       ├── core/             # Configuration and security settings
+│       ├── data_platform/    # Data ingestion, validation, quality scorecard, versioning
+│       ├── db/               # PostgreSQL / SQLite ORM entities & session management
+│       ├── forecasting/      # Time-series demand forecasting engines
+│       ├── industries/       # Domain plugins (Logistics, Restaurant, Retail)
+│       ├── optimization/     # CP-SAT & MIP solver adapters, sensitivity analysis
+│       ├── recommendations/  # AI explanation engine & numerical fact verifier
+│       └── main.py           # FastAPI application entrypoint
 ├── frontend/
-│   ├── index.html            # Dashboard Single Page Application
-│   └── app.js                # Frontend logic & API client integration
-├── tests/                    # Comprehensive Pytest test suites
-├── roadmap.md                # Project architectural blueprint & roadmap
+│   ├── index.html            # Business Decision Workspace UI
+│   └── app.js                # Frontend state management & API integration
+├── tests/                    # Comprehensive Pytest automated test suites
+├── roadmap.md                # Technical blueprint
 └── README.md
 ```

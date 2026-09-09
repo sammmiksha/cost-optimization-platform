@@ -1,157 +1,150 @@
 const API_BASE = "http://127.0.0.1:8000/api/v1";
 
 let appState = {
-    organization: { name: "Enterprise Operations Corp", industry: "restaurant", locations: 5, currency: "USD" },
-    products: [],
-    ingredients: [],
-    suppliers: [],
-    employees: [],
+    organization: { name: "Enterprise Operations Corp", industry: "logistics", operating_model: "Construction Material Haulage", currency: "INR" },
+    unitEcon: null,
     forecasts: {},
     chartInstance: null
 };
 
-function switchTab(stageId) {
-    const stages = ['setup', 'data', 'forecast', 'optimization', 'scenarios', 'network'];
-    stages.forEach(s => {
+function formatCurrency(val, currency = "INR") {
+    if (currency === "INR") {
+        if (val >= 10000000) {
+            return `₹${(val / 10000000).toFixed(2)} Crore`;
+        } else if (val >= 100000) {
+            return `₹${(val / 100000).toFixed(2)} Lakh`;
+        } else {
+            return `₹${val.toLocaleString('en-IN')}`;
+        }
+    } else {
+        return `$${val.toLocaleString('en-US')}`;
+    }
+}
+
+function switchTab(sectionId) {
+    const sections = ['overview', 'setup', 'data', 'forecast', 'unit-econ', 'optimize', 'scenarios', 'recommendations', 'learn'];
+    sections.forEach(s => {
         const btn = document.getElementById(`tab-${s}`);
-        const container = document.getElementById(`stage-${s}`);
-        if (s === stageId) {
-            btn.className = "sidebar-item sidebar-item-active w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition";
+        const container = document.getElementById(`section-${s}`);
+        if (s === sectionId) {
+            btn.className = "nav-item nav-item-active w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition";
             container.classList.remove("hidden");
         } else {
-            btn.className = "sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition";
+            btn.className = "nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition";
             container.classList.add("hidden");
         }
     });
 }
 
-function onOrgIndustryChange() {
-    const ind = document.getElementById("orgIndustry").value;
-    document.getElementById("industrySelect").value = ind;
-    appState.organization.industry = ind;
-}
-
-function onIndustryChange() {
-    const ind = document.getElementById("industrySelect").value;
-    document.getElementById("orgIndustry").value = ind;
-    appState.organization.industry = ind;
-}
-
-function saveOrgProfile() {
-    appState.organization.name = document.getElementById("orgName").value;
-    appState.organization.locations = parseInt(document.getElementById("orgLocations").value) || 1;
-    appState.organization.currency = document.getElementById("orgCurrency").value;
-    switchTab('data');
-    if (appState.products.length === 0) {
-        loadStandardDataset();
+function onCurrencyChange() {
+    appState.organization.currency = document.getElementById("currencySelect").value;
+    if (appState.unitEcon) {
+        renderOverviewMetrics();
     }
 }
 
-function loadStandardDataset() {
-    appState.products = [
-        { name: "Classic Burger", selling_price: 15.00, prep_time_minutes: 10, category: "Mains", ingredient_requirements: { "Beef Patty": 1, "Burger Bun": 1 } },
-        { name: "Margherita Pizza", selling_price: 22.00, prep_time_minutes: 15, category: "Mains", ingredient_requirements: { "Pizza Dough": 1, "Mozzarella": 2 } },
-        { name: "French Fries", selling_price: 7.50, prep_time_minutes: 5, category: "Sides", ingredient_requirements: { "Potatoes": 0.3 } }
-    ];
-
-    appState.ingredients = [
-        { name: "Beef Patty", unit: "piece", purchase_cost: 3.50, current_stock: 150, min_stock: 20 },
-        { name: "Burger Bun", unit: "piece", purchase_cost: 0.80, current_stock: 200, min_stock: 30 },
-        { name: "Mozzarella", unit: "piece", purchase_cost: 2.00, current_stock: 100, min_stock: 15 },
-        { name: "Pizza Dough", unit: "piece", purchase_cost: 1.50, current_stock: 80, min_stock: 10 },
-        { name: "Potatoes", unit: "kg", purchase_cost: 1.20, current_stock: 100, min_stock: 15 }
-    ];
-
-    appState.suppliers = [
-        { name: "Prime Meats Co", rating: 4.9 },
-        { name: "Fresh Bakery & Dairy", rating: 4.8 }
-    ];
-
-    appState.employees = [
-        { name: "Head Chef Mario", role: "Cook", hourly_cost: 26.00, available_hours: 40, skills: ["Cook"] },
-        { name: "Prep Specialist Sarah", role: "Cook", hourly_cost: 18.50, available_hours: 35, skills: ["Cook"] },
-        { name: "Cashier David", role: "Cashier", hourly_cost: 15.00, available_hours: 30, skills: ["Cashier"] }
-    ];
-
-    renderTables();
+function onSetupTemplateChange() {
+    const ind = document.getElementById("setupIndustry").value;
+    const modelInput = document.getElementById("setupOperatingModel");
+    if (ind === "logistics") modelInput.value = "Construction Material Haulage (Sand Transport)";
+    else if (ind === "apparel") modelInput.value = "Small-Batch Designer Clothing";
+    else if (ind === "restaurant") modelInput.value = "Multi-Branch Casual Dining";
+    else modelInput.value = "Chain Supermarket Retail";
 }
 
-function renderTables() {
-    document.getElementById("prodCount").innerText = `${appState.products.length} Records`;
-    document.getElementById("ingCount").innerText = `${appState.ingredients.length} Records`;
-    document.getElementById("empCount").innerText = `${appState.employees.length} Records`;
-
-    document.getElementById("prodTableBody").innerHTML = appState.products.map(p => `
-        <tr class="hover:bg-slate-900">
-            <td class="px-3 py-2 font-medium text-slate-200">${p.name}</td>
-            <td class="px-3 py-2">$${p.selling_price.toFixed(2)}</td>
-            <td class="px-3 py-2">${p.prep_time_minutes} min</td>
-            <td class="px-3 py-2 text-slate-400">${p.category}</td>
-        </tr>
-    `).join('');
-
-    document.getElementById("ingTableBody").innerHTML = appState.ingredients.map(i => `
-        <tr class="hover:bg-slate-900">
-            <td class="px-3 py-2 font-medium text-slate-200">${i.name}</td>
-            <td class="px-3 py-2">${i.unit}</td>
-            <td class="px-3 py-2">$${i.purchase_cost.toFixed(2)}</td>
-            <td class="px-3 py-2 text-slate-400">Prime Meats / Fresh Bakery</td>
-            <td class="px-3 py-2 font-mono">${i.current_stock}</td>
-        </tr>
-    `).join('');
-
-    document.getElementById("empTableBody").innerHTML = appState.employees.map(e => `
-        <tr class="hover:bg-slate-900">
-            <td class="px-3 py-2 font-medium text-slate-200">${e.name}</td>
-            <td class="px-3 py-2 text-slate-400">${e.role}</td>
-            <td class="px-3 py-2">$${e.hourly_cost.toFixed(2)}</td>
-            <td class="px-3 py-2 font-mono">${e.available_hours} hrs</td>
-        </tr>
-    `).join('');
+function saveBusinessSetup() {
+    appState.organization.industry = document.getElementById("setupIndustry").value;
+    appState.organization.operating_model = document.getElementById("setupOperatingModel").value;
+    switchTab('unit-econ');
+    calculateUnitEconomics();
 }
 
-async function runValidation() {
-    if (appState.products.length === 0) loadStandardDataset();
+async function calculateUnitEconomics() {
+    const mat = parseFloat(document.getElementById("ueMaterial").value) || 5000;
+    const dist = parseFloat(document.getElementById("ueDistance").value) || 240;
+    const fuelP = parseFloat(document.getElementById("ueFuelPrice").value) || 92;
+    const driverPay = parseFloat(document.getElementById("ueDriverPay").value) || 1000;
+    const tolls = parseFloat(document.getElementById("ueTolls").value) || 1600;
+    const price = parseFloat(document.getElementById("ueQuotedPrice").value) || 22000;
 
+    try {
+        const res = await fetch(`${API_BASE}/business/unit-economics/transport`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                material_cost: mat,
+                distance_km: dist,
+                mileage_km_per_liter: 3.0,
+                fuel_price_per_liter: fuelP,
+                driver_pay_per_round: driverPay,
+                toll_cost: tolls / 2.0,
+                loading_unloading_cost: tolls / 2.0,
+                maintenance_allocation: 1000.0,
+                quoted_customer_price: price,
+                target_margin_pct: 25.0
+            })
+        });
+
+        const data = await res.json();
+        appState.unitEcon = data;
+
+        document.getElementById("unitEconOutput").classList.remove("hidden");
+        document.getElementById("ueBreakEven").innerText = formatCurrency(data.pricing_analysis.break_even_price, appState.organization.currency);
+        document.getElementById("ueDirectCost").innerText = formatCurrency(data.cost_breakdown.total_direct_cost, appState.organization.currency);
+        document.getElementById("ueContribution").innerText = formatCurrency(data.profitability_metrics.gross_contribution, appState.organization.currency);
+        document.getElementById("ueRecommended").innerText = formatCurrency(data.pricing_analysis.recommended_price_target, appState.organization.currency);
+
+        renderOverviewMetrics();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function renderOverviewMetrics() {
+    if (!appState.unitEcon) return;
+    const data = appState.unitEcon;
+    const cur = appState.organization.currency;
+
+    document.getElementById("ovRevenue").innerText = formatCurrency(data.profitability_metrics.quoted_customer_price, cur);
+    document.getElementById("ovCost").innerText = formatCurrency(data.cost_breakdown.total_direct_cost, cur);
+    document.getElementById("ovProfit").innerText = formatCurrency(data.profitability_metrics.gross_contribution, cur);
+    document.getElementById("ovMargin").innerText = `${data.profitability_metrics.contribution_margin_percentage}%`;
+}
+
+async function checkDataReadiness() {
     try {
         const res = await fetch(`${API_BASE}/datasets/readiness`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                products: appState.products,
-                ingredients: appState.ingredients,
-                employees: appState.employees
+                products: [{ name: "Sand Load", selling_price: 22000 }],
+                ingredients: [{ name: "Diesel", current_stock: 500 }],
+                employees: [{ name: "Driver 01", hourly_cost: 1000 }]
             })
         });
         const data = await res.json();
         
-        document.getElementById("auditLogContainer").classList.remove("hidden");
-        const list = document.getElementById("auditLogList");
-        list.innerHTML = `
-            <li>Data Readiness Score: <strong class="text-emerald-400">${data.overall_score}% (${data.readiness_status})</strong></li>
-            <li>Completeness: ${data.metrics.completeness}% | Validity: ${data.metrics.validity}% | Freshness: ${data.metrics.freshness}%</li>
+        document.getElementById("readinessBox").classList.remove("hidden");
+        document.getElementById("readinessDetails").innerHTML = `
+            <div>Overall Quality Score: <strong class="text-emerald-400">${data.overall_score}% (${data.readiness_status})</strong></div>
+            <div>Completeness: ${data.metrics.completeness}% | Validity: ${data.metrics.validity}% | Freshness: ${data.metrics.freshness}%</div>
         `;
     } catch (err) {
         console.error(err);
     }
 }
 
-async function runForecastModel() {
-    if (appState.products.length === 0) loadStandardDataset();
-
+async function generateForecasts() {
     try {
         const res = await fetch(`${API_BASE}/forecasting/predict`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                historical_sales: [],
-                products: appState.products,
+                products: [{ name: "Sand Load (20T)" }],
                 days_ahead: 7
             })
         });
         const data = await res.json();
-        appState.forecasts = data.forecasts;
-
         renderForecastChart(data.forecasts);
     } catch (err) {
         console.error(err);
@@ -163,12 +156,10 @@ function renderForecastChart(forecasts) {
     if (appState.chartInstance) appState.chartInstance.destroy();
 
     const days = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
-    const palette = ['#3b82f6', '#10b981', '#f59e0b'];
-
-    const datasets = Object.keys(forecasts).map((name, idx) => ({
+    const datasets = Object.keys(forecasts).map(name => ({
         label: name,
         data: forecasts[name],
-        borderColor: palette[idx % palette.length],
+        borderColor: '#2563eb',
         borderWidth: 2,
         fill: false,
         tension: 0.3
@@ -189,115 +180,71 @@ function renderForecastChart(forecasts) {
     });
 }
 
-async function executeSolver() {
-    if (appState.products.length === 0) loadStandardDataset();
-    if (Object.keys(appState.forecasts).length === 0) await runForecastModel();
-
-    const obj = document.getElementById("optObjective").value;
-    const budget = parseFloat(document.getElementById("optBudget").value) || 5000;
-    const staffHours = parseFloat(document.getElementById("optStaffHours").value) || 8;
-
+async function runMasterOptimizer() {
     try {
-        const res = await fetch(`${API_BASE}/optimization/runs`, {
+        const res = await fetch(`${API_BASE}/optimization/logistics/runs`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                products: appState.products,
-                ingredients: appState.ingredients,
-                suppliers: appState.suppliers,
-                employees: appState.employees,
-                demand_forecast: appState.forecasts,
-                objective: obj,
-                days: 1,
-                constraints_config: { budget_limit: budget, min_daily_staff_hours: staffHours }
-            })
-        });
-
-        const data = await res.json();
-        document.getElementById("solverOutput").classList.remove("hidden");
-
-        if (data.status === "INFEASIBLE") {
-            document.getElementById("resProfit").innerText = "INFEASIBLE";
-            document.getElementById("resSummary").innerText = data.message;
-            return;
-        }
-
-        const fin = data.financials;
-        document.getElementById("resProfit").innerText = `$${fin.expected_profit.toLocaleString()}`;
-        document.getElementById("resRevenue").innerText = `$${fin.expected_revenue.toLocaleString()}`;
-        document.getElementById("resCost").innerText = `$${fin.expected_total_cost.toLocaleString()}`;
-        document.getElementById("resRoi").innerText = `${fin.roi_percentage}%`;
-
-        const ai = data.ai_explanation;
-        document.getElementById("resSummary").innerText = ai.executive_summary;
-        document.getElementById("resRecs").innerHTML = ai.actionable_recommendations.map(r => `<li>${r}</li>`).join('');
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-function updateScenText() {
-    const d = document.getElementById("scenDem").value;
-    const c = document.getElementById("scenCost").value;
-    const w = document.getElementById("scenWage").value;
-
-    const dPct = Math.round((d - 1.0) * 100);
-    const cPct = Math.round((c - 1.0) * 100);
-    const wPct = Math.round((w - 1.0) * 100);
-
-    document.getElementById("scenDemText").innerText = `${dPct >= 0 ? '+' : ''}${dPct}% Demand Variance`;
-    document.getElementById("scenCostText").innerText = `${cPct >= 0 ? '+' : ''}${cPct}% Raw Cost Variance`;
-    document.getElementById("scenWageText").innerText = `${wPct >= 0 ? '+' : ''}${wPct}% Wage Variance`;
-}
-
-async function runScenarioSim() {
-    if (appState.products.length === 0) loadStandardDataset();
-    if (Object.keys(appState.forecasts).length === 0) await runForecastModel();
-
-    const dem = parseFloat(document.getElementById("scenDem").value);
-    const cost = parseFloat(document.getElementById("scenCost").value);
-    const wage = parseFloat(document.getElementById("scenWage").value);
-
-    try {
-        const res = await fetch(`${API_BASE}/optimization/runs`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                products: appState.products,
-                ingredients: appState.ingredients,
-                suppliers: appState.suppliers,
-                employees: appState.employees,
-                demand_forecast: appState.forecasts,
-                objective: "maximize_profit",
+                vehicles: [{ name: "Sand Truck 01", mileage_km_l: 3.0, driver_pay_per_round: 1000.0, max_rounds_per_day: 2 }],
+                routes: [{ name: "Sand Quarry -> Customer Site", round_distance_km: 240.0, quoted_price: 22000.0, toll_cost: 800.0 }],
+                fuel_price_per_liter: 92.0,
                 days: 1
             })
         });
 
         const data = await res.json();
-        document.getElementById("scenOutput").classList.remove("hidden");
+        document.getElementById("optOutput").classList.remove("hidden");
 
-        const baseP = data.financials.expected_profit;
-        const newP = Math.round(baseP * dem * (2.0 - cost));
-        const delta = newP - baseP;
-
-        document.getElementById("scenBaseProfit").innerText = `$${baseP.toLocaleString()}`;
-        document.getElementById("scenNewProfit").innerText = `$${newP.toLocaleString()}`;
-        document.getElementById("scenDelta").innerText = `${delta >= 0 ? '+' : ''}$${delta.toLocaleString()}`;
+        const fin = data.financials;
+        const cur = appState.organization.currency;
+        document.getElementById("optSummaryText").innerText = `Optimal schedule completed ${fin.total_trips_scheduled} rounds generating expected net contribution of ${formatCurrency(fin.total_expected_contribution, cur)}.`;
+        
+        document.getElementById("optActionList").innerHTML = data.assigned_trips.map(t => 
+            `<li>Assign ${t.vehicle} to ${t.route} for ${t.rounds_completed} rounds (Revenue: ${formatCurrency(t.revenue, cur)}, Net Contribution: ${formatCurrency(t.net_contribution, cur)})</li>`
+        ).join('');
     } catch (err) {
         console.error(err);
     }
 }
 
-async function runNetworkTransfers() {
-    document.getElementById("netOutput").classList.remove("hidden");
-    document.getElementById("netTransfersList").innerHTML = `
-        <div class="p-2 bg-slate-950 rounded border border-slate-800 flex justify-between">
-            <span>Transfer from Location A to Location B</span>
-            <span class="font-bold text-blue-400">120 units (Shipping cost: $300.00)</span>
-        </div>
-    `;
+function updateScenLabels() {
+    const f = document.getElementById("scenFuelShift").value;
+    const t = document.getElementById("scenTripShift").value;
+
+    const fPct = Math.round((f - 1.0) * 100);
+    const tPct = Math.round((t - 1.0) * 100);
+
+    document.getElementById("scenFuelLabel").innerText = `${fPct >= 0 ? '+' : ''}${fPct}% Diesel Price Variance`;
+    document.getElementById("scenTripLabel").innerText = `${tPct >= 0 ? '+' : ''}${tPct}% Trip Volume Variance`;
+}
+
+async function runScenarioStressTest() {
+    calculateUnitEconomics();
+}
+
+async function submitApproval(decisionStatus) {
+    try {
+        const res = await fetch(`${API_BASE}/approvals`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                optimization_run_id: 184,
+                user_id: 1,
+                status: decisionStatus,
+                comments: `Management decision recorded as ${decisionStatus}.`
+            })
+        });
+        const data = await res.json();
+
+        const box = document.getElementById("approvalStatusBox");
+        box.classList.remove("hidden");
+        box.innerText = `Approval Decision Recorded: ${data.decision} (Run ID #${data.run_id})`;
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    loadStandardDataset();
+    calculateUnitEconomics();
 });

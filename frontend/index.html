@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Industry Business Optimization Platform</title>
+    <title>Business Optimization Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .sidebar-item-active {
+        .nav-item-active {
             background-color: #1e293b;
-            border-left: 3px solid #3b82f6;
+            border-left: 3px solid #2563eb;
             color: #f8fafc;
         }
-        .sidebar-item {
+        .nav-item {
             color: #94a3b8;
             border-left: 3px solid transparent;
         }
-        .sidebar-item:hover {
+        .nav-item:hover {
             background-color: #0f172a;
             color: #cbd5e1;
         }
@@ -32,223 +32,206 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col antialiased">
 
-    <!-- Top Navigation Header -->
+    <!-- Header Navigation -->
     <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="bg-blue-600 text-white p-2 rounded-lg font-bold text-sm">
-                    <i class="fa-solid fa-chart-nodes"></i>
+                <div class="bg-blue-600 text-white px-2.5 py-1.5 rounded font-semibold text-xs tracking-wider">
+                    OPTI-DECISION
                 </div>
                 <div>
-                    <h1 class="text-base font-semibold text-white tracking-tight">Business Optimization Platform</h1>
-                    <p class="text-xs text-slate-400">Enterprise Decision Engine & Mathematical Optimizer</p>
+                    <h1 class="text-sm font-semibold text-white">Business Optimization Platform</h1>
+                    <p class="text-xs text-slate-400">Configurable Enterprise Decision Workspace</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2 text-xs text-slate-400">
-                    <span>Selected Domain:</span>
-                    <select id="industrySelect" onchange="onIndustryChange()" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-md px-3 py-1.5 focus:outline-none focus:border-blue-500">
-                        <option value="restaurant">Restaurant Operations</option>
-                        <option value="retail">Retail Operations</option>
-                        <option value="manufacturing">Manufacturing Operations</option>
-                        <option value="logistics">Logistics Operations</option>
+                    <span>Currency Format:</span>
+                    <select id="currencySelect" onchange="onCurrencyChange()" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded px-2.5 py-1 focus:outline-none focus:border-blue-500">
+                        <option value="INR">INR (₹ Lakhs / Crores)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
                     </select>
                 </div>
                 <span class="text-xs px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono">
-                    MILP Solver: OR-Tools CBC
+                    Mode: Configurable Workspace
                 </span>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Container -->
+    <!-- Main Workspace -->
     <div class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 grid grid-cols-12 gap-6">
 
-        <!-- Navigation Sidebar -->
+        <!-- Sidebar Navigation -->
         <aside class="col-span-12 lg:col-span-3 space-y-1">
-            <div class="text-xs font-semibold text-slate-500 uppercase px-3 py-2">Workflow Stages</div>
+            <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-2 tracking-wider">Workspace</div>
             
-            <button onclick="switchTab('setup')" id="tab-setup" class="sidebar-item sidebar-item-active w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
-                <i class="fa-solid fa-building text-slate-400 w-4 text-center"></i>
-                <span>1. Organization & Industry</span>
+            <button onclick="switchTab('overview')" id="tab-overview" class="nav-item nav-item-active w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-chart-pie w-4 text-slate-400"></i>
+                <span>Overview</span>
             </button>
 
-            <button onclick="switchTab('data')" id="tab-data" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
-                <i class="fa-solid fa-database text-slate-400 w-4 text-center"></i>
-                <span>2. Data Upload & Validation</span>
+            <button onclick="switchTab('setup')" id="tab-setup" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-sliders w-4 text-slate-400"></i>
+                <span>Business Setup</span>
             </button>
 
-            <button onclick="switchTab('forecast')" id="tab-forecast" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
-                <i class="fa-solid fa-chart-line text-slate-400 w-4 text-center"></i>
-                <span>3. ML Demand Forecasting</span>
+            <button onclick="switchTab('data')" id="tab-data" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-database w-4 text-slate-400"></i>
+                <span>Data Center</span>
             </button>
 
-            <button onclick="switchTab('optimization')" id="tab-optimization" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
-                <i class="fa-solid fa-calculator text-slate-400 w-4 text-center"></i>
-                <span>4. MILP Optimization Engine</span>
+            <button onclick="switchTab('forecast')" id="tab-forecast" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-chart-line w-4 text-slate-400"></i>
+                <span>Forecasts</span>
             </button>
 
-            <button onclick="switchTab('scenarios')" id="tab-scenarios" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
-                <i class="fa-solid fa-sliders text-slate-400 w-4 text-center"></i>
-                <span>5. What-If Scenario Simulator</span>
+            <button onclick="switchTab('unit-econ')" id="tab-unit-econ" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-calculator w-4 text-slate-400"></i>
+                <span>Unit Economics & Pricing</span>
             </button>
 
-            <button onclick="switchTab('network')" id="tab-network" class="sidebar-item w-full text-left px-3.5 py-2.5 rounded-r-md text-xs font-medium flex items-center space-x-3 transition">
-                <i class="fa-solid fa-network-wired text-slate-400 w-4 text-center"></i>
-                <span>6. Multi-Branch Network</span>
+            <button onclick="switchTab('optimize')" id="tab-optimize" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-gears w-4 text-slate-400"></i>
+                <span>Optimize Operations</span>
             </button>
 
-            <div class="mt-8 p-4 rounded-md bg-slate-900 border border-slate-800 text-xs text-slate-400 space-y-2">
-                <div class="font-semibold text-slate-300">System Architecture</div>
-                <div class="text-[11px] leading-relaxed">
-                    Data Ingestion <i class="fa-solid fa-arrow-right text-slate-600 px-0.5"></i> ML Forecasting <i class="fa-solid fa-arrow-right text-slate-600 px-0.5"></i> MILP Formulation <i class="fa-solid fa-arrow-right text-slate-600 px-0.5"></i> Actionable Rationale.
-                </div>
+            <button onclick="switchTab('scenarios')" id="tab-scenarios" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-code-branch w-4 text-slate-400"></i>
+                <span>What-If Scenarios</span>
+            </button>
+
+            <button onclick="switchTab('recommendations')" id="tab-recommendations" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-circle-check w-4 text-slate-400"></i>
+                <span>Recommendations & Review</span>
+            </button>
+
+            <button onclick="switchTab('learn')" id="tab-learn" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                <i class="fa-solid fa-book-open w-4 text-slate-400"></i>
+                <span>Learn & Templates</span>
+            </button>
+
+            <div class="pt-6 text-[11px] font-semibold text-slate-500 uppercase px-3 py-2 tracking-wider">System Settings</div>
+            <div class="px-3.5 py-2 text-xs text-slate-400 space-y-1 font-mono">
+                <div>Org: <span class="text-slate-200">Enterprise Corp</span></div>
+                <div>Role: <span class="text-blue-400">Operations Manager</span></div>
             </div>
         </aside>
 
-        <!-- Stage Workspaces -->
+        <!-- Main Workspace Area -->
         <main class="col-span-12 lg:col-span-9 space-y-6">
 
-            <!-- STAGE 1: Organization & Industry Setup -->
-            <div id="stage-setup" class="space-y-6">
+            <!-- TAB 1: OVERVIEW -->
+            <div id="section-overview" class="space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                    <h2 class="text-sm font-semibold text-white mb-1">Step 1 — Organization Profile & Objectives</h2>
-                    <p class="text-xs text-slate-400 mb-6">Configure corporate metadata and standard optimization criteria according to roadmap Step 1 & 2.</p>
+                    <h2 class="text-sm font-semibold text-white mb-1">Executive Business Health & Overview</h2>
+                    <p class="text-xs text-slate-400 mb-6">Summary of baseline operations, financial contribution margins, and optimization opportunities.</p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                        <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Organization Name</label>
-                            <input type="text" id="orgName" value="Enterprise Operations Corp" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs mb-6">
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
+                            <span class="text-slate-400 font-medium">Estimated Revenue</span>
+                            <div id="ovRevenue" class="text-lg font-bold text-slate-200 mt-1">₹22.00 Lakh</div>
                         </div>
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
+                            <span class="text-slate-400 font-medium">Direct Operating Cost</span>
+                            <div id="ovCost" class="text-lg font-bold text-rose-400 mt-1">₹15.96 Lakh</div>
+                        </div>
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
+                            <span class="text-slate-400 font-medium">Gross Contribution</span>
+                            <div id="ovProfit" class="text-lg font-bold text-emerald-400 mt-1">₹6.04 Lakh</div>
+                        </div>
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
+                            <span class="text-slate-400 font-medium">Contribution Margin</span>
+                            <div id="ovMargin" class="text-lg font-bold text-blue-400 mt-1">27.45%</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 border border-slate-800 p-4 rounded text-xs space-y-2">
+                        <div class="font-semibold text-slate-200">Active Operational Optimization Opportunities</div>
+                        <ul class="list-disc list-inside text-slate-400 space-y-1">
+                            <li>Material Delivery Route B contribution margin is below target. Recommended minimum quote: ₹21,800.</li>
+                            <li>Fuel expense constitutes 46.1% of direct round cost. Shift 40% allocations to high-mileage vehicle fleet.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: BUSINESS SETUP -->
+            <div id="section-setup" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 1 — Business Model & Cost Engine Builder</h2>
+                    <p class="text-xs text-slate-400 mb-6">Configure how your organization operates, earns revenue, and calculates employee compensation.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mb-6">
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Industry Segment</label>
-                            <select id="orgIndustry" onchange="onOrgIndustryChange()" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
-                                <option value="restaurant">Restaurant</option>
-                                <option value="retail">Retail</option>
-                                <option value="manufacturing">Manufacturing</option>
-                                <option value="logistics">Logistics</option>
+                            <label class="block font-medium text-slate-300 mb-1.5">Industry Template</label>
+                            <select id="setupIndustry" onchange="onSetupTemplateChange()" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                                <option value="logistics">Logistics & Transport</option>
+                                <option value="apparel">Apparel & Fashion</option>
+                                <option value="restaurant">Restaurant / Food Service</option>
+                                <option value="retail">Retail Supermarket</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Operating Locations Count</label>
-                            <input type="number" id="orgLocations" value="5" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                            <label class="block font-medium text-slate-300 mb-1.5">Operating Model</label>
+                            <input type="text" id="setupOperatingModel" value="Construction Material Haulage (Sand Transport)" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Currency Code</label>
-                            <input type="text" id="orgCurrency" value="USD" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                            <label class="block font-medium text-slate-300 mb-1.5">Worker Compensation Model</label>
+                            <select id="setupCompensation" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                                <option value="per_round">Per Completed Round (e.g. ₹1,000 / round)</option>
+                                <option value="hourly">Hourly Wage ($/hr)</option>
+                                <option value="per_shift">Per Shift ($/shift)</option>
+                                <option value="monthly">Monthly Salary</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Primary Distance & Weight Units</label>
+                            <select id="setupUnits" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                                <option value="metric_in">Kilometers (km), Tonnes, Liters</option>
+                                <option value="metric_std">Kilometers (km), Kilograms (kg), Liters</option>
+                                <option value="imperial">Miles (mi), Tons, Gallons</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div class="mt-6 flex justify-end">
-                        <button onclick="saveOrgProfile()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded transition">
-                            Save Configuration & Proceed
+                    <button onclick="saveBusinessSetup()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded transition">
+                        Save Business Model Configuration
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 3: DATA CENTER -->
+            <div id="section-data" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-sm font-semibold text-white">Step 2 — Data Center & Quality Readiness</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Upload operational records or evaluate dataset quality metrics.</p>
+                        </div>
+                        <button onclick="checkDataReadiness()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3.5 py-1.5 rounded transition">
+                            Evaluate Data Quality Scorecard
                         </button>
                     </div>
-                </div>
-            </div>
 
-            <!-- STAGE 2: Data Upload & Validation -->
-            <div id="stage-data" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h2 class="text-sm font-semibold text-white">Step 2 — Data Ingestion & Data Validation Engine</h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Clean and standardize raw operational data (Step 3 & 4 of roadmap).</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="loadStandardDataset()" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded transition">
-                                Populate Benchmark Data
-                            </button>
-                            <button onclick="runValidation()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3.5 py-1.5 rounded transition">
-                                Execute Validation Pipeline
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="auditLogContainer" class="hidden mb-6 p-4 rounded bg-slate-950 border border-slate-800 text-xs">
-                        <div class="font-medium text-slate-300 mb-2">Validation Audit Trail:</div>
-                        <ul id="auditLogList" class="list-disc list-inside space-y-1 text-slate-400 font-mono text-[11px]"></ul>
-                    </div>
-
-                    <!-- Data Tables -->
-                    <div class="space-y-6 text-xs">
-                        <!-- Products Table -->
-                        <div>
-                            <div class="font-medium text-slate-300 mb-2 flex justify-between items-center">
-                                <span>Products & Selling Prices</span>
-                                <span class="text-slate-500 text-[11px]" id="prodCount">0 Records</span>
-                            </div>
-                            <div class="overflow-x-auto border border-slate-800 rounded">
-                                <table class="w-full text-left">
-                                    <thead class="table-header border-b border-slate-800">
-                                        <tr>
-                                            <th class="px-3 py-2">Product Name</th>
-                                            <th class="px-3 py-2">Selling Price ($)</th>
-                                            <th class="px-3 py-2">Prep Time (min)</th>
-                                            <th class="px-3 py-2">Category</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="prodTableBody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Ingredients Table -->
-                        <div>
-                            <div class="font-medium text-slate-300 mb-2 flex justify-between items-center">
-                                <span>Raw Ingredients & Suppliers</span>
-                                <span class="text-slate-500 text-[11px]" id="ingCount">0 Records</span>
-                            </div>
-                            <div class="overflow-x-auto border border-slate-800 rounded">
-                                <table class="w-full text-left">
-                                    <thead class="table-header border-b border-slate-800">
-                                        <tr>
-                                            <th class="px-3 py-2">Ingredient</th>
-                                            <th class="px-3 py-2">Unit</th>
-                                            <th class="px-3 py-2">Purchase Cost ($)</th>
-                                            <th class="px-3 py-2">Supplier</th>
-                                            <th class="px-3 py-2">Current Stock</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="ingTableBody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Employees Table -->
-                        <div>
-                            <div class="font-medium text-slate-300 mb-2 flex justify-between items-center">
-                                <span>Staff & Available Shift Hours</span>
-                                <span class="text-slate-500 text-[11px]" id="empCount">0 Records</span>
-                            </div>
-                            <div class="overflow-x-auto border border-slate-800 rounded">
-                                <table class="w-full text-left">
-                                    <thead class="table-header border-b border-slate-800">
-                                        <tr>
-                                            <th class="px-3 py-2">Employee Name</th>
-                                            <th class="px-3 py-2">Role</th>
-                                            <th class="px-3 py-2">Hourly Cost ($/hr)</th>
-                                            <th class="px-3 py-2">Available Hours</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="empTableBody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div id="readinessBox" class="hidden mb-6 p-4 rounded bg-slate-950 border border-slate-800 text-xs">
+                        <div class="font-medium text-slate-300 mb-2">Data Quality Scorecard:</div>
+                        <div id="readinessDetails" class="text-slate-400 space-y-1"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- STAGE 3: ML Demand Forecasting -->
-            <div id="stage-forecast" class="hidden space-y-6">
+            <!-- TAB 4: FORECASTS -->
+            <div id="section-forecast" class="hidden space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <h2 class="text-sm font-semibold text-white">Step 3 — Machine Learning Demand Forecasting</h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Predicts product demand trends using time-series regressors (Step 8 of roadmap).</p>
+                            <h2 class="text-sm font-semibold text-white">Step 3 — Demand Forecasts</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Time-series prediction bounds where historical data exists.</p>
                         </div>
-                        <button onclick="runForecastModel()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded transition">
-                            Generate Time-Series Forecast
+                        <button onclick="generateForecasts()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3.5 py-1.5 rounded transition">
+                            Generate Demand Forecast
                         </button>
                     </div>
 
@@ -258,132 +241,153 @@
                 </div>
             </div>
 
-            <!-- STAGE 4: MILP Optimization Workbench -->
-            <div id="stage-optimization" class="hidden space-y-6">
+            <!-- TAB 5: UNIT ECONOMICS & PRICING -->
+            <div id="section-unit-econ" class="hidden space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                    <h2 class="text-sm font-semibold text-white mb-1">Step 4 — MILP Optimization Engine</h2>
-                    <p class="text-xs text-slate-400 mb-6">Formulate decision variables and evaluate optimal operational strategies (Step 9–13 of roadmap).</p>
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 4 — Unit Economics & Pricing Analysis Calculator</h2>
+                    <p class="text-xs text-slate-400 mb-6">Analyze unit cost structure, break-even prices, and contribution margins (Guided Mode).</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs mb-6">
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Objective Function</label>
-                            <select id="optObjective" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
-                                <option value="maximize_profit">Maximize Profit</option>
-                                <option value="minimize_cost">Minimize Total Cost</option>
-                                <option value="minimize_waste">Minimize Raw Material Waste</option>
-                                <option value="balanced">Balanced Multi-Objective</option>
-                            </select>
+                            <label class="block font-medium text-slate-300 mb-1.5">Material Cost per Load (₹)</label>
+                            <input type="number" id="ueMaterial" value="5000" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
                         </div>
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Operating Budget Cap ($)</label>
-                            <input type="number" id="optBudget" value="5000" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                            <label class="block font-medium text-slate-300 mb-1.5">Round Distance (km)</label>
+                            <input type="number" id="ueDistance" value="240" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
                         </div>
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Minimum Staffing Hours</label>
-                            <input type="number" id="optStaffHours" value="8" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500">
+                            <label class="block font-medium text-slate-300 mb-1.5">Diesel Price (₹/Liter)</label>
+                            <input type="number" id="ueFuelPrice" value="92" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Driver Pay per Round (₹)</label>
+                            <input type="number" id="ueDriverPay" value="1000" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Tolls & Expenses per Round (₹)</label>
+                            <input type="number" id="ueTolls" value="1600" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Quoted Price to Customer (₹)</label>
+                            <input type="number" id="ueQuotedPrice" value="22000" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
                         </div>
                     </div>
 
-                    <button onclick="executeSolver()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 rounded transition">
-                        Run Mathematical Optimization Solver (Google OR-Tools MILP)
+                    <button onclick="calculateUnitEconomics()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded transition">
+                        Calculate Unit Economics & Target Pricing
                     </button>
                 </div>
 
-                <!-- Financial Outcome Cards -->
-                <div id="solverOutput" class="hidden space-y-6">
+                <div id="unitEconOutput" class="hidden space-y-6">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                         <div class="bg-slate-900 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Expected Profit</span>
-                            <div id="resProfit" class="text-lg font-bold text-emerald-400 mt-1">$0.00</div>
+                            <span class="text-slate-400 font-medium">Break-Even Price</span>
+                            <div id="ueBreakEven" class="text-base font-bold text-slate-200 mt-1">₹0</div>
                         </div>
                         <div class="bg-slate-900 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Expected Revenue</span>
-                            <div id="resRevenue" class="text-lg font-bold text-slate-200 mt-1">$0.00</div>
+                            <span class="text-slate-400 font-medium">Direct Trip Cost</span>
+                            <div id="ueDirectCost" class="text-base font-bold text-rose-400 mt-1">₹0</div>
                         </div>
                         <div class="bg-slate-900 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Total Operating Cost</span>
-                            <div id="resCost" class="text-lg font-bold text-rose-400 mt-1">$0.00</div>
+                            <span class="text-slate-400 font-medium">Gross Contribution</span>
+                            <div id="ueContribution" class="text-base font-bold text-emerald-400 mt-1">₹0</div>
                         </div>
                         <div class="bg-slate-900 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Estimated ROI</span>
-                            <div id="resRoi" class="text-lg font-bold text-blue-400 mt-1">0.0%</div>
+                            <span class="text-slate-400 font-medium">Recommended Price (25% Target)</span>
+                            <div id="ueRecommended" class="text-base font-bold text-blue-400 mt-1">₹0</div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Explanation Layer -->
+            <!-- TAB 6: OPTIMIZE -->
+            <div id="section-optimize" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 5 — Operational Plan Optimizer</h2>
+                    <p class="text-xs text-slate-400 mb-6">Computes mathematically optimal resource, supplier, and shift allocations.</p>
+
+                    <button onclick="runMasterOptimizer()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 rounded transition">
+                        Run Mathematical Optimization Engine
+                    </button>
+                </div>
+
+                <div id="optOutput" class="hidden space-y-6">
                     <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                        <h3 class="font-semibold text-white">AI Decision Explanation & Rationale</h3>
-                        <div id="resSummary" class="text-slate-300 leading-relaxed bg-slate-950 p-3 rounded border border-slate-800"></div>
+                        <h3 class="font-semibold text-white">Recommended Operational Plan Summary</h3>
+                        <div id="optSummaryText" class="text-slate-300 leading-relaxed bg-slate-950 p-3 rounded border border-slate-800"></div>
                         
                         <div>
-                            <div class="font-medium text-slate-400 uppercase tracking-wider mb-2">Recommended Operational Decisions:</div>
-                            <ul id="resRecs" class="list-disc list-inside space-y-1 text-slate-300"></ul>
+                            <div class="font-medium text-slate-400 uppercase tracking-wider mb-2">Key Decision Actions:</div>
+                            <ul id="optActionList" class="list-disc list-inside space-y-1 text-slate-300"></ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- STAGE 5: What-If Scenario Simulator -->
-            <div id="stage-scenarios" class="hidden space-y-6">
+            <!-- TAB 7: SCENARIOS -->
+            <div id="section-scenarios" class="hidden space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                    <h2 class="text-sm font-semibold text-white mb-1">Step 5 — What-If Scenario Simulator</h2>
-                    <p class="text-xs text-slate-400 mb-6">Test plan sensitivity against operational parameters (Step 16 of roadmap).</p>
+                    <h2 class="text-sm font-semibold text-white mb-1">Step 6 — What-If Scenario Stress Testing</h2>
+                    <p class="text-xs text-slate-400 mb-6">Evaluate plan stability against diesel price hikes, demand shocks, and wage variance.</p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mb-6">
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Demand Variance</label>
-                            <input type="range" id="scenDem" min="0.5" max="1.5" step="0.05" value="1.2" oninput="updateScenText()" class="w-full">
-                            <span id="scenDemText" class="text-[11px] text-blue-400 font-mono">+20% Demand</span>
+                            <label class="block font-medium text-slate-300 mb-1.5">Diesel Price Shift (%)</label>
+                            <input type="range" id="scenFuelShift" min="0.8" max="1.5" step="0.05" value="1.15" oninput="updateScenLabels()" class="w-full">
+                            <span id="scenFuelLabel" class="text-[11px] text-amber-400 font-mono">+15% Diesel Price Hike</span>
                         </div>
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Supplier Cost Variance</label>
-                            <input type="range" id="scenCost" min="0.5" max="1.5" step="0.05" value="1.15" oninput="updateScenText()" class="w-full">
-                            <span id="scenCostText" class="text-[11px] text-amber-400 font-mono">+15% Raw Cost</span>
-                        </div>
-                        <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Hourly Wage Variance</label>
-                            <input type="range" id="scenWage" min="0.5" max="1.5" step="0.05" value="1.0" oninput="updateScenText()" class="w-full">
-                            <span id="scenWageText" class="text-[11px] text-slate-400 font-mono">0% Wage Variance</span>
+                            <label class="block font-medium text-slate-300 mb-1.5">Trip Volume Variance (%)</label>
+                            <input type="range" id="scenTripShift" min="0.5" max="1.5" step="0.05" value="1.2" oninput="updateScenLabels()" class="w-full">
+                            <span id="scenTripLabel" class="text-[11px] text-blue-400 font-mono">+20% Trip Volume</span>
                         </div>
                     </div>
 
-                    <button onclick="runScenarioSim()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 rounded transition">
-                        Execute Scenario Simulation
+                    <button onclick="runScenarioStressTest()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 rounded transition">
+                        Run Scenario Stress Test
                     </button>
-                </div>
-
-                <div id="scenOutput" class="hidden bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs">
-                    <h3 class="font-semibold text-white mb-4">Financial Impact Variance</h3>
-                    <div class="grid grid-cols-3 gap-4 text-center">
-                        <div class="bg-slate-950 p-3 rounded border border-slate-800">
-                            <span class="text-slate-400">Baseline Profit</span>
-                            <div id="scenBaseProfit" class="text-base font-bold text-slate-200 mt-1">$0.00</div>
-                        </div>
-                        <div class="bg-slate-950 p-3 rounded border border-slate-800">
-                            <span class="text-slate-400">Scenario Profit</span>
-                            <div id="scenNewProfit" class="text-base font-bold text-blue-400 mt-1">$0.00</div>
-                        </div>
-                        <div class="bg-slate-950 p-3 rounded border border-slate-800">
-                            <span class="text-slate-400">Profit Delta</span>
-                            <div id="scenDelta" class="text-base font-bold text-emerald-400 mt-1">+$0.00</div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- STAGE 6: Multi-Branch Network Optimization -->
-            <div id="stage-network" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                    <h2 class="text-sm font-semibold text-white mb-1">Step 6 — Multi-Branch Network Transfers</h2>
-                    <p class="text-xs text-slate-400 mb-6">Optimize stock transfers across operating branches vs external supplier procurement (Step 17 of roadmap).</p>
+            <!-- TAB 8: RECOMMENDATIONS & REVIEW -->
+            <div id="section-recommendations" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
+                    <h2 class="text-sm font-semibold text-white">Step 7 — Plan Review & Human Approval Workflow</h2>
+                    <p class="text-xs text-slate-400">Review recommendations and submit management decision.</p>
 
-                    <button onclick="runNetworkTransfers()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded transition">
-                        Compute Network Transfer Plan
-                    </button>
+                    <div class="flex space-x-3 pt-4">
+                        <button onclick="submitApproval('APPROVED')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded transition">
+                            Approve Recommended Plan
+                        </button>
+                        <button onclick="submitApproval('REJECTED')" class="bg-rose-600 hover:bg-rose-500 text-white font-medium px-4 py-2 rounded transition">
+                            Reject Plan
+                        </button>
+                    </div>
 
-                    <div id="netOutput" class="hidden mt-6 space-y-2 text-xs">
-                        <div class="font-medium text-slate-400">Optimal Inter-Branch Transfers:</div>
-                        <div id="netTransfersList" class="space-y-1 text-slate-300 font-mono"></div>
+                    <div id="approvalStatusBox" class="hidden p-3 rounded bg-slate-950 border border-slate-800 text-slate-300 font-mono"></div>
+                </div>
+            </div>
+
+            <!-- TAB 9: LEARN & TEMPLATES -->
+            <div id="section-learn" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
+                    <h2 class="text-sm font-semibold text-white">Platform Methodologies & Industry CSV Templates</h2>
+                    <p class="text-slate-400">Download formatted operational templates for your industry:</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
+                        <div class="p-3 bg-slate-950 rounded border border-slate-800">
+                            <div class="text-slate-200 font-bold mb-1">Logistics Templates</div>
+                            <div class="text-slate-400 text-[11px]">vehicles.xlsx, trips.xlsx, materials.xlsx</div>
+                        </div>
+                        <div class="p-3 bg-slate-950 rounded border border-slate-800">
+                            <div class="text-slate-200 font-bold mb-1">Apparel Templates</div>
+                            <div class="text-slate-400 text-[11px]">fabric.xlsx, tailoring.xlsx, batches.xlsx</div>
+                        </div>
+                        <div class="p-3 bg-slate-950 rounded border border-slate-800">
+                            <div class="text-slate-200 font-bold mb-1">Restaurant Templates</div>
+                            <div class="text-slate-400 text-[11px]">recipes.xlsx, ingredients.xlsx, shifts.xlsx</div>
+                        </div>
                     </div>
                 </div>
             </div>
