@@ -101,6 +101,75 @@ def read_root():
     }
 
 
+@app.get(f"{settings.API_V1_STR}/decisions/schemas")
+def get_decision_problem_schemas():
+    return {
+        "production_planning": {
+            "title": "Production Planning & Scheduling",
+            "entity_types": ["Products", "Materials", "Machines", "Workers"],
+            "levers": ["Product Quantities", "Production Day", "Machine Allocation", "Worker Shift Assignment"],
+            "constraints": ["Material Availability", "Worker Hours", "Machine Capacity", "Customer Orders", "Budget"],
+            "fields": [
+                {"name": "selling_price", "label": "Unit Selling Price", "type": "currency", "required": True},
+                {"name": "material_cost", "label": "Material Cost per Unit", "type": "currency", "required": True},
+                {"name": "production_time", "label": "Production Time (Hours)", "type": "number", "unit": "hours", "required": True}
+            ]
+        },
+        "workforce_scheduling": {
+            "title": "Workforce Shift & Skill Allocation",
+            "entity_types": ["Employees", "Skills", "Shifts", "Branches"],
+            "levers": ["Employee Shift Assignment", "Overtime Allocation", "Skill Role Matching"],
+            "constraints": ["Maximum Weekly Hours", "Required Skill Roles per Shift", "Employee Availability", "Labor Budget"],
+            "fields": [
+                {"name": "hourly_rate", "label": "Hourly Pay Rate", "type": "currency", "required": True},
+                {"name": "max_hours", "label": "Maximum Weekly Hours", "type": "number", "unit": "hours", "required": True}
+            ]
+        },
+        "logistics_dispatch": {
+            "title": "Logistics Dispatch & Route Optimization",
+            "entity_types": ["Vehicles", "Drivers", "Routes", "Orders"],
+            "levers": ["Vehicle Trip Assignment", "Delivery Route Choice", "Driver Compensation Model"],
+            "constraints": ["Vehicle Payload Tonnage", "Driver Shift Limits", "Customer Delivery Deadlines", "Fuel Budget"],
+            "fields": [
+                {"name": "round_distance", "label": "Round Trip Distance", "type": "number", "unit": "km", "required": True},
+                {"name": "quoted_price", "label": "Quoted Freight Price", "type": "currency", "required": True}
+            ]
+        },
+        "inventory_planning": {
+            "title": "Inventory & Supplier Replenishment",
+            "entity_types": ["Products", "Suppliers", "Warehouses", "Orders"],
+            "levers": ["Reorder Quantity", "Supplier Selection", "Safety Stock Level"],
+            "constraints": ["Warehouse Storage Volume", "Supplier Delivery Lead Time", "Supplier Minimum Order Quantity"],
+            "fields": [
+                {"name": "holding_cost", "label": "Holding Cost per Unit", "type": "currency", "required": True},
+                {"name": "lead_time", "label": "Delivery Lead Time (Days)", "type": "number", "unit": "days", "required": True}
+            ]
+        },
+        "pricing_unit_econ": {
+            "title": "Pricing & Unit Economics Optimization",
+            "entity_types": ["Products", "Direct Costs", "Demand Curves", "Margins"],
+            "levers": ["Product Quoted Price", "Discount Tier Strategy"],
+            "constraints": ["Break-Even Floor Price", "Target Contribution Margin %", "Competitor Price Bounds"],
+            "fields": [
+                {"name": "direct_cost", "label": "Direct Cost per Unit", "type": "currency", "required": True},
+                {"name": "target_margin", "label": "Target Contribution Margin %", "type": "number", "unit": "%", "required": True}
+            ]
+        },
+        "custom_decision": {
+            "title": "Controlled Custom Decision Schema",
+            "entity_types": ["Entities", "Variables", "Parameters", "Constraints"],
+            "levers": ["Custom Decision Variable Vector"],
+            "constraints": ["Custom Upper & Lower Linear Bounds"],
+            "fields": [
+                {"name": "variable_name", "label": "Decision Variable Name", "type": "string", "required": True},
+                {"name": "lower_bound", "label": "Minimum Lower Bound", "type": "number", "required": True},
+                {"name": "upper_bound", "label": "Maximum Upper Bound", "type": "number", "required": True}
+            ]
+        }
+    }
+
+
+
 @app.post(f"{settings.API_V1_STR}/optimization/apparel/runs")
 def run_apparel_optimization(req: ApparelOptimizationRequest):
     plugin = ApparelDesignerPlugin()
