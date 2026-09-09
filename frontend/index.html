@@ -78,7 +78,7 @@
 
             <button onclick="switchTab('data')" id="tab-data" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
                 <i class="fa-solid fa-database w-4 text-slate-400"></i>
-                <span>Data Center</span>
+                <span>Data Center & Readiness</span>
             </button>
 
             <button onclick="switchTab('forecast')" id="tab-forecast" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
@@ -108,7 +108,7 @@
 
             <button onclick="switchTab('learn')" id="tab-learn" class="nav-item w-full text-left px-3.5 py-2.5 rounded-r text-xs font-medium flex items-center space-x-3 transition">
                 <i class="fa-solid fa-book-open w-4 text-slate-400"></i>
-                <span>Learn & Templates</span>
+                <span>How It Works & Templates</span>
             </button>
 
             <div class="pt-6 text-[11px] font-semibold text-slate-500 uppercase px-3 py-2 tracking-wider">System Settings</div>
@@ -199,7 +199,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: DATA CENTER -->
+            <!-- TAB 3: DATA CENTER & READINESS -->
             <div id="section-data" class="hidden space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
                     <div class="flex items-center justify-between mb-4">
@@ -212,9 +212,57 @@
                         </button>
                     </div>
 
-                    <div id="readinessBox" class="hidden mb-6 p-4 rounded bg-slate-950 border border-slate-800 text-xs">
-                        <div class="font-medium text-slate-300 mb-2">Data Quality Scorecard:</div>
-                        <div id="readinessDetails" class="text-slate-400 space-y-1"></div>
+                    <div id="readinessBox" class="hidden mb-6 p-4 rounded bg-slate-950 border border-slate-800 text-xs space-y-2">
+                        <div class="font-medium text-slate-300 mb-1">Data Quality Scorecard & Readiness Audit:</div>
+                        <div id="readinessDetails" class="text-slate-400 space-y-1 font-mono"></div>
+                    </div>
+
+                    <!-- Parameter Justification Table -->
+                    <div class="space-y-3 text-xs border-t border-slate-800 pt-4">
+                        <div class="font-semibold text-slate-300">Data Requirement Justifications (Why Parameters Are Needed)</div>
+                        <div class="overflow-x-auto border border-slate-800 rounded">
+                            <table class="w-full text-left">
+                                <thead class="table-header border-b border-slate-800">
+                                    <tr>
+                                        <th class="px-3 py-2">Parameter</th>
+                                        <th class="px-3 py-2">Requirement Status</th>
+                                        <th class="px-3 py-2">Business Justification</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                                    <tr>
+                                        <td class="px-3 py-2 font-medium text-slate-200">Unit Selling Price</td>
+                                        <td class="px-3 py-2 text-rose-400 font-semibold">REQUIRED</td>
+                                        <td class="px-3 py-2 text-slate-400">Needed to compute gross revenue ($\sum \text{Price}_p \cdot x_{p,t}$) and overall profitability.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 font-medium text-slate-200">Material Purchase Cost</td>
+                                        <td class="px-3 py-2 text-rose-400 font-semibold">REQUIRED</td>
+                                        <td class="px-3 py-2 text-slate-400">Needed to calculate raw material expenditure and gross contribution margin.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 font-medium text-slate-200">Worker Pay Rate / Model</td>
+                                        <td class="px-3 py-2 text-rose-400 font-semibold">REQUIRED</td>
+                                        <td class="px-3 py-2 text-slate-400">Needed to compute labor costs based on payment structure (Hourly, Per Round, Per Shift).</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 font-medium text-slate-200">Equipment Prep Limits</td>
+                                        <td class="px-3 py-2 text-rose-400 font-semibold">REQUIRED</td>
+                                        <td class="px-3 py-2 text-slate-400">Prevents scheduling more production work than machines/ovens can physically execute.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 font-medium text-slate-200">Supplier Delivery Lead Time</td>
+                                        <td class="px-3 py-2 text-amber-400 font-semibold">RECOMMENDED</td>
+                                        <td class="px-3 py-2 text-slate-400">Accounts for delivery delays before raw material purchases arrive in usable inventory.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 font-medium text-slate-200">Historical Sales Transactions</td>
+                                        <td class="px-3 py-2 text-blue-400 font-semibold">OPTIONAL</td>
+                                        <td class="px-3 py-2 text-slate-400">Enables time-series ML demand forecasting. Platform uses Guided Unit Economics Mode if absent.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -368,22 +416,69 @@
 
             <!-- TAB 9: LEARN & TEMPLATES -->
             <div id="section-learn" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h2 class="text-sm font-semibold text-white">Platform Methodologies & Industry Excel Templates</h2>
-                    <p class="text-slate-400">Download formatted operational templates for your decision problem:</p>
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
+                    <div>
+                        <h2 class="text-sm font-semibold text-white mb-1">How the Platform Works — 4-Stage Operational Blueprint</h2>
+                        <p class="text-slate-400 mb-4">The platform converts operational constraints, costs, and resources into mathematical decision models.</p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
-                        <div class="p-3 bg-slate-950 rounded border border-slate-800">
-                            <div class="text-slate-200 font-bold mb-1">Production Planning</div>
-                            <div class="text-slate-400 text-[11px]">products.xlsx, fabric.xlsx, machines.xlsx</div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-[11px] font-mono">
+                            <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-1">
+                                <div class="text-blue-400 font-bold">01. BUSINESS DATA</div>
+                                <div class="text-slate-300">You provide costs, worker pay rules, resources and limits.</div>
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-1">
+                                <div class="text-emerald-400 font-bold">02. FORECAST & BOUNDS</div>
+                                <div class="text-slate-300">System audits quality scorecard and evaluates demand bounds.</div>
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-1">
+                                <div class="text-amber-400 font-bold">03. OPTIMIZATION</div>
+                                <div class="text-slate-300">Solver evaluates candidate plans against constraints & objective.</div>
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-1">
+                                <div class="text-indigo-400 font-bold">04. RECOMMENDATIONS</div>
+                                <div class="text-slate-300">You receive actionable decisions, financial diffs & approval controls.</div>
+                            </div>
                         </div>
-                        <div class="p-3 bg-slate-950 rounded border border-slate-800">
-                            <div class="text-slate-200 font-bold mb-1">Logistics & Trips</div>
-                            <div class="text-slate-400 text-[11px]">vehicles.xlsx, routes.xlsx, drivers.xlsx</div>
+                    </div>
+
+                    <!-- Interactive Page-by-Page Architectural Explorer -->
+                    <div class="border-t border-slate-800 pt-6 space-y-4">
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">Page-by-Page Architectural Breakdown & Data Requirements</h3>
+                            <p class="text-slate-400 text-xs mt-0.5">Click any workspace page below to inspect what it does, how it works, and why specific business data is required.</p>
                         </div>
-                        <div class="p-3 bg-slate-950 rounded border border-slate-800">
-                            <div class="text-slate-200 font-bold mb-1">Workforce Shift</div>
-                            <div class="text-slate-400 text-[11px]">employees.xlsx, skills.xlsx, shifts.xlsx</div>
+
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="showPageDetail('overview')" id="pbtn-overview" class="px-3 py-1.5 rounded bg-blue-950 border border-blue-700 text-blue-300 font-mono text-xs font-semibold">Overview</button>
+                            <button onclick="showPageDetail('setup')" id="pbtn-setup" class="px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-xs hover:text-slate-200">Decision Setup</button>
+                            <button onclick="showPageDetail('data')" id="pbtn-data" class="px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-xs hover:text-slate-200">Data Center</button>
+                            <button onclick="showPageDetail('forecast')" id="pbtn-forecast" class="px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-xs hover:text-slate-200">Forecasts</button>
+                            <button onclick="showPageDetail('unit-econ')" id="pbtn-unit-econ" class="px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-xs hover:text-slate-200">Unit Economics</button>
+                            <button onclick="showPageDetail('optimize')" id="pbtn-optimize" class="px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-xs hover:text-slate-200">Decision Engine</button>
+                            <button onclick="showPageDetail('scenarios')" id="pbtn-scenarios" class="px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-xs hover:text-slate-200">What-If Scenarios</button>
+                            <button onclick="showPageDetail('recommendations')" id="pbtn-recommendations" class="px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-xs hover:text-slate-200">Recommendations</button>
+                        </div>
+
+                        <div id="pageDetailCard" class="bg-slate-950 border border-slate-800 rounded p-4 text-xs space-y-3">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-800 pt-4 space-y-3">
+                        <div class="font-semibold text-slate-200">Downloadable Operational Excel Templates</div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
+                            <div class="p-3 bg-slate-950 rounded border border-slate-800">
+                                <div class="text-slate-200 font-bold mb-1">Production Planning</div>
+                                <div class="text-slate-400 text-[11px]">products.xlsx, fabric.xlsx, machines.xlsx</div>
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded border border-slate-800">
+                                <div class="text-slate-200 font-bold mb-1">Logistics & Trips</div>
+                                <div class="text-slate-400 text-[11px]">vehicles.xlsx, routes.xlsx, drivers.xlsx</div>
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded border border-slate-800">
+                                <div class="text-slate-200 font-bold mb-1">Workforce Shift</div>
+                                <div class="text-slate-400 text-[11px]">employees.xlsx, skills.xlsx, shifts.xlsx</div>
+                            </div>
                         </div>
                     </div>
                 </div>

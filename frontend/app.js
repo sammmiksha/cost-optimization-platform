@@ -286,6 +286,103 @@ async function submitApproval(decisionStatus) {
     }
 }
 
+const pageDetailsMap = {
+    overview: {
+        title: "Overview Page — Executive Decision Summary Dashboard",
+        purpose: "Provides business owners and executives with an instant snapshot of financial performance, net contribution margins, and optimization deltas across flagship industry models.",
+        howItWorks: "Pulls active organization metrics and calculated decision run outputs, aggregating top-line KPIs (Expected Revenue, Material Cost, Net Contribution Margin %, Profit Variance).",
+        requiredData: "Organization Name, Domain Industry Type, and Local Currency Format (INR ₹ Lakhs/Crores vs USD).",
+        justification: "Executives require high-level financial summaries in standard accounting metrics before diving into micro-level operational dispatches.",
+        output: "Top-line profit snapshot, margin improvement deltas, and quick-switch access to flagship industry models."
+    },
+    setup: {
+        title: "Decision Setup Page — Problem Specification & Goals",
+        purpose: "Defines the exact operational decision problem, optimization target (maximize profit vs minimize cost/waste), and decision horizon.",
+        howItWorks: "Feeds configured template choices into the backend DecisionProblemBuilder to instantiate decision variables x, y, h and objective function Z = max(Revenue - Costs).",
+        requiredData: "Decision Problem Template (Production Planning, Logistics Dispatch, Shift Scheduling), Optimization Goal (Maximize Profit, Minimize Cost), Planning Horizon.",
+        justification: "A solver cannot optimize without a target objective and discrete planning horizon; defining these upfront ensures the algorithm aligns with strategic goals.",
+        output: "Configured solver parameters, decision variable bounds, and objective expression structure."
+    },
+    data: {
+        title: "Data Center Page — Data Ingestion & Readiness Scorecard",
+        purpose: "Central hub for dataset imports, automated quality audits (Completeness, Validity, Freshness), and parameter requirement justifications.",
+        howItWorks: "Passes raw datasets to DataQualityAssurance engine which runs 5 quality metrics and returns a 0–100% Data Quality Scorecard.",
+        requiredData: "SKU Selling Prices, BOM Material Costs, Worker Pay Rates, Resource/Machine Limits (Mandatory); Supplier Lead Times (Recommended); Historical Sales (Optional).",
+        justification: "Prevents 'garbage-in, garbage-out' optimization failures by auditing dataset completeness and verifying physical capacity limits before solver execution.",
+        output: "Data Quality Scorecard %, Data Readiness Status (READY vs BLOCKED), and parameter justification table."
+    },
+    forecast: {
+        title: "Forecasts Page — Time-Series Demand Predictions",
+        purpose: "Generates time-series demand predictions with 95% confidence intervals to replace wild guessing with statistical bounds on future customer demand.",
+        howItWorks: "Applies Holt-Winters / ARIMA / Ridge time-series models on historical transaction logs to predict daily demand d_hat and confidence intervals [d_low, d_high].",
+        requiredData: "Historical Sales Transactions (SKU, Date, Quantity Sold, Unit Selling Price) and Demand Horizon Days.",
+        justification: "Customer demand is uncertain. Forecasting provides lower and upper demand bounds so the solver optimizes production without over-producing (waste) or under-producing (stockouts).",
+        output: "7-day / 30-day forecast curves, prediction intervals, and demand constraint upper bounds."
+    },
+    "unit-econ": {
+        title: "Unit Economics Page — Direct Cost Breakdown & Pricing Calculator",
+        purpose: "Calculates single-unit or single-trip cost structures (materials, labor, fuel, tolls) to compute break-even prices and recommended target pricing.",
+        howItWorks: "Calculates direct trip/production costs and margin percentages even when historical sales data is missing (Guided Unit Economics Mode).",
+        requiredData: "Direct Material Cost, Round Distance & Fuel Mileage (Logistics), Driver Pay Rate, Tolls & Maintenance Allocations, Quoted Customer Price.",
+        justification: "Small businesses often quote prices below true break-even due to hidden operating costs (empty return trips, tolls, maintenance). Explicit unit cost breakdown protects profitability.",
+        output: "Break-Even Price, Direct Trip Cost, Gross Contribution %, and Recommended Target Price (25% margin)."
+    },
+    optimize: {
+        title: "Decision Engine Page — Solver Adapter Execution",
+        purpose: "Executes CP-SAT or MIP mathematical solver adapters to compute optimal production mixes, vehicle dispatches, worker shift schedules, and resource allocations.",
+        howItWorks: "Translates configured matrices into formal MILP/CP models (Z = max c^T x s.t. Ax <= b), calls Google OR-Tools solvers, and extracts optimal decision variables.",
+        requiredData: "Validated Organization Datasets, Objective Function Config, and Capacity Bounds.",
+        justification: "Replaces manual intuitive scheduling with mathematically proven optimal operational plans that satisfy 100% of real-world operational constraints.",
+        output: "Optimal decision plan (units to produce, vehicle trip dispatches, cook shift hours), capacity utilization %, and total profit projection."
+    },
+    scenarios: {
+        title: "What-If Scenarios Page — Parameter Sensitivity & Stress Testing",
+        purpose: "Evaluates operational plan stability against fuel price hikes, material inflation, driver shortages, and demand spikes before committing capital.",
+        howItWorks: "Applies percentage variance shifts to baseline cost/demand matrices, re-runs solver adapters, and generates financial diffs (Baseline vs Scenario).",
+        requiredData: "Material Cost Variance %, Demand Variance %, Wage Shift %, Capacity Shock %.",
+        justification: "Operating environments are volatile. Stress-testing allows management to see plan stability and financial break-even points under worst-case economic shocks.",
+        output: "Baseline vs Scenario financial diffs, plan stability index, and recommended contingency adjustments."
+    },
+    recommendations: {
+        title: "Recommendations & Review Page — Human Approval & Audit Logs",
+        purpose: "Converts complex solver outputs into bulleted executive action items verified by fact-checking guardrails, with human-in-the-loop approval controls.",
+        howItWorks: "Runs FactVerificationGuardrail to verify numeric claims match formulas, then presents approval controls (APPROVED/REJECTED) and logs audit events.",
+        requiredData: "Manager User Identity, Role, Approval Decision (APPROVED/REJECTED), and Management Review Comments.",
+        justification: "AI decision systems must maintain human control and governance. Approval logs enforce manager accountability and preserve audit trails.",
+        output: "Verified action items, management approval decision log, and system audit event."
+    }
+};
+
+function showPageDetail(key) {
+    const details = pageDetailsMap[key] || pageDetailsMap.overview;
+    const card = document.getElementById("pageDetailCard");
+    if (!card) return;
+
+    Object.keys(pageDetailsMap).forEach(k => {
+        const btn = document.getElementById(`pbtn-${k}`);
+        if (btn) {
+            if (k === key) {
+                btn.className = "px-3 py-1.5 rounded bg-blue-950 border border-blue-700 text-blue-300 font-mono text-xs font-semibold";
+            } else {
+                btn.className = "px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-xs hover:text-slate-200";
+            }
+        }
+    });
+
+    card.innerHTML = `
+        <div class="font-bold text-slate-200 text-sm mb-2">${details.title}</div>
+        <div class="space-y-2 text-slate-300">
+            <div><strong class="text-blue-400 font-mono uppercase">01. Core Purpose:</strong> ${details.purpose}</div>
+            <div><strong class="text-emerald-400 font-mono uppercase">02. How It Works:</strong> ${details.howItWorks}</div>
+            <div><strong class="text-amber-400 font-mono uppercase">03. Required Org Data:</strong> <span class="text-slate-200 font-mono">${details.requiredData}</span></div>
+            <div><strong class="text-rose-400 font-mono uppercase">04. Business Justification:</strong> ${details.justification}</div>
+            <div><strong class="text-indigo-400 font-mono uppercase">05. Decision Output:</strong> ${details.output}</div>
+        </div>
+    `;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     runApparelOptimizer();
+    showPageDetail('overview');
 });
+
