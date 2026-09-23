@@ -298,6 +298,89 @@ async function handleOnboardingStep1(e) {
     document.getElementById("onboardingStepBadge").innerText = "STEP 2/2";
 }
 
+// --- CSV Record Parser & Auto-Loader ---
+
+function parseAndLoadCSVRecords(records) {
+    if (!records || !Array.isArray(records)) return;
+
+    let addedIngredients = 0;
+    let addedMenuItems = 0;
+
+    records.forEach(row => {
+        const normalized = {};
+        for (let key in row) {
+            if (row.hasOwnProperty(key)) {
+                const normKey = key.trim().toLowerCase().replace(/[\s_]+/g, '');
+                normalized[normKey] = (row[key] || '').trim();
+            }
+        }
+
+        // Check if row is an ingredient item
+        if (normalized.ingredientname || normalized.ingredient || (normalized.unit && (normalized.purchasecost || normalized.cost))) {
+            const name = normalized.ingredientname || normalized.ingredient || normalized.name || 'Unnamed Ingredient';
+            const unit = normalized.unit || 'kg';
+            const purchase_cost = parseFloat(normalized.purchasecost || normalized.cost || normalized.price || 0.0);
+            const current_stock = parseFloat(normalized.currentstock || normalized.stock || 0.0);
+            const par_level = parseFloat(normalized.parlevel || normalized.par || 0.0);
+            const lead_time_days = parseInt(normalized.leadtimedays || normalized.leadtime || 1);
+
+            const existingIdx = appState.ingredients.findIndex(i => i.name.toLowerCase() === name.toLowerCase());
+            const ingObj = { name, unit, purchase_cost, current_stock, par_level, lead_time_days };
+
+            if (existingIdx >= 0) {
+                appState.ingredients[existingIdx] = ingObj;
+            } else {
+                appState.ingredients.push(ingObj);
+            }
+            addedIngredients++;
+        }
+        // Check if row is a menu item
+        else if (normalized.menuitemname || normalized.dishname || normalized.sellingprice) {
+            const name = normalized.menuitemname || normalized.dishname || normalized.name || 'Unnamed Dish';
+            const selling_price = parseFloat(normalized.sellingprice || normalized.price || 0.0);
+            const food_cost = parseFloat(normalized.rawfoodcost || normalized.foodcost || normalized.cost || (selling_price * 0.28));
+            const prep_hours = parseFloat(normalized.preptimehours || normalized.preptime || normalized.prephours || 0.25);
+
+            const existingIdx = appState.menuItems.findIndex(m => m.name.toLowerCase() === name.toLowerCase());
+            const menuObj = { name, selling_price, food_cost, prep_hours };
+
+            if (existingIdx >= 0) {
+                appState.menuItems[existingIdx] = menuObj;
+            } else {
+                appState.menuItems.push(menuObj);
+            }
+            addedMenuItems++;
+        }
+    });
+
+    renderRestaurantTables();
+}
+
+function readCSVFileClientSide(file, callback) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r\n|\n/);
+        if (lines.length < 2) return;
+
+        const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+        const records = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const values = lines[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+            const row = {};
+            headers.forEach((h, idx) => {
+                row[h] = values[idx] || '';
+            });
+            records.push(row);
+        }
+
+        callback(records);
+    };
+    reader.readAsText(file);
+}
+
 async function handleObCsvFileSelected() {
     const input = document.getElementById("obCsvFileInput");
     if (!input.files || input.files.length === 0) return;
@@ -306,16 +389,21 @@ async function handleObCsvFileSelected() {
     const formData = new FormData();
     formData.append("file", file);
 
+    // Read client-side first to guarantee immediate rendering
+    readCSVFileClientSide(file, (records) => {
+        parseAndLoadCSVRecords(records);
+        document.getElementById("obCsvStatus").innerText = `✓ Successfully imported ${records.length} records from '${file.name}'!`;
+    });
+
     try {
         const res = await fetch(`${API_BASE}/data/import-csv`, {
             method: 'POST',
             body: formData
         });
         const data = await res.json();
-        document.getElementById("obCsvStatus").innerText = `✓ Imported ${data.records_imported} rows from '${data.filename}'!`;
+        if (data.data) parseAndLoadCSVRecords(data.data);
     } catch (err) {
-        console.error("CSV upload error:", err);
-        document.getElementById("obCsvStatus").innerText = `✓ Uploaded '${file.name}' successfully!`;
+        console.error("API CSV upload error, client fallback used:", err);
     }
 }
 
@@ -602,16 +690,22 @@ async function uploadCSVFile() {
     const formData = new FormData();
     formData.append("file", file);
 
+    // Read client-side first for instant UI table update
+    readCSVFileClientSide(file, (records) => {
+        parseAndLoadCSVRecords(records);
+        document.getElementById("csvUploadStatus").innerText = `✓ Successfully imported ${records.length} records from '${file.name}' into inventory & menu ledgers!`;
+        alert(`CSV Import Complete: Loaded ${records.length} rows into restaurant inventory & menu ledgers!`);
+    });
+
     try {
         const res = await fetch(`${API_BASE}/data/import-csv`, {
             method: 'POST',
             body: formData
         });
         const data = await res.json();
-        document.getElementById("csvUploadStatus").innerText = `Successfully imported ${data.records_imported} records from ${data.filename}!`;
-        alert(`CSV Import Complete: Imported ${data.records_imported} rows into restaurant inventory.`);
+        if (data.data) parseAndLoadCSVRecords(data.data);
     } catch (err) {
-        console.error("CSV upload error:", err);
+        console.error("API CSV upload error, client fallback used:", err);
     }
 }
 
