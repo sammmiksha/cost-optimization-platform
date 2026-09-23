@@ -672,7 +672,7 @@ function removeRecipeLink(dishName, ingName) {
     renderRestaurantTables();
 }
 
-// --- Dynamic Recipe Cost Link Helper ---
+// --- Dynamic Recipe Cost Link & Portion Capacity Helper ---
 function getCalculatedFoodCost(dish) {
     if (!dish) return 0;
     if (!appState.recipes || appState.recipes.length === 0) {
@@ -692,18 +692,76 @@ function getCalculatedFoodCost(dish) {
     return calculatedCost > 0 ? calculatedCost : (dish.food_cost || 0);
 }
 
+function getDishProductionCapacity(dish) {
+    if (!dish || !appState.recipes || appState.recipes.length === 0) {
+        return { portions: null, bottleneck: null, remainingStock: null, unit: 'kg' };
+    }
+    const linkedRecipes = appState.recipes.filter(r => r.dish_name.toLowerCase() === dish.name.toLowerCase());
+    if (linkedRecipes.length === 0) {
+        return { portions: null, bottleneck: null, remainingStock: null, unit: 'kg' };
+    }
+
+    let minPortions = Infinity;
+    let bottleneckIng = null;
+    let bottleneckStock = 0;
+    let bottleneckUnit = 'kg';
+
+    linkedRecipes.forEach(r => {
+        const ing = appState.ingredients.find(i => i.name.toLowerCase() === r.ingredient_name.toLowerCase());
+        const stock = ing ? (ing.current_stock || 0) : 0;
+        const req = r.quantity_required || 0.001;
+        const portions = Math.floor(stock / req);
+
+        if (portions < minPortions) {
+            minPortions = portions;
+            bottleneckIng = r.ingredient_name;
+            bottleneckStock = stock;
+            bottleneckUnit = r.unit || (ing ? ing.unit : 'kg');
+        }
+    });
+
+    if (minPortions === Infinity) {
+        return { portions: null, bottleneck: null, remainingStock: null, unit: 'kg' };
+    }
+
+    return {
+        portions: minPortions,
+        bottleneck: bottleneckIng,
+        remainingStock: bottleneckStock,
+        unit: bottleneckUnit
+    };
+}
+
+function getSuggestedSellingPrice(dish) {
+    const foodCost = getCalculatedFoodCost(dish);
+    if (foodCost <= 0) return dish ? dish.selling_price : 0;
+    const targetFoodCostPct = 0.28;
+    return Math.ceil(foodCost / targetFoodCostPct);
+}
+
+function handleMenuRecipeCsvSelected() {
+    const input = document.getElementById("menuRecipeCsvInput");
+    if (!input || !input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    readCSVFileClientSide(file, (records) => {
+        parseAndLoadCSVRecords(records);
+        alert(`✓ Successfully loaded recipe ingredient links from '${file.name}' into Menu & Recipes LEDGER!`);
+    });
+}
+
 // --- Table Rendering Functions ---
 
 function renderRestaurantTables() {
     const cur = appState.currency;
 
-    // Render Menu Table with Expandable Recipe Ingredient Breakdown
+    // Render Menu Table with Expandable Recipe Ingredient Breakdown & Portion Capacity
     const menuBody = document.getElementById("menuTableBody");
     if (menuBody) {
         if (appState.menuItems.length === 0) {
             menuBody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="px-4 py-6 text-center text-gray-400">No menu items added yet. Click "+ Add Menu Item" to add your first dish.</td>
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No menu items added yet. Click "+ Add Menu Item" or "Import Recipe CSV" to get started.</td>
                 </tr>
             `;
         } else {
@@ -716,6 +774,41 @@ function renderRestaurantTables() {
                 const marginBadgeHtml = isMarginLow 
                     ? `<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-bold block mt-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Margin Decreasing</span>`
                     : `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold block mt-1"><i class="fa-solid fa-circle-check mr-1"></i>Healthy Margin</span>`;
+
+                const capacity = getDishProductionCapacity(m);
+                const suggestedPrice = getSuggestedSellingPrice(m);
+
+                let capacityHtml = "";
+                if (capacity.portions === null) {
+                    capacityHtml = `<span class="text-gray-400 text-[11px] italic font-mono">No recipe linked</span>`;
+                } else if (capacity.portions === 0) {
+                    capacityHtml = `
+                        <div class="inline-block bg-rose-50 border border-rose-200 text-rose-800 px-2 py-1 rounded text-center font-mono">
+                            <span class="font-bold text-xs"><i class="fa-solid fa-circle-exclamation text-rose-600 mr-1"></i>0 Portions</span>
+                            <span class="text-[10px] text-rose-600 block">Out of stock: ${capacity.bottleneck}</span>
+                        </div>
+                    `;
+                } else {
+                    capacityHtml = `
+                        <div class="inline-block bg-blue-50 border border-blue-200 text-blue-900 px-2.5 py-1 rounded text-center font-mono">
+                            <span class="font-bold text-xs text-blue-700"><i class="fa-solid fa-boxes-stacked mr-1 text-blue-600"></i>${capacity.portions} Portions</span>
+                            <span class="text-[10px] text-gray-500 block">Limiting: ${capacity.bottleneck} (${capacity.remainingStock} ${capacity.unit})</span>
+                        </div>
+                    `;
+                }
+
+                let priceSuggestionHtml = "";
+                if (isMarginLow && suggestedPrice > m.selling_price) {
+                    priceSuggestionHtml = `
+                        <div class="mt-1.5 text-[10px] font-mono bg-amber-50 text-amber-900 border border-amber-300 p-1.5 rounded-lg text-left shadow-2xs">
+                            <div class="font-bold text-amber-800 flex items-center">
+                                <i class="fa-solid fa-arrow-trend-up text-amber-600 mr-1"></i>Raw Price Inflation Alert
+                            </div>
+                            <div>Food Cost rose to ${formatCurrency(foodCost, cur)}.</div>
+                            <div>Suggested Price: <strong class="text-emerald-700 font-bold underline">${formatCurrency(suggestedPrice, cur)}</strong> (to target 72% margin).</div>
+                        </div>
+                    `;
+                }
 
                 const linkedRecipes = (appState.recipes || []).filter(r => r.dish_name.toLowerCase() === m.name.toLowerCase());
                 const recipeCount = linkedRecipes.length;
@@ -771,13 +864,15 @@ function renderRestaurantTables() {
                         <td class="px-4 py-2.5 text-right font-bold text-gray-800">${formatCurrency(m.selling_price, cur)}</td>
                         <td class="px-4 py-2.5 text-right text-rose-600 font-bold">${formatCurrency(foodCost, cur)}</td>
                         <td class="px-4 py-2.5 text-right text-gray-500">${m.prep_hours} hr</td>
+                        <td class="px-4 py-2.5 text-center">${capacityHtml}</td>
                         <td class="px-4 py-2.5 text-right text-emerald-600 font-bold">
                             <div>${formatCurrency(margin, cur)} (${marginPct}%)</div>
                             ${marginBadgeHtml}
+                            ${priceSuggestionHtml}
                         </td>
                     </tr>
                     <tr id="recipe-breakdown-${idx}" class="bg-slate-50/90 hidden border-b border-gray-200">
-                        <td colspan="5" class="px-6 py-3">
+                        <td colspan="6" class="px-6 py-3">
                             <div class="space-y-2">
                                 <div class="flex items-center justify-between">
                                     <span class="font-bold text-xs text-gray-700 uppercase tracking-wider font-mono">

@@ -458,11 +458,17 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-sm font-bold text-gray-900">Menu Items & Recipe Margins</h2>
-                            <p class="text-gray-500 mt-0.5">Manage dish selling prices, prep times, and raw material ingredient costs.</p>
+                            <p class="text-gray-500 mt-0.5">Manage dish selling prices, prep times, portion limits, and raw ingredient costs.</p>
                         </div>
-                        <button onclick="openAddMenuModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3.5 py-1.5 rounded-lg transition shadow-xs">
-                            + Add Menu Item
-                        </button>
+                        <div class="flex space-x-2">
+                            <input type="file" id="menuRecipeCsvInput" accept=".csv" class="hidden" onchange="handleMenuRecipeCsvSelected()">
+                            <button onclick="document.getElementById('menuRecipeCsvInput').click()" class="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-3 py-1.5 rounded-lg transition font-mono text-xs shadow-xs">
+                                <i class="fa-solid fa-file-csv text-blue-600 mr-1.5"></i>Import Recipe CSV
+                            </button>
+                            <button onclick="openAddMenuModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3.5 py-1.5 rounded-lg transition shadow-xs">
+                                + Add Menu Item
+                            </button>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-xs">
@@ -473,12 +479,13 @@
                                     <th class="px-4 py-2.5 text-right">Selling Price</th>
                                     <th class="px-4 py-2.5 text-right">Raw Food Cost</th>
                                     <th class="px-4 py-2.5 text-right">Prep Time</th>
-                                    <th class="px-4 py-2.5 text-right">Contribution Margin</th>
+                                    <th class="px-4 py-2.5 text-center">Portions Capacity (Inventory Limit)</th>
+                                    <th class="px-4 py-2.5 text-right">Contribution Margin & Price Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="menuTableBody" class="divide-y divide-gray-200 text-gray-800 bg-white">
                                 <tr>
-                                    <td colspan="5" class="px-4 py-6 text-center text-gray-400">No menu items added yet. Click "+ Add Menu Item" to add your first dish.</td>
+                                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No menu items added yet. Click "+ Add Menu Item" or "Import Recipe CSV" to get started.</td>
                                 </tr>
                             </tbody>
                         </table>
