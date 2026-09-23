@@ -43,6 +43,44 @@ class Location(Base):
     city = Column(String(128), nullable=True)
 
 
+class Ingredient(Base):
+    __tablename__ = "ingredients"
+
+    id = Column(Integer, primary_key=True, index=True)
+    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False)
+    name = Column(String(255), nullable=False)
+    unit = Column(String(32), nullable=False, default="kg")
+    purchase_cost = Column(Float, nullable=False, default=0.0)
+    current_stock = Column(Float, nullable=False, default=0.0)
+    par_level = Column(Float, nullable=False, default=0.0)
+    lead_time_days = Column(Integer, default=1)
+
+
+class MenuItem(Base):
+    __tablename__ = "menu_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False)
+    name = Column(String(255), nullable=False)
+    selling_price = Column(Float, nullable=False, default=0.0)
+    prep_time_minutes = Column(Float, nullable=False, default=15.0)
+
+    recipe_items = relationship("RecipeItem", back_populates="menu_item", cascade="all, delete-orphan")
+
+
+class RecipeItem(Base):
+    __tablename__ = "recipe_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    menu_item_id = Column(Integer, ForeignKey("menu_items.id", ondelete="CASCADE"), nullable=False)
+    ingredient_id = Column(Integer, ForeignKey("ingredients.id", ondelete="CASCADE"), nullable=False)
+    quantity_per_dish = Column(Float, nullable=False, default=1.0)
+
+    menu_item = relationship("MenuItem", back_populates="recipe_items")
+    ingredient = relationship("Ingredient")
+
+
+
 class Supplier(Base):
     __tablename__ = "suppliers"
 

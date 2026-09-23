@@ -128,7 +128,8 @@ function renderRestaurantTables() {
         }
     }
 
-    // Calculate Summary KPIs if items exist
+    // Calculate Summary KPIs & Ranked Dishes if items exist
+    const rankedBody = document.getElementById("rankedDishTableBody");
     if (appState.menuItems.length > 0) {
         const totalSales = appState.menuItems.reduce((acc, m) => acc + m.selling_price, 0);
         const totalFood = appState.menuItems.reduce((acc, m) => acc + m.food_cost, 0);
@@ -139,7 +140,52 @@ function renderRestaurantTables() {
         document.getElementById("kpiLaborCost").innerText = "24.1%";
         document.getElementById("kpiContribution").innerText = `${marginPct}%`;
         document.getElementById("overviewEmptyPrompt").classList.add("hidden");
+
+        if (rankedBody) {
+            const sortedDishes = [...appState.menuItems].sort((a, b) => {
+                const marginA = (a.selling_price - a.food_cost) / a.selling_price;
+                const marginB = (b.selling_price - b.food_cost) / b.selling_price;
+                return marginB - marginA;
+            });
+
+            rankedBody.innerHTML = sortedDishes.map(d => {
+                const profit = d.selling_price - d.food_cost;
+                const pct = d.selling_price > 0 ? ((profit / d.selling_price) * 100).toFixed(1) : 0;
+                let badgeClass = "bg-blue-100 text-blue-800";
+                let badgeText = "Healthy Margin";
+
+                if (pct >= 65.0) {
+                    badgeClass = "bg-emerald-100 text-emerald-800 font-bold";
+                    badgeText = "Top Earner";
+                } else if (pct < 35.0) {
+                    badgeClass = "bg-rose-100 text-rose-800 font-bold";
+                    badgeText = "Low Margin / Review";
+                }
+
+                return `
+                    <tr>
+                        <td class="px-4 py-2.5 font-bold text-gray-900">${d.name}</td>
+                        <td class="px-4 py-2.5 text-right">${formatCurrency(d.selling_price, cur)}</td>
+                        <td class="px-4 py-2.5 text-right text-rose-600">${formatCurrency(d.food_cost, cur)}</td>
+                        <td class="px-4 py-2.5 text-right font-bold text-emerald-600">${formatCurrency(profit, cur)}</td>
+                        <td class="px-4 py-2.5 text-right font-bold text-blue-600">${pct}%</td>
+                        <td class="px-4 py-2.5 text-center">
+                            <span class="px-2 py-0.5 rounded text-[11px] ${badgeClass}">${badgeText}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    } else {
+        if (rankedBody) {
+            rankedBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No dishes ranked yet. Add dishes in Menu & Recipes or run Setup Wizard.</td>
+                </tr>
+            `;
+        }
     }
+
 }
 
 async function uploadCSVFile() {

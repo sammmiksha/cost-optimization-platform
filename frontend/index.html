@@ -176,6 +176,39 @@
                     </div>
                 </div>
 
+                <!-- Ranked Dish Profitability & Food Cost Analysis -->
+                <div id="rankedDishesCard" class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-gray-900 text-sm">Ranked Dish Margin Analysis</h3>
+                            <p class="text-gray-500 text-xs mt-0.5">Top-earning dishes vs low-margin / money-losing items based on recipe ingredient costs.</p>
+                        </div>
+                        <button onclick="switchTab('menu')" class="text-blue-600 hover:underline font-mono text-xs">
+                            Manage Menu & Recipes &rarr;
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-xs">
+                        <table class="w-full text-left font-mono">
+                            <thead class="table-header border-b border-gray-200">
+                                <tr>
+                                    <th class="px-4 py-2.5">Menu Dish Name</th>
+                                    <th class="px-4 py-2.5 text-right">Price</th>
+                                    <th class="px-4 py-2.5 text-right">Food Cost</th>
+                                    <th class="px-4 py-2.5 text-right">Profit / Plate</th>
+                                    <th class="px-4 py-2.5 text-right">Margin %</th>
+                                    <th class="px-4 py-2.5 text-center">Performance Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankedDishTableBody" class="divide-y divide-gray-200 text-gray-800 bg-white">
+                                <tr>
+                                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No dishes ranked yet. Add dishes in Menu & Recipes to see dish ranking.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Action Launcher Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                     <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
