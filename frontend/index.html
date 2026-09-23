@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurable Business Decision & Optimization Platform</title>
+    <title>KitchenOptima — Restaurant Operations & Cost Optimization Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,28 +36,28 @@
     <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="bg-blue-600 text-white px-2.5 py-1.5 rounded font-semibold text-xs tracking-wider">
-                    DECISION-ENGINE
+                <div class="bg-blue-600 text-white px-2.5 py-1.5 rounded font-semibold text-xs tracking-wider font-mono">
+                    KITCHENOPTIMA
                 </div>
                 <div>
-                    <h1 class="text-sm font-semibold text-white">Configurable Decision & Optimization Workspace</h1>
-                    <p class="text-xs text-slate-400">Turn operational rules and constraints into mathematically optimal feasible business decisions</p>
+                    <h1 class="text-sm font-semibold text-white">Restaurant Operations & Cost Optimization Platform</h1>
+                    <p class="text-xs text-slate-400">Turn POS sales history, recipes, and ingredient costs into actionable weekly ordering and staffing decisions</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
-                <div id="demoBadge" class="hidden text-xs px-2.5 py-1 rounded bg-amber-950/80 border border-amber-700/80 text-amber-300 font-mono">
-                    DEMO DATA - Sample Organization
+                <div id="demoBadge" class="text-xs px-2.5 py-1 rounded bg-blue-950/80 border border-blue-700/80 text-blue-300 font-mono">
+                    DEMO MODE — Luigi's Italian Trattoria
                 </div>
                 <div class="flex items-center space-x-2 text-xs text-slate-400">
                     <span>Currency:</span>
                     <select id="currencySelect" onchange="onCurrencyChange()" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded px-2.5 py-1 focus:outline-none focus:border-blue-500 font-mono">
-                        <option value="INR">INR (₹ Lakhs / Crores)</option>
                         <option value="USD">USD ($)</option>
+                        <option value="INR">INR (₹)</option>
                     </select>
                 </div>
-                <span class="text-xs px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono">
-                    Model: Decision Compiler
-                </span>
+                <button onclick="openSetupWizard()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded transition font-mono">
+                    Setup Wizard
+                </button>
             </div>
         </div>
     </header>
@@ -68,59 +68,59 @@
         <!-- Sidebar Navigation -->
         <aside class="col-span-12 lg:col-span-3 space-y-4">
             
-            <!-- GROUP 1: WORKSPACE -->
+            <!-- GROUP 1: RESTAURANT WORKSPACE -->
             <div>
-                <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-1.5 tracking-wider">WORKSPACE</div>
+                <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-1.5 tracking-wider">RESTAURANT WORKSPACE</div>
                 <div class="space-y-0.5">
                     <button onclick="switchTab('overview')" id="tab-overview" class="nav-item nav-item-active w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
                         <i class="fa-solid fa-house w-4 text-slate-400"></i>
-                        <span>Overview</span>
+                        <span>This Week (Dashboard)</span>
                     </button>
 
-                    <button onclick="switchTab('setup')" id="tab-setup" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-sliders w-4 text-slate-400"></i>
-                        <span>Decisions</span>
+                    <button onclick="switchTab('menu')" id="tab-menu" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-utensils w-4 text-slate-400"></i>
+                        <span>Menu & Recipes</span>
                     </button>
 
                     <button onclick="switchTab('data')" id="tab-data" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-database w-4 text-slate-400"></i>
-                        <span>Business Data</span>
+                        <i class="fa-solid fa-boxes-stacked w-4 text-slate-400"></i>
+                        <span>Inventory & Suppliers</span>
+                    </button>
+
+                    <button onclick="switchTab('shifts')" id="tab-shifts" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-user-clock w-4 text-slate-400"></i>
+                        <span>Staffing & Shifts</span>
                     </button>
 
                     <button onclick="switchTab('optimize')" id="tab-optimize" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-microchip w-4 text-slate-400"></i>
-                        <span>Optimization</span>
+                        <i class="fa-solid fa-calculator w-4 text-slate-400"></i>
+                        <span>Weekly Optimizer</span>
                     </button>
 
                     <button onclick="switchTab('scenarios')" id="tab-scenarios" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
                         <i class="fa-solid fa-code-branch w-4 text-slate-400"></i>
-                        <span>Scenarios</span>
+                        <span>What-If Scenarios</span>
                     </button>
 
                     <button onclick="switchTab('recommendations')" id="tab-recommendations" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
                         <i class="fa-solid fa-circle-check w-4 text-slate-400"></i>
-                        <span>Recommendations</span>
-                    </button>
-
-                    <button onclick="switchTab('reports')" id="tab-reports" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-file-invoice w-4 text-slate-400"></i>
-                        <span>Reports & Audits</span>
+                        <span>Track Record & Review</span>
                     </button>
                 </div>
             </div>
 
-            <!-- GROUP 2: RESOURCES -->
+            <!-- GROUP 2: INTEGRATIONS -->
             <div>
-                <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-1.5 tracking-wider">RESOURCES</div>
+                <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-1.5 tracking-wider">INTEGRATIONS</div>
                 <div class="space-y-0.5">
-                    <button onclick="switchTab('templates')" id="tab-templates" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-file-excel w-4 text-slate-400"></i>
-                        <span>Templates</span>
+                    <button onclick="switchTab('csv-import')" id="tab-csv-import" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-file-csv w-4 text-slate-400"></i>
+                        <span>CSV Import & Templates</span>
                     </button>
 
-                    <button onclick="switchTab('learn')" id="tab-learn" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-book-open w-4 text-slate-400"></i>
-                        <span>How It Works</span>
+                    <button onclick="switchTab('pos')" id="tab-pos" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-cash-register w-4 text-slate-400"></i>
+                        <span>POS Systems (Phase 2)</span>
                     </button>
                 </div>
             </div>
@@ -130,600 +130,469 @@
                 <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-1.5 tracking-wider">SETTINGS</div>
                 <div class="space-y-0.5">
                     <button onclick="switchTab('settings-org')" id="tab-settings-org" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-building w-4 text-slate-400"></i>
-                        <span>Organization</span>
-                    </button>
-
-                    <button onclick="switchTab('settings-team')" id="tab-settings-team" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-users w-4 text-slate-400"></i>
-                        <span>Team & Permissions</span>
-                    </button>
-
-                    <button onclick="switchTab('settings-units')" id="tab-settings-units" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-coins w-4 text-slate-400"></i>
-                        <span>Currency & Units</span>
-                    </button>
-
-                    <button onclick="switchTab('settings-audit')" id="tab-settings-audit" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-shield-halved w-4 text-slate-400"></i>
-                        <span>Audit Log</span>
+                        <i class="fa-solid fa-store w-4 text-slate-400"></i>
+                        <span>Restaurant Profile</span>
                     </button>
                 </div>
             </div>
 
             <div class="pt-4 border-t border-slate-800 text-[11px] text-slate-400 space-y-1 font-mono px-3">
-                <div>Org: <span id="sidebarOrgName" class="text-slate-200">Enterprise Operations</span></div>
-                <div>Role: <span class="text-blue-400">Operations Manager</span></div>
+                <div>Restaurant: <span id="sidebarOrgName" class="text-slate-200">Luigi's Italian Trattoria</span></div>
+                <div>Role: <span class="text-blue-400">Owner / Manager</span></div>
             </div>
         </aside>
 
         <!-- Main Workspace Content Area -->
         <main class="col-span-12 lg:col-span-9 space-y-6">
 
-            <!-- TAB 1: OVERVIEW -->
+            <!-- TAB 1: THIS WEEK (DASHBOARD) -->
             <div id="section-overview" class="space-y-6">
                 
-                <!-- Decision Launcher Banner -->
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                    <div class="text-xs font-mono text-blue-400 mb-1 uppercase tracking-wider">Good evening</div>
-                    <h2 class="text-lg font-semibold text-white mb-4">What decision would you like to optimize?</h2>
-
-                    <!-- Decision Launcher Grid -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                        <button onclick="selectDecisionLauncher('production_planning')" class="p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-blue-500 rounded text-left transition space-y-1">
-                            <div class="font-bold text-blue-400">Production</div>
-                            <div class="text-slate-400 text-[11px]">What to produce, when & how much</div>
-                        </button>
-
-                        <button onclick="selectDecisionLauncher('workforce_scheduling')" class="p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500 rounded text-left transition space-y-1">
-                            <div class="font-bold text-emerald-400">Workforce</div>
-                            <div class="text-slate-400 text-[11px]">Shifts, skills & overtime allocation</div>
-                        </button>
-
-                        <button onclick="selectDecisionLauncher('logistics_dispatch')" class="p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-amber-400 rounded text-left transition space-y-1">
-                            <div class="font-bold text-amber-400">Logistics</div>
-                            <div class="text-slate-400 text-[11px]">Vehicles, trips & route dispatch</div>
-                        </button>
-
-                        <button onclick="selectDecisionLauncher('inventory_planning')" class="p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-indigo-400 rounded text-left transition space-y-1">
-                            <div class="font-bold text-indigo-400">Inventory</div>
-                            <div class="text-slate-400 text-[11px]">Safety stock & supplier reorders</div>
-                        </button>
-
-                        <button onclick="selectDecisionLauncher('pricing_unit_econ')" class="p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-purple-400 rounded text-left transition space-y-1">
-                            <div class="font-bold text-purple-400">Pricing</div>
-                            <div class="text-slate-400 text-[11px]">Break-even & target margin pricing</div>
-                        </button>
-
-                        <button onclick="selectDecisionLauncher('allocation')" class="p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-teal-400 rounded text-left transition space-y-1">
-                            <div class="font-bold text-teal-400">Allocation</div>
-                            <div class="text-slate-400 text-[11px]">Resource & budget distribution</div>
-                        </button>
-
-                        <button onclick="openCustomDecisionBuilder()" class="p-3.5 bg-slate-950 hover:bg-slate-800 border border-blue-800 hover:border-blue-400 rounded text-left transition space-y-1">
-                            <div class="font-bold text-blue-300">+ Custom Decision</div>
-                            <div class="text-slate-400 text-[11px]">Define variables & bounds schema</div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Recent Decisions Table -->
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h3 class="font-semibold text-white text-sm">Recent Operational Decisions</h3>
-                    <div class="overflow-x-auto border border-slate-800 rounded">
-                        <table class="w-full text-left">
-                            <thead class="table-header border-b border-slate-800">
-                                <tr>
-                                    <th class="px-3.5 py-2.5">Decision Title</th>
-                                    <th class="px-3.5 py-2.5">Domain Type</th>
-                                    <th class="px-3.5 py-2.5">Last Status</th>
-                                    <th class="px-3.5 py-2.5">Horizon</th>
-                                    <th class="px-3.5 py-2.5">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-800 text-slate-300 font-mono">
-                                <tr>
-                                    <td class="px-3.5 py-2.5 font-bold text-slate-200">Production Plan — Designer Apparel</td>
-                                    <td class="px-3.5 py-2.5 text-blue-400">Production Planning</td>
-                                    <td class="px-3.5 py-2.5 text-emerald-400 font-semibold">Completed (OPTIMAL)</td>
-                                    <td class="px-3.5 py-2.5 text-slate-400">7 Days</td>
-                                    <td class="px-3.5 py-2.5"><button onclick="loadDemo('apparel')" class="text-blue-400 hover:underline">Inspect</button></td>
-                                </tr>
-                                <tr>
-                                    <td class="px-3.5 py-2.5 font-bold text-slate-200">Workforce Schedule — Restaurant Staff</td>
-                                    <td class="px-3.5 py-2.5 text-emerald-400">Workforce Scheduling</td>
-                                    <td class="px-3.5 py-2.5 text-blue-400 font-semibold">Approved</td>
-                                    <td class="px-3.5 py-2.5 text-slate-400">Weekly Shift</td>
-                                    <td class="px-3.5 py-2.5"><button onclick="loadDemo('restaurant')" class="text-blue-400 hover:underline">Inspect</button></td>
-                                </tr>
-                                <tr>
-                                    <td class="px-3.5 py-2.5 font-bold text-slate-200">Sand Transport Dispatch</td>
-                                    <td class="px-3.5 py-2.5 text-amber-400">Logistics & Trip Dispatch</td>
-                                    <td class="px-3.5 py-2.5 text-slate-400 font-semibold">Draft</td>
-                                    <td class="px-3.5 py-2.5 text-slate-400">Daily Trips</td>
-                                    <td class="px-3.5 py-2.5"><button onclick="loadDemo('logistics')" class="text-blue-400 hover:underline">Inspect</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Explore Example Decisions -->
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h3 class="font-semibold text-white text-sm">Explore Example Flagship Decisions</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 font-mono">
-                        <button onclick="loadDemo('apparel')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded text-left transition space-y-1">
-                            <div class="text-blue-400 font-bold">1. Designer Clothing</div>
-                            <div class="text-slate-400 text-[11px]">Production planning under tailor, designer & embroidery limits</div>
-                        </button>
-                        <button onclick="loadDemo('logistics')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded text-left transition space-y-1">
-                            <div class="text-emerald-400 font-bold">2. Sand Transport</div>
-                            <div class="text-slate-400 text-[11px]">Trip dispatch, diesel mileage & per-round driver pay</div>
-                        </button>
-                        <button onclick="loadDemo('restaurant')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded text-left transition space-y-1">
-                            <div class="text-amber-400 font-bold">3. Restaurant Service</div>
-                            <div class="text-slate-400 text-[11px]">Shift staffing & recipe ingredient allocation</div>
-                        </button>
-                        <button onclick="loadDemo('timetable')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded text-left transition space-y-1">
-                            <div class="text-indigo-400 font-bold">4. Timetable Schedule</div>
-                            <div class="text-slate-400 text-[11px]">Classroom, teacher & course slot scheduling</div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Active Financial Metrics Summary (Only rendered when optimization run exists) -->
-                <div id="overviewMetricsCard" class="hidden bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-semibold text-white text-sm">Active Decision Metrics Snapshot</h3>
-                        <span id="overviewMetricStatus" class="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-700 text-emerald-400 font-mono text-[11px]">Calculated</span>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                        <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Expected Revenue</span>
-                            <div id="ovRevenue" class="text-lg font-bold text-slate-200 mt-1">--</div>
-                        </div>
-                        <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Operating Cost</span>
-                            <div id="ovCost" class="text-lg font-bold text-rose-400 mt-1">--</div>
-                        </div>
-                        <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Net Contribution</span>
-                            <div id="ovProfit" class="text-lg font-bold text-emerald-400 mt-1">--</div>
-                        </div>
-                        <div class="bg-slate-950 border border-slate-800 p-4 rounded text-center">
-                            <span class="text-slate-400 font-medium">Margin %</span>
-                            <div id="ovMargin" class="text-lg font-bold text-blue-400 mt-1">--</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 2: DECISIONS SETUP -->
-            <div id="section-setup" class="space-y-6 hidden">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
+                <!-- Track Record Banner -->
+                <div class="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border border-emerald-800/80 rounded-lg p-4 flex items-center justify-between">
                     <div>
-                        <h2 class="text-sm font-semibold text-white mb-1">Define Decision Problem & Operational Rules</h2>
-                        <p class="text-slate-400">Specify what decisions the platform must generate, the optimization objective, and physical constraints.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">What are you trying to decide?</label>
-                            <select id="setupProblemType" onchange="onProblemTypeChange()" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500 font-mono">
-                                <option value="production_planning">Production Planning (What products to produce, when & how much)</option>
-                                <option value="workforce_scheduling">Workforce Scheduling (Shift & employee skill allocation)</option>
-                                <option value="logistics_dispatch">Logistics & Dispatch (Vehicles, routes & delivery trips)</option>
-                                <option value="inventory_planning">Inventory Planning (Safety stock & supplier reorders)</option>
-                                <option value="pricing_unit_econ">Pricing & Unit Economics (Break-even & target margin pricing)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Optimization Goal Objective</label>
-                            <select id="setupGoal" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500 font-mono">
-                                <option value="maximize_profit">Maximize Net Contribution / Profit</option>
-                                <option value="minimize_cost">Minimize Total Operating Cost</option>
-                                <option value="minimize_waste">Minimize Waste & Spoilage</option>
-                                <option value="maximize_utilization">Maximize Resource Utilization %</option>
-                            </select>
+                        <div class="text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider">Recommendation Track Record</div>
+                        <div id="trackRecordBannerText" class="text-sm font-semibold text-white mt-0.5">
+                            Recommendations followed in the last 30 days saved you <strong class="text-emerald-400">$580 (₹48,500)</strong> in food waste and overtime.
                         </div>
                     </div>
+                    <span class="text-xs font-mono px-2.5 py-1 rounded bg-emerald-900 border border-emerald-700 text-emerald-300">
+                        18 Recommendations Followed
+                    </span>
+                </div>
 
-                    <!-- Levers & Constraints Checklist -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-800">
-                        <div class="space-y-2">
-                            <div class="font-semibold text-slate-200 uppercase tracking-wider text-[11px]">What can the system decide? (Levers)</div>
-                            <div id="leverChecklist" class="space-y-1.5 font-mono text-slate-300">
-                                <label class="flex items-center space-x-2"><input type="checkbox" checked disabled class="rounded bg-slate-950 border-slate-700 text-blue-600"> <span>Product production quantities</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" checked disabled class="rounded bg-slate-950 border-slate-700 text-blue-600"> <span>Production schedule days</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" checked disabled class="rounded bg-slate-950 border-slate-700 text-blue-600"> <span>Machine & worker allocations</span></label>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2">
-                            <div class="font-semibold text-slate-200 uppercase tracking-wider text-[11px]">What must the system respect? (Constraints)</div>
-                            <div id="constraintChecklist" class="space-y-1.5 font-mono text-slate-300">
-                                <label class="flex items-center space-x-2"><input type="checkbox" checked class="rounded bg-slate-950 border-slate-700 text-blue-600"> <span>Material availability stock</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" checked class="rounded bg-slate-950 border-slate-700 text-blue-600"> <span>Employee shift hours</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" checked class="rounded bg-slate-950 border-slate-700 text-blue-600"> <span>Machine capacity limits</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" checked class="rounded bg-slate-950 border-slate-700 text-blue-600"> <span>Operating budget caps</span></label>
-                            </div>
-                        </div>
+                <!-- Top Restaurant KPIs -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-center">
+                        <span class="text-slate-400 font-medium">Food Cost %</span>
+                        <div id="kpiFoodCost" class="text-xl font-bold text-slate-200 mt-1">28.4%</div>
+                        <span class="text-[10px] text-emerald-400 font-mono">-2.1% vs target 30%</span>
                     </div>
-
-                    <div class="pt-4 flex items-center justify-between border-t border-slate-800">
-                        <button onclick="saveDecisionSetup()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded transition">
-                            Save Configuration & Proceed to Business Data
-                        </button>
-                        <button onclick="openCustomDecisionBuilder()" class="text-blue-400 hover:underline font-mono text-xs">
-                            Define Controlled Custom Schema
-                        </button>
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-center">
+                        <span class="text-slate-400 font-medium">Labor Cost %</span>
+                        <div id="kpiLaborCost" class="text-xl font-bold text-slate-200 mt-1">24.1%</div>
+                        <span class="text-[10px] text-emerald-400 font-mono">Aligned with sales</span>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-center">
+                        <span class="text-slate-400 font-medium">Weekly Waste Saved</span>
+                        <div id="kpiWasteSaved" class="text-xl font-bold text-emerald-400 mt-1">$170</div>
+                        <span class="text-[10px] text-slate-400 font-mono">2 days excess stock cut</span>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-center">
+                        <span class="text-slate-400 font-medium">Contribution Margin %</span>
+                        <div id="kpiContribution" class="text-xl font-bold text-blue-400 mt-1">47.5%</div>
+                        <span class="text-[10px] text-blue-400 font-mono">Gross weekly profit</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- TAB 3: BUSINESS DATA CENTER -->
-            <div id="section-data" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-sm font-semibold text-white">Business Data Management Center</h2>
-                            <p class="text-slate-400 mt-0.5">Manage operational entities, SKU prices, costs, capacities, and dataset quality scorecards.</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="checkDataReadiness()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-3.5 py-1.5 rounded transition">
-                                Audit Data Quality Scorecard
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Dynamic Entity Tabs -->
-                    <div class="border-b border-slate-800 flex space-x-4 font-mono text-xs" id="entityTabContainer">
-                        <button onclick="switchEntityTab('products')" id="enttab-products" class="pb-2 border-b-2 border-blue-500 text-blue-400 font-bold">Products</button>
-                        <button onclick="switchEntityTab('materials')" id="enttab-materials" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">Materials</button>
-                        <button onclick="switchEntityTab('machines')" id="enttab-machines" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">Machines</button>
-                        <button onclick="switchEntityTab('employees')" id="enttab-employees" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">Employees</button>
-                    </div>
-
-                    <!-- Entity Data Table -->
-                    <div class="overflow-x-auto border border-slate-800 rounded">
-                        <table class="w-full text-left" id="entityDataTable">
-                            <thead class="table-header border-b border-slate-800" id="entityTableHead">
-                                <!-- Populated dynamically -->
-                            </thead>
-                            <tbody class="divide-y divide-slate-800 text-slate-300 font-mono" id="entityTableBody">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div id="readinessBox" class="hidden p-4 rounded bg-slate-950 border border-slate-800 space-y-2 font-mono">
-                        <div class="font-medium text-slate-300">Data Quality Scorecard & Audit:</div>
-                        <div id="readinessDetails" class="text-slate-400 space-y-1"></div>
-                    </div>
-
-                    <!-- Contextual Capability: Demand Forecasting / Unit Economics Toggle -->
-                    <div id="contextualCapabilityBox" class="p-4 rounded bg-slate-950 border border-slate-800 space-y-3">
+                <!-- Action Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Card 1: Weekly Ingredient Purchase Plan -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 text-xs space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="font-semibold text-slate-200">Contextual Capability: Time-Series Demand Forecasting</span>
-                            <span class="text-[11px] text-blue-400 font-mono">Optional Layer</span>
-                        </div>
-                        <p class="text-slate-400 text-[11px]">Generate statistical demand bounds where historical sales transactions exist. System runs in Guided Mode if absent.</p>
-                        <button onclick="generateForecasts()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3 py-1.5 rounded transition">
-                            Generate Demand Bounds Forecast
-                        </button>
-                        <div class="h-48 w-full hidden mt-2" id="forecastChartWrapper">
-                            <canvas id="forecastChartCanvas"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 4: OPTIMIZATION RESULTS DASHBOARD -->
-            <div id="section-optimize" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-sm font-semibold text-white">OPTIMIZATION RESULT — Solver Output & Performance</h2>
-                            <p class="text-slate-400 mt-0.5">Executes CP-SAT / MIP solver adapters to extract mathematically optimal dispatches.</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span id="optStatusBadge" class="px-2.5 py-1 rounded bg-emerald-950 border border-emerald-700 text-emerald-400 font-mono font-bold">OPTIMAL</span>
-                            <button onclick="runMasterOptimizer()" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded transition">
-                                Execute Decision Model
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="optOutput" class="hidden space-y-6">
-                        
-                        <!-- Recommended Plan Table -->
-                        <div class="space-y-2">
-                            <div class="font-semibold text-slate-200 uppercase tracking-wider text-[11px]">Recommended Decision Plan</div>
-                            <div class="overflow-x-auto border border-slate-800 rounded">
-                                <table class="w-full text-left">
-                                    <thead class="table-header border-b border-slate-800">
-                                        <tr>
-                                            <th class="px-3.5 py-2.5">Product / Dispatch</th>
-                                            <th class="px-3.5 py-2.5 text-right">Optimal Quantity</th>
-                                            <th class="px-3.5 py-2.5 text-right">Production Time</th>
-                                            <th class="px-3.5 py-2.5 text-right">Expected Contribution</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="optPlanTableBody" class="divide-y divide-slate-800 text-slate-300 font-mono">
-                                        <!-- Populated dynamically -->
-                                    </tbody>
-                                </table>
-                            </div>
+                            <h3 class="font-semibold text-white text-sm">Weekly Ingredient Purchase Plan</h3>
+                            <button onclick="switchTab('optimize')" class="text-blue-400 hover:underline font-mono text-[11px]">View Full Plan &rarr;</button>
                         </div>
 
-                        <!-- Financial Impact & VS CURRENT PLAN Comparison -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
-                                <div class="font-semibold text-slate-200 uppercase tracking-wider text-[11px]">Financial Impact Summary</div>
-                                <div class="grid grid-cols-2 gap-3 text-slate-300 font-mono">
-                                    <div>Revenue: <strong id="resRevenue" class="text-slate-100">--</strong></div>
-                                    <div>Operating Cost: <strong id="resCost" class="text-rose-400">--</strong></div>
-                                    <div>Net Contribution: <strong id="resContribution" class="text-emerald-400">--</strong></div>
-                                    <div>Contribution Margin: <strong id="resMargin" class="text-blue-400">--</strong></div>
-                                </div>
-                            </div>
-
-                            <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
-                                <div class="font-semibold text-slate-200 uppercase tracking-wider text-[11px]">VS Baseline / Current Operating Plan</div>
-                                <div class="grid grid-cols-2 gap-3 text-slate-300 font-mono">
-                                    <div>Net Improvement: <strong id="resVsProfit" class="text-emerald-400">+₹18,400</strong></div>
-                                    <div>Margin Expansion: <strong id="resVsMargin" class="text-blue-400">+6.2 pp</strong></div>
-                                    <div>Waste Reduction: <strong id="resVsWaste" class="text-amber-400">-11.4%</strong></div>
-                                    <div>Plan Feasibility: <strong class="text-emerald-400">100% Valid</strong></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Binding / Bottleneck Constraints & Resource Utilization -->
-                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <div class="font-semibold text-slate-200 uppercase tracking-wider text-[11px]">Resource Capacity & Binding Constraints</div>
-                                <span class="text-[11px] font-mono text-amber-400">Binding Constraints Bottleneck Identified</span>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-                                <div class="space-y-1">
-                                    <div class="flex justify-between text-slate-400"><span>Fabric Material Stock</span><span>94%</span></div>
-                                    <div class="w-full bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-blue-500 h-full" style="width: 94%"></div></div>
-                                </div>
-                                <div class="space-y-1">
-                                    <div class="flex justify-between text-slate-400"><span>Tailor Capacity</span><span>87%</span></div>
-                                    <div class="w-full bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-emerald-500 h-full" style="width: 87%"></div></div>
-                                </div>
-                                <div class="space-y-1">
-                                    <div class="flex justify-between text-slate-400"><span>Embroidery Machine</span><span class="text-rose-400 font-bold">100% (BINDING)</span></div>
-                                    <div class="w-full bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-rose-500 h-full" style="width: 100%"></div></div>
-                                </div>
-                                <div class="space-y-1">
-                                    <div class="flex justify-between text-slate-400"><span>Operating Budget</span><span>79%</span></div>
-                                    <div class="w-full bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-indigo-500 h-full" style="width: 79%"></div></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Plain-Language Rationale -->
-                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
-                            <div class="font-semibold text-slate-200 uppercase tracking-wider text-[11px]">Why This Plan? (Managerial Decision Rationale)</div>
-                            <p id="optRationaleText" class="text-slate-300 leading-relaxed font-mono text-[11px]">
-                                The optimizer shifts production toward products that generate greater contribution per constrained production hour. Production is limited by embroidery capacity.
-                            </p>
-                        </div>
-
-                        <!-- View Technical Model Drawer Toggle -->
-                        <div class="pt-2 flex justify-end">
-                            <button onclick="toggleTechnicalModelModal()" class="text-xs text-blue-400 hover:underline font-mono">
-                                View Technical Solver Metadata & Model Details $\to$
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 5: WHAT-IF SCENARIOS -->
-            <div id="section-scenarios" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
-                    <div>
-                        <h2 class="text-sm font-semibold text-white mb-1">What-If Scenario Stress Testing</h2>
-                        <p class="text-slate-400">Re-run the backend optimization engine under parameter variance shocks.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Material / Fuel Cost Inflation Variance (%)</label>
-                            <input type="range" id="scenFuelShift" min="0.8" max="1.5" step="0.05" value="1.15" oninput="updateScenLabels()" class="w-full">
-                            <span id="scenFuelLabel" class="text-[11px] text-amber-400 font-mono">+15% Material Inflation</span>
-                        </div>
-                        <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Demand Variance (%)</label>
-                            <input type="range" id="scenTripShift" min="0.5" max="1.5" step="0.05" value="1.2" oninput="updateScenLabels()" class="w-full">
-                            <span id="scenTripLabel" class="text-[11px] text-blue-400 font-mono">+20% Demand Surge</span>
-                        </div>
-                    </div>
-
-                    <button onclick="runScenarioStressTest()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded transition">
-                        Re-Run Backend Solver Scenario
-                    </button>
-
-                    <!-- Side-by-Side BASELINE vs SCENARIO Comparison Matrix -->
-                    <div id="scenOutput" class="space-y-4 pt-4 border-t border-slate-800">
-                        <div class="font-semibold text-slate-200 text-sm">Side-by-Side Decision Matrix: Baseline vs Stress Scenario</div>
                         <div class="overflow-x-auto border border-slate-800 rounded">
-                            <table class="w-full text-left">
+                            <table class="w-full text-left font-mono">
                                 <thead class="table-header border-b border-slate-800">
                                     <tr>
-                                        <th class="px-3.5 py-2.5">Financial Metric</th>
-                                        <th class="px-3.5 py-2.5 text-right">Baseline Plan</th>
-                                        <th class="px-3.5 py-2.5 text-right">Stress Scenario</th>
-                                        <th class="px-3.5 py-2.5 text-right">Absolute Variance</th>
+                                        <th class="px-3 py-2">Ingredient</th>
+                                        <th class="px-3 py-2 text-right">Order Qty</th>
+                                        <th class="px-3 py-2 text-right">Est Cost</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-800 text-slate-300 font-mono">
+                                <tbody class="divide-y divide-slate-800 text-slate-300">
                                     <tr>
-                                        <td class="px-3.5 py-2.5">Expected Revenue</td>
-                                        <td id="scenBaseRev" class="px-3.5 py-2.5 text-right">₹2.28 Lakh</td>
-                                        <td id="scenStressRev" class="px-3.5 py-2.5 text-right text-slate-200">₹2.25 Lakh</td>
-                                        <td id="scenDiffRev" class="px-3.5 py-2.5 text-right text-rose-400">-₹3,000</td>
+                                        <td class="px-3 py-2 font-bold text-slate-200">Mozzarella Cheese</td>
+                                        <td class="px-3 py-2 text-right text-emerald-400">22.0 kg</td>
+                                        <td class="px-3 py-2 text-right">$264.00</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-3.5 py-2.5">Operating Cost</td>
-                                        <td id="scenBaseCost" class="px-3.5 py-2.5 text-right">₹1.14 Lakh</td>
-                                        <td id="scenStressCost" class="px-3.5 py-2.5 text-right text-rose-400">₹1.31 Lakh</td>
-                                        <td id="scenDiffCost" class="px-3.5 py-2.5 text-right text-rose-400">+₹17,000</td>
+                                        <td class="px-3 py-2 font-bold text-slate-200">Salmon Fillets</td>
+                                        <td class="px-3 py-2 text-right text-emerald-400">16.5 kg</td>
+                                        <td class="px-3 py-2 text-right">$462.00</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-3.5 py-2.5 font-bold">Net Contribution</td>
-                                        <td id="scenBaseNet" class="px-3.5 py-2.5 text-right font-bold text-emerald-400">₹1.14 Lakh</td>
-                                        <td id="scenStressNet" class="px-3.5 py-2.5 text-right font-bold text-amber-400">₹0.94 Lakh</td>
-                                        <td id="scenDiffNet" class="px-3.5 py-2.5 text-right font-bold text-rose-400">-₹20,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-3.5 py-2.5">Contribution Margin %</td>
-                                        <td id="scenBaseMargin" class="px-3.5 py-2.5 text-right">50.0%</td>
-                                        <td id="scenStressMargin" class="px-3.5 py-2.5 text-right">41.8%</td>
-                                        <td id="scenDiffMargin" class="px-3.5 py-2.5 text-right text-rose-400">-8.2 pp</td>
+                                        <td class="px-3 py-2 font-bold text-slate-200">Artisan Pasta</td>
+                                        <td class="px-3 py-2 text-right text-emerald-400">35.0 kg</td>
+                                        <td class="px-3 py-2 text-right">$157.50</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                    </div>
 
-                        <div class="p-3.5 rounded bg-slate-950 border border-slate-800 font-mono text-[11px] space-y-1">
-                            <span class="text-blue-400 font-bold uppercase">Recommended Operational Response:</span>
-                            <div id="scenRecResponseText" class="text-slate-300">
-                                Reduce production of lower-margin SKU C and reallocate machine hours toward high-margin SKU A.
+                    <!-- Card 2: Kitchen Staffing Schedule -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 text-xs space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold text-white text-sm">Chef & Kitchen Staff Schedule</h3>
+                            <button onclick="switchTab('shifts')" class="text-blue-400 hover:underline font-mono text-[11px]">View Shifts &rarr;</button>
+                        </div>
+
+                        <div class="space-y-2 font-mono text-slate-300">
+                            <div class="p-2.5 bg-slate-950 rounded border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-slate-200">Executive Chef Luigi</div>
+                                    <div class="text-[11px] text-slate-400">Head Chef & Dinner Service</div>
+                                </div>
+                                <span class="text-blue-400 font-bold">40 hrs / wk</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-950 rounded border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-slate-200">Line Cook Marco</div>
+                                    <div class="text-[11px] text-slate-400">Main Line & Grill Station</div>
+                                </div>
+                                <span class="text-blue-400 font-bold">40 hrs / wk</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-950 rounded border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-slate-200">Prep Cook Sofia</div>
+                                    <div class="text-[11px] text-slate-400">Morning Prep & Prep Station</div>
+                                </div>
+                                <span class="text-amber-400 font-bold">35 hrs (Shortage Warning)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seed Demo Mode Switcher Button -->
+                <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-semibold text-white">Instant Demo Seed — Luigi's Italian Trattoria</div>
+                        <div class="text-xs text-slate-400">Load sample menu, ingredients, and shift data to test optimization features instantly.</div>
+                    </div>
+                    <button onclick="seedDemoData()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-400 text-xs font-mono px-4 py-2 rounded transition">
+                        Load Luigi's Trattoria Seed
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: MENU & RECIPES -->
+            <div id="section-menu" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-sm font-semibold text-white">Menu Items & Recipe Margins</h2>
+                            <p class="text-slate-400 mt-0.5">Manage dish selling prices, prep times, and raw material ingredient costs.</p>
+                        </div>
+                        <button onclick="openAddMenuModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-3.5 py-1.5 rounded transition">
+                            + Add Menu Item
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-800 rounded">
+                        <table class="w-full text-left font-mono">
+                            <thead class="table-header border-b border-slate-800">
+                                <tr>
+                                    <th class="px-3.5 py-2.5">Menu Dish Name</th>
+                                    <th class="px-3.5 py-2.5 text-right">Selling Price</th>
+                                    <th class="px-3.5 py-2.5 text-right">Raw Food Cost</th>
+                                    <th class="px-3.5 py-2.5 text-right">Prep Time</th>
+                                    <th class="px-3.5 py-2.5 text-right">Contribution Margin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menuTableBody" class="divide-y divide-slate-800 text-slate-300">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: INVENTORY & SUPPLIERS -->
+            <div id="section-data" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-sm font-semibold text-white">Ingredient Inventory & Supplier Lead Times</h2>
+                            <p class="text-slate-400 mt-0.5">Track current stock on hand, purchase costs, par levels, and supplier delivery days.</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="switchTab('csv-import')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3 py-1.5 rounded transition font-mono">
+                                Import CSV
+                            </button>
+                            <button onclick="openAddIngredientModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-3.5 py-1.5 rounded transition font-mono">
+                                + Add Ingredient
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-800 rounded">
+                        <table class="w-full text-left font-mono">
+                            <thead class="table-header border-b border-slate-800">
+                                <tr>
+                                    <th class="px-3.5 py-2.5">Ingredient Name</th>
+                                    <th class="px-3.5 py-2.5">Unit</th>
+                                    <th class="px-3.5 py-2.5 text-right">Purchase Cost</th>
+                                    <th class="px-3.5 py-2.5 text-right">Stock Level</th>
+                                    <th class="px-3.5 py-2.5 text-right">Par Level</th>
+                                    <th class="px-3.5 py-2.5 text-center">Lead Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody" class="divide-y divide-slate-800 text-slate-300">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: STAFFING & SHIFTS -->
+            <div id="section-shifts" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-sm font-semibold text-white">Kitchen Staff & Shift Allocations</h2>
+                            <p class="text-slate-400 mt-0.5">Manage chef, line cook, and prep staff shift availability and hourly rates.</p>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-800 rounded">
+                        <table class="w-full text-left font-mono">
+                            <thead class="table-header border-b border-slate-800">
+                                <tr>
+                                    <th class="px-3.5 py-2.5">Staff Member</th>
+                                    <th class="px-3.5 py-2.5">Role</th>
+                                    <th class="px-3.5 py-2.5 text-right">Hourly Rate</th>
+                                    <th class="px-3.5 py-2.5 text-right">Weekly Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staffTableBody" class="divide-y divide-slate-800 text-slate-300">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: WEEKLY OPTIMIZER RESULTS -->
+            <div id="section-optimize" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-sm font-semibold text-white">Weekly Ordering & Staffing Recommendations</h2>
+                            <p class="text-slate-400 mt-0.5">Calculates optimal ingredient procurement and shift schedules based on sales forecasts.</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span id="optConfidenceBadge" class="px-2.5 py-1 rounded bg-blue-950 border border-blue-700 text-blue-300 font-mono text-[11px]">
+                                Forecast Confidence: High (91.5%)
+                            </span>
+                            <button onclick="runWeeklyOptimizer()" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded transition font-mono">
+                                Run Optimizer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Humanized Recommendation Bulletins -->
+                    <div class="p-4 rounded bg-slate-950 border border-slate-800 space-y-3 font-mono">
+                        <div class="font-semibold text-slate-200 uppercase text-[11px] flex items-center justify-between">
+                            <span>Explainable Operational Recommendations</span>
+                            <span class="text-emerald-400 text-[11px]">Estimated Savings: $170</span>
+                        </div>
+                        <ul id="recommendationActionList" class="list-disc list-inside space-y-2 text-slate-300 leading-relaxed">
+                            <li>Order 15% less Mozzarella Cheese this week — sales demand is trending stable and you are currently overstocked by ~2 days. Estimated savings: $170.</li>
+                            <li>Order 16.5 kg of Salmon Fillets to cover projected weekend dinner service without incurring spoilage.</li>
+                            <li>Schedule Sofia for 35 prep cook hours. Note: Prep Cook capacity reaches 95% on Friday night dinner service.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Expandable "Why We Recommend This" Rationale Card -->
+                    <div class="p-4 rounded bg-slate-950 border border-slate-800 space-y-2 font-mono">
+                        <div class="font-semibold text-slate-200 uppercase text-[11px]">Why We Recommend This? (Decision Rationale)</div>
+                        <p id="optRationaleText" class="text-slate-300 leading-relaxed text-[11px]">
+                            The optimization engine balances ingredient shelf-life degradation against supplier order minimums. Mozzarella orders are reduced because existing stock covers mid-week prep demand.
+                        </p>
+                    </div>
+
+                    <!-- Humanized Resource Shortage Warnings (if any) -->
+                    <div id="humanizedDiagnosticBox" class="p-3.5 rounded bg-amber-950/60 border border-amber-800 text-amber-300 font-mono text-[11px] space-y-1">
+                        <span class="font-bold">Staffing Alert:</span>
+                        <span id="humanizedDiagnosticText">You don't have enough prep cook hours scheduled on Friday night dinner service — 12 additional cook hours recommended.</span>
+                    </div>
+
+                    <!-- Manual Override Controls -->
+                    <div class="p-4 rounded bg-slate-950 border border-slate-800 space-y-3 font-mono">
+                        <div class="font-semibold text-slate-200 uppercase text-[11px]">Manager Manual Override (Adjust Without Breaking Model)</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div>
+                                <label class="block text-slate-400 mb-1">Mozzarella Order Override (kg)</label>
+                                <div class="flex space-x-2">
+                                    <input type="number" id="overrideMozzarella" value="22.0" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-200">
+                                    <button onclick="applyManualOverride('Mozzarella Cheese')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3 py-1.5 rounded transition">Apply</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">Prep Cook Hours Override (hr)</label>
+                                <div class="flex space-x-2">
+                                    <input type="number" id="overridePrepCook" value="35.0" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-200">
+                                    <button onclick="applyManualOverride('Prep Cook Hours')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3 py-1.5 rounded transition">Apply</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 6: RECOMMENDATIONS & HUMAN REVIEW -->
-            <div id="section-recommendations" class="hidden space-y-6">
+            <!-- TAB 6: WHAT-IF SCENARIOS -->
+            <div id="section-scenarios" class="hidden space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
                     <div>
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-sm font-semibold text-white">Plan Review & Human Approval Workflow</h2>
-                            <span id="reviewRunTag" class="px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-blue-400 font-mono">Optimization Run #184</span>
-                        </div>
-                        <p class="text-slate-400 mt-0.5">Review fact-verified action bulletins and submit management decision.</p>
+                        <h2 class="text-sm font-semibold text-white mb-1">What-If Stress Testing</h2>
+                        <p class="text-slate-400">Evaluate cost structure stability under raw material price spikes and sales surges.</p>
                     </div>
 
-                    <div class="p-4 rounded bg-slate-950 border border-slate-800 space-y-3 font-mono">
-                        <div class="font-semibold text-slate-200 uppercase text-[11px]">Fact-Verified Action Items:</div>
-                        <ul id="recommendationActionList" class="list-disc list-inside space-y-1.5 text-slate-300">
-                            <li>Produce 14 units of Designer Dress A to capture maximum contribution per tailor hour.</li>
-                            <li>Produce 9 units of Designer Dress B to fulfill confirmed order demand.</li>
-                            <li>Cap production of Designer Dress C at 4 units due to embroidery machine limit.</li>
-                        </ul>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Ingredient Purchase Price Inflation (%)</label>
+                            <input type="range" id="scenFuelShift" min="0.8" max="1.5" step="0.05" value="1.15" oninput="updateScenLabels()" class="w-full">
+                            <span id="scenFuelLabel" class="text-[11px] text-amber-400 font-mono">+15% Ingredient Price Inflation</span>
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-300 mb-1.5">Dining Sales Volume Shift (%)</label>
+                            <input type="range" id="scenTripShift" min="0.5" max="1.5" step="0.05" value="1.2" oninput="updateScenLabels()" class="w-full">
+                            <span id="scenTripLabel" class="text-[11px] text-blue-400 font-mono">+20% Weekend Sales Demand</span>
+                        </div>
+                    </div>
+
+                    <button onclick="runScenarioStressTest()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded transition font-mono">
+                        Re-Run Scenario Solver
+                    </button>
+
+                    <!-- Side-by-Side Comparison -->
+                    <div id="scenOutput" class="space-y-4 pt-4 border-t border-slate-800">
+                        <div class="font-semibold text-slate-200 text-sm">Side-by-Side Matrix: Baseline vs Inflation Scenario</div>
+                        <div class="overflow-x-auto border border-slate-800 rounded">
+                            <table class="w-full text-left font-mono">
+                                <thead class="table-header border-b border-slate-800">
+                                    <tr>
+                                        <th class="px-3.5 py-2.5">Financial Metric</th>
+                                        <th class="px-3.5 py-2.5 text-right">Baseline Operating Plan</th>
+                                        <th class="px-3.5 py-2.5 text-right">Stress Inflation Plan</th>
+                                        <th class="px-3.5 py-2.5 text-right">Variance</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800 text-slate-300">
+                                    <tr>
+                                        <td class="px-3.5 py-2.5">Expected Revenue</td>
+                                        <td id="scenBaseRev" class="px-3.5 py-2.5 text-right">$2,280</td>
+                                        <td id="scenStressRev" class="px-3.5 py-2.5 text-right text-slate-200">$2,250</td>
+                                        <td id="scenDiffRev" class="px-3.5 py-2.5 text-right text-rose-400">-$30</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3.5 py-2.5">Food Procurement Cost</td>
+                                        <td id="scenBaseCost" class="px-3.5 py-2.5 text-right">$1,140</td>
+                                        <td id="scenStressCost" class="px-3.5 py-2.5 text-right text-rose-400">$1,310</td>
+                                        <td id="scenDiffCost" class="px-3.5 py-2.5 text-right text-rose-400">+$170</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3.5 py-2.5 font-bold">Net Contribution Margin</td>
+                                        <td id="scenBaseNet" class="px-3.5 py-2.5 text-right font-bold text-emerald-400">$1,140</td>
+                                        <td id="scenStressNet" class="px-3.5 py-2.5 text-right font-bold text-amber-400">$940</td>
+                                        <td id="scenDiffNet" class="px-3.5 py-2.5 text-right font-bold text-rose-400">-$200</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: RECOMMENDATIONS & TRACK RECORD -->
+            <div id="section-recommendations" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-sm font-semibold text-white">Management Review & Track Record</h2>
+                            <p class="text-slate-400 mt-0.5">Track historical savings achieved by following weekly recommendations.</p>
+                        </div>
+                        <span id="reviewRunTag" class="px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-blue-400 font-mono">Run #184</span>
+                    </div>
+
+                    <div class="p-4 rounded bg-slate-950 border border-slate-800 space-y-2 font-mono">
+                        <div class="font-semibold text-slate-200 uppercase text-[11px]">30-Day Recommendation Performance:</div>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-slate-300">
+                            <div>Followed Recommendations: <strong class="text-emerald-400">18 / 20</strong></div>
+                            <div>Total Waste Saved: <strong class="text-emerald-400">$580 (₹48,500)</strong></div>
+                            <div>Food Cost % Reduction: <strong class="text-blue-400">-2.1 pp</strong></div>
+                        </div>
                     </div>
 
                     <div class="space-y-3 pt-2">
-                        <label class="block font-medium text-slate-300">Management Review Comments</label>
-                        <input type="text" id="approvalComments" value="Operating plan reviewed and aligned with capacity constraints." class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500 font-mono">
+                        <label class="block font-medium text-slate-300">Manager Review Comments</label>
+                        <input type="text" id="approvalComments" value="Weekly ingredient order approved and sent to supplier." class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500 font-mono">
 
                         <div class="flex space-x-3 pt-2">
-                            <button onclick="submitApproval('APPROVED')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded transition">
-                                Approve Recommended Plan
+                            <button onclick="submitApproval('APPROVED')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded transition font-mono">
+                                Approve Weekly Plan
                             </button>
-                            <button onclick="submitApproval('REJECTED')" class="bg-rose-600 hover:bg-rose-500 text-white font-medium px-4 py-2 rounded transition">
+                            <button onclick="submitApproval('REJECTED')" class="bg-rose-600 hover:bg-rose-500 text-white font-medium px-4 py-2 rounded transition font-mono">
                                 Reject Plan
                             </button>
                         </div>
                     </div>
 
-                    <div id="approvalStatusBox" class="hidden p-3.5 rounded bg-slate-950 border border-slate-800 text-slate-200 font-mono space-y-1">
-                        <!-- Populated by JavaScript without undefined errors -->
-                    </div>
+                    <div id="approvalStatusBox" class="hidden p-3.5 rounded bg-slate-950 border border-slate-800 text-slate-200 font-mono space-y-1"></div>
                 </div>
             </div>
 
-            <!-- TAB 7: REPORTS & AUDITS -->
-            <div id="section-reports" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h2 class="text-sm font-semibold text-white">Historical Optimization Run Ledger & Audit Logs</h2>
-                    <div class="overflow-x-auto border border-slate-800 rounded">
-                        <table class="w-full text-left font-mono">
-                            <thead class="table-header border-b border-slate-800">
-                                <tr>
-                                    <th class="px-3.5 py-2.5">Run ID</th>
-                                    <th class="px-3.5 py-2.5">Domain</th>
-                                    <th class="px-3.5 py-2.5">Timestamp</th>
-                                    <th class="px-3.5 py-2.5 text-right">Contribution</th>
-                                    <th class="px-3.5 py-2.5 text-right">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-800 text-slate-300">
-                                <tr>
-                                    <td class="px-3.5 py-2.5 text-blue-400">#184</td>
-                                    <td class="px-3.5 py-2.5">Apparel Production</td>
-                                    <td class="px-3.5 py-2.5 text-slate-400">2026-09-09 14:32:00</td>
-                                    <td class="px-3.5 py-2.5 text-right text-emerald-400">₹1,14,000</td>
-                                    <td class="px-3.5 py-2.5 text-right font-bold text-emerald-400">OPTIMAL</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 8: TEMPLATES -->
-            <div id="section-templates" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h2 class="text-sm font-semibold text-white">Downloadable Operational Excel Templates</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
-                        <div class="p-3.5 bg-slate-950 rounded border border-slate-800 space-y-1">
-                            <div class="text-slate-200 font-bold">Production Planning</div>
-                            <div class="text-slate-400 text-[11px]">products.xlsx, fabric.xlsx, machines.xlsx</div>
-                        </div>
-                        <div class="p-3.5 bg-slate-950 rounded border border-slate-800 space-y-1">
-                            <div class="text-slate-200 font-bold">Logistics & Trips</div>
-                            <div class="text-slate-400 text-[11px]">vehicles.xlsx, routes.xlsx, drivers.xlsx</div>
-                        </div>
-                        <div class="p-3.5 bg-slate-950 rounded border border-slate-800 space-y-1">
-                            <div class="text-slate-200 font-bold">Workforce Shift</div>
-                            <div class="text-slate-400 text-[11px]">employees.xlsx, skills.xlsx, shifts.xlsx</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 9: HOW IT WORKS -->
-            <div id="section-learn" class="hidden space-y-6">
+            <!-- TAB 8: CSV IMPORT & TEMPLATES -->
+            <div id="section-csv-import" class="hidden space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
                     <div>
-                        <h2 class="text-sm font-semibold text-white mb-1">How the Platform Works — 6-Stage Plain-Language Blueprint</h2>
-                        <p class="text-slate-400 mb-4">The platform converts operational constraints, costs, and resources into mathematical decision models.</p>
+                        <h2 class="text-sm font-semibold text-white mb-1">CSV Data Ingestion & Downloadable Templates</h2>
+                        <p class="text-slate-400">Upload inventory or menu CSV exports, or download standard template schemas.</p>
+                    </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono text-[11px]">
-                            <div class="p-3.5 bg-slate-950 rounded border border-slate-800 space-y-1">
-                                <div class="text-blue-400 font-bold">01. TELL US WHAT TO DECIDE</div>
-                                <div class="text-slate-300">Production, staffing, logistics, inventory or pricing problem.</div>
-                            </div>
-                            <div class="p-3.5 bg-slate-950 rounded border border-slate-800 space-y-1">
-                                <div class="text-emerald-400 font-bold">02. TELL US YOUR RULES</div>
-                                <div class="text-slate-300">Products, workers, machines, costs, stock limits & deadlines.</div>
-                            </div>
-                            <div class="p-3.5 bg-slate-950 rounded border border-slate-800 space-y-1">
-                                <div class="text-amber-400 font-bold">03. MODEL COMPILED</div>
-                                <div class="text-slate-300">Business rules become decision variables x and constraints Ax &le; b.</div>
-                            </div>
-                            <div class="p-3.5 bg-slate-950 rounded border border-slate-800 space-y-1">
-                                <div class="text-indigo-400 font-bold">04. FEASIBLE SEARCH</div>
-                                <div class="text-slate-300">Solver evaluates candidate plans and finds the optimal solution.</div>
-                            </div>
-                            <div class="p-3.5 bg-slate-950 rounded border border-slate-800 space-y-1">
-                                <div class="text-purple-400 font-bold">05. UNDERSTAND RESULTS</div>
-                                <div class="text-slate-300">See expected profit, cost, waste, utilization & binding bottlenecks.</div>
-                            </div>
-                            <div class="p-3.5 bg-slate-950 rounded border border-slate-800 space-y-1">
-                                <div class="text-teal-400 font-bold">06. APPROVE DECISION</div>
-                                <div class="text-slate-300">Operations manager reviews rationale and records decision approval.</div>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono">
+                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
+                            <div class="font-bold text-slate-200">1. Inventory & Stock Template</div>
+                            <p class="text-slate-400 text-[11px]">Download formatted CSV template for ingredient stock, unit costs, and supplier lead times.</p>
+                            <a href="http://127.0.0.1:8000/api/v1/data/templates/inventory" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded transition text-[11px]">
+                                Download inventory_template.csv
+                            </a>
+                        </div>
+                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
+                            <div class="font-bold text-slate-200">2. Menu & Recipe Template</div>
+                            <p class="text-slate-400 text-[11px]">Download formatted CSV template for menu dish prices, prep times, and recipe requirements.</p>
+                            <a href="http://127.0.0.1:8000/api/v1/data/templates/menu" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded transition text-[11px]">
+                                Download menu_template.csv
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Upload Form -->
+                    <div class="p-6 bg-slate-950 border border-dashed border-slate-700 rounded-lg text-center space-y-3 font-mono">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-400"></i>
+                        <div class="text-slate-200 font-bold">Upload CSV Inventory or Menu File</div>
+                        <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="uploadCSVFile()">
+                        <button onclick="document.getElementById('csvFileInput').click()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-4 py-2 rounded transition">
+                            Select CSV File to Upload
+                        </button>
+                        <div id="csvUploadStatus" class="text-[11px] text-slate-400">Supported format: .csv format only</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 9: POS INTEGRATIONS -->
+            <div id="section-pos" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4 font-mono">
+                    <h2 class="text-sm font-semibold text-white">Point of Sale (POS) Integrations</h2>
+                    <p class="text-slate-400">Automate transaction log syncing directly from your POS system.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
+                            <div class="font-bold text-blue-400">Toast POS</div>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-300">Phase 2 — Coming Soon</span>
+                        </div>
+                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
+                            <div class="font-bold text-emerald-400">Square POS</div>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-300">Phase 2 — Coming Soon</span>
+                        </div>
+                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
+                            <div class="font-bold text-amber-400">Clover POS</div>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-300">Phase 2 — Coming Soon</span>
                         </div>
                     </div>
                 </div>
@@ -731,102 +600,39 @@
 
             <!-- SETTINGS SECTIONS -->
             <div id="section-settings-org" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h2 class="text-sm font-semibold text-white">Organization Profile Settings</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4 font-mono">
+                    <h2 class="text-sm font-semibold text-white">Restaurant Profile Settings</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-slate-400 mb-1">Organization Name</label>
-                            <input type="text" id="settingOrgName" value="Enterprise Operations Corp" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
+                            <label class="block text-slate-400 mb-1">Restaurant Group Name</label>
+                            <input type="text" id="settingOrgName" value="Luigi's Italian Trattoria" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
                         </div>
                         <div>
-                            <label class="block text-slate-400 mb-1">Primary Industry</label>
-                            <input type="text" value="Apparel & Logistics" readonly class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-400">
+                            <label class="block text-slate-400 mb-1">Location / Branch</label>
+                            <input type="text" value="Downtown Central Branch" readonly class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-400">
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div id="section-settings-team" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h2 class="text-sm font-semibold text-white">Team & Role Permissions (RBAC)</h2>
-                    <div class="text-slate-400 font-mono">User: Operations Manager (Full decision optimization & approval rights).</div>
-                </div>
-            </div>
-
-            <div id="section-settings-units" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h2 class="text-sm font-semibold text-white">Currency & Measurement Unit Conventions</h2>
-                    <div class="text-slate-400 font-mono">Active Currency: <strong class="text-slate-200">INR (₹ Lakhs / Crores)</strong>.</div>
-                </div>
-            </div>
-
-            <div id="section-settings-audit" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
-                    <h2 class="text-sm font-semibold text-white">System Security & Audit Trail</h2>
-                    <div class="text-slate-400 font-mono">100% audit logging enabled for all decision runs and approvals.</div>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <!-- Technical Model Drawer Modal -->
-    <div id="technicalModelModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-lg max-w-xl w-full p-6 text-xs space-y-4 font-mono">
+    <!-- 3-Step Setup Wizard Modal -->
+    <div id="setupWizardModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-lg max-w-xl w-full p-6 text-xs space-y-6 font-mono">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-white text-sm">Technical Solver Metadata</h3>
-                <button onclick="toggleTechnicalModelModal()" class="text-slate-400 hover:text-white">&times;</button>
+                <h3 class="font-bold text-white text-sm">KitchenOptima 3-Step Restaurant Setup Wizard</h3>
+                <button onclick="closeSetupWizard()" class="text-slate-400 hover:text-white">&times;</button>
             </div>
 
-            <div class="space-y-2 text-slate-300">
-                <div>Solver Adapter: <strong class="text-blue-400">Google OR-Tools (CP-SAT / CBC)</strong></div>
-                <div>Solver Status: <strong class="text-emerald-400">OPTIMAL</strong></div>
-                <div>Decision Variables: <strong class="text-slate-100">426</strong></div>
-                <div>Operational Constraints: <strong class="text-slate-100">1,182</strong></div>
-                <div>Runtime: <strong class="text-slate-100">1.82 seconds</strong></div>
-                <div>Objective Formulation: <strong class="text-slate-100">Maximize Z = Revenue - Material Cost - Labor Cost</strong></div>
+            <div id="wizardStepContent" class="space-y-4">
+                <!-- Populated dynamically by JS -->
             </div>
 
-            <div class="pt-4 text-right border-t border-slate-800">
-                <button onclick="toggleTechnicalModelModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded transition">
-                    Close Metadata Window
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Decision Builder Modal -->
-    <div id="customDecisionModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-lg max-w-lg w-full p-6 text-xs space-y-4 font-mono">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-white text-sm">Controlled Custom Decision Builder</h3>
-                <button onclick="closeCustomDecisionBuilder()" class="text-slate-400 hover:text-white">&times;</button>
-            </div>
-
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-slate-400 mb-1">Decision Name</label>
-                    <input type="text" id="custName" value="Custom Resource Allocation" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
-                </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Decision Variable Vector</label>
-                    <input type="text" id="custVar" value="x_i (Quantity of resource i allocated)" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-slate-400 mb-1">Lower Bound</label>
-                        <input type="number" id="custMin" value="0" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 mb-1">Upper Bound</label>
-                        <input type="number" id="custMax" value="500" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
-                    </div>
-                </div>
-            </div>
-
-            <div class="pt-4 flex justify-end space-x-2 border-t border-slate-800">
-                <button onclick="closeCustomDecisionBuilder()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded transition">Cancel</button>
-                <button onclick="saveCustomDecision()" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded transition font-bold">Compile Model</button>
+            <div class="pt-4 flex justify-between border-t border-slate-800">
+                <button onclick="prevWizardStep()" id="wizPrevBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded transition">Back</button>
+                <button onclick="nextWizardStep()" id="wizNextBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition font-bold">Next Step &rarr;</button>
             </div>
         </div>
     </div>

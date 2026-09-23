@@ -6,6 +6,7 @@ from typing import List, Dict, Any, Optional
 from backend.app.db.session import Base, engine
 from backend.app.core.config import settings
 from backend.app.api.v1.auth import router as auth_router
+from backend.app.api.v1.data_ingest import router as data_ingest_router
 
 from backend.app.business_models.unit_economics import UnitEconomicsCalculator
 from backend.app.data_platform.quality import DataQualityEvaluator
@@ -23,7 +24,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="Business Optimization Platform v3: Configurable Decision Workspace with Dynamic Model Generator (CP-SAT/MIP).",
+    description="KitchenOptima — Restaurant Operations & Cost Optimization Platform.",
     version="3.0.0"
 )
 
@@ -36,6 +37,8 @@ app.add_middleware(
 )
 
 app.include_router(auth_router, prefix=settings.API_V1_STR)
+app.include_router(data_ingest_router, prefix=settings.API_V1_STR)
+
 
 
 # --- Request Schemas ---
@@ -305,3 +308,36 @@ def submit_human_approval(req: HumanApprovalRequest):
         "decision": req.status,
         "comments": req.comments
     }
+
+
+@app.post(f"{settings.API_V1_STR}/demo/seed")
+def seed_demo_restaurant():
+    """Seeds sample data for Luigi's Italian Trattoria for instant user evaluation."""
+    return {
+        "restaurant_name": "Luigi's Italian Trattoria",
+        "currency": "USD",
+        "menu_items": [
+            {"name": "Classic Margherita Pizza", "selling_price": 18.50, "prep_hours": 0.25, "food_cost": 4.80},
+            {"name": "Truffle Mushroom Pasta", "selling_price": 24.00, "prep_hours": 0.35, "food_cost": 6.20},
+            {"name": "Grilled Salmon Entree", "selling_price": 32.00, "prep_hours": 0.45, "food_cost": 9.50},
+            {"name": "Tiramisu Dessert", "selling_price": 12.00, "prep_hours": 0.15, "food_cost": 2.90}
+        ],
+        "ingredients": [
+            {"name": "Mozzarella Cheese", "unit": "kg", "purchase_cost": 12.00, "current_stock": 18.0, "par_level": 40.0, "lead_time_days": 1},
+            {"name": "Salmon Fillets", "unit": "kg", "purchase_cost": 28.00, "current_stock": 8.5, "par_level": 25.0, "lead_time_days": 2},
+            {"name": "Truffle Oil", "unit": "Liters", "purchase_cost": 65.00, "current_stock": 3.0, "par_level": 8.0, "lead_time_days": 3},
+            {"name": "Artisan Pasta", "unit": "kg", "purchase_cost": 4.50, "current_stock": 25.0, "par_level": 60.0, "lead_time_days": 1}
+        ],
+        "staff": [
+            {"name": "Executive Chef Luigi", "role": "Head Chef", "hourly_rate": 35.00, "available_hours": 40},
+            {"name": "Line Cook Marco", "role": "Line Cook", "hourly_rate": 22.00, "available_hours": 40},
+            {"name": "Prep Cook Sofia", "role": "Prep Cook", "hourly_rate": 18.00, "available_hours": 35}
+        ],
+        "track_record": {
+            "followed_recommendations_30d": 18,
+            "total_savings_usd": 580.00,
+            "total_savings_inr": 48500.00,
+            "confidence_level": "High (91.5% based on 6 weeks sales history)"
+        }
+    }
+
