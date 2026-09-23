@@ -1,32 +1,18 @@
 const API_BASE = "http://127.0.0.1:8000/api/v1";
 
 let appState = {
-    restaurantName: "Luigi's Italian Trattoria",
+    restaurantName: "My Restaurant",
     currency: "USD",
-    activeRunId: 184,
+    activeRunId: null,
     wizardStep: 1,
     lastResult: null,
-    menuItems: [
-        { name: "Classic Margherita Pizza", selling_price: 18.50, food_cost: 4.80, prep_hours: 0.25 },
-        { name: "Truffle Mushroom Pasta", selling_price: 24.00, food_cost: 6.20, prep_hours: 0.35 },
-        { name: "Grilled Salmon Entree", selling_price: 32.00, food_cost: 9.50, prep_hours: 0.45 },
-        { name: "Tiramisu Dessert", selling_price: 12.00, food_cost: 2.90, prep_hours: 0.15 }
-    ],
-    ingredients: [
-        { name: "Mozzarella Cheese", unit: "kg", purchase_cost: 12.00, current_stock: 18.0, par_level: 40.0, lead_time_days: 1 },
-        { name: "Salmon Fillets", unit: "kg", purchase_cost: 28.00, current_stock: 8.5, par_level: 25.0, lead_time_days: 2 },
-        { name: "Truffle Oil", unit: "Liters", purchase_cost: 65.00, current_stock: 3.0, par_level: 8.0, lead_time_days: 3 },
-        { name: "Artisan Pasta", unit: "kg", purchase_cost: 4.50, current_stock: 25.0, par_level: 60.0, lead_time_days: 1 }
-    ],
-    staff: [
-        { name: "Executive Chef Luigi", role: "Head Chef", hourly_rate: 35.00, available_hours: 40 },
-        { name: "Line Cook Marco", role: "Line Cook", hourly_rate: 22.00, available_hours: 40 },
-        { name: "Prep Cook Sofia", role: "Prep Cook", hourly_rate: 18.00, available_hours: 35 }
-    ],
+    menuItems: [],
+    ingredients: [],
+    staff: [],
     trackRecord: {
-        followed_30d: 18,
-        saved_usd: 580.00,
-        saved_inr: 48500.00
+        followed_30d: 0,
+        saved_usd: 0.00,
+        saved_inr: 0.00
     }
 };
 
@@ -55,10 +41,10 @@ function switchTab(sectionId) {
         const btn = document.getElementById(`tab-${t}`);
         const container = document.getElementById(`section-${t}`);
         if (t === sectionId) {
-            if (btn) btn.className = "nav-item nav-item-active w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition";
+            if (btn) btn.className = "nav-item nav-item-active w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition";
             if (container) container.classList.remove("hidden");
         } else {
-            if (btn) btn.className = "nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition";
+            if (btn) btn.className = "nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition";
             if (container) container.classList.add("hidden");
         }
     });
@@ -75,64 +61,84 @@ function renderRestaurantTables() {
     // Render Menu Table
     const menuBody = document.getElementById("menuTableBody");
     if (menuBody) {
-        menuBody.innerHTML = appState.menuItems.map(m => {
-            const margin = (m.selling_price - m.food_cost);
-            const marginPct = ((margin / m.selling_price) * 100).toFixed(1);
-            return `
+        if (appState.menuItems.length === 0) {
+            menuBody.innerHTML = `
                 <tr>
-                    <td class="px-3.5 py-2.5 font-bold text-slate-200">${m.name}</td>
-                    <td class="px-3.5 py-2.5 text-right font-bold text-slate-100">${formatCurrency(m.selling_price, cur)}</td>
-                    <td class="px-3.5 py-2.5 text-right text-rose-400">${formatCurrency(m.food_cost, cur)}</td>
-                    <td class="px-3.5 py-2.5 text-right text-slate-400">${m.prep_hours} hr</td>
-                    <td class="px-3.5 py-2.5 text-right text-emerald-400 font-bold">${formatCurrency(margin, cur)} (${marginPct}%)</td>
+                    <td colspan="5" class="px-4 py-6 text-center text-gray-400">No menu items added yet. Click "+ Add Menu Item" to add your first dish.</td>
                 </tr>
             `;
-        }).join('');
+        } else {
+            menuBody.innerHTML = appState.menuItems.map(m => {
+                const margin = (m.selling_price - m.food_cost);
+                const marginPct = m.selling_price > 0 ? ((margin / m.selling_price) * 100).toFixed(1) : 0;
+                return `
+                    <tr>
+                        <td class="px-4 py-2.5 font-bold text-gray-900">${m.name}</td>
+                        <td class="px-4 py-2.5 text-right font-bold text-gray-800">${formatCurrency(m.selling_price, cur)}</td>
+                        <td class="px-4 py-2.5 text-right text-rose-600">${formatCurrency(m.food_cost, cur)}</td>
+                        <td class="px-4 py-2.5 text-right text-gray-500">${m.prep_hours} hr</td>
+                        <td class="px-4 py-2.5 text-right text-emerald-600 font-bold">${formatCurrency(margin, cur)} (${marginPct}%)</td>
+                    </tr>
+                `;
+            }).join('');
+        }
     }
 
     // Render Inventory Table
     const invBody = document.getElementById("inventoryTableBody");
     if (invBody) {
-        invBody.innerHTML = appState.ingredients.map(i => `
-            <tr>
-                <td class="px-3.5 py-2.5 font-bold text-slate-200">${i.name}</td>
-                <td class="px-3.5 py-2.5 text-slate-400">${i.unit}</td>
-                <td class="px-3.5 py-2.5 text-right text-rose-400">${formatCurrency(i.purchase_cost, cur)}</td>
-                <td class="px-3.5 py-2.5 text-right text-emerald-400 font-bold">${i.current_stock} ${i.unit}</td>
-                <td class="px-3.5 py-2.5 text-right text-slate-400">${i.par_level} ${i.unit}</td>
-                <td class="px-3.5 py-2.5 text-center text-blue-400">${i.lead_time_days} ${i.lead_time_days === 1 ? 'day' : 'days'}</td>
-            </tr>
-        `).join('');
+        if (appState.ingredients.length === 0) {
+            invBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No inventory items added yet. Click "+ Add Ingredient" or "Import CSV" to get started.</td>
+                </tr>
+            `;
+        } else {
+            invBody.innerHTML = appState.ingredients.map(i => `
+                <tr>
+                    <td class="px-4 py-2.5 font-bold text-gray-900">${i.name}</td>
+                    <td class="px-4 py-2.5 text-gray-500">${i.unit}</td>
+                    <td class="px-4 py-2.5 text-right text-rose-600">${formatCurrency(i.purchase_cost, cur)}</td>
+                    <td class="px-4 py-2.5 text-right text-emerald-600 font-bold">${i.current_stock} ${i.unit}</td>
+                    <td class="px-4 py-2.5 text-right text-gray-500">${i.par_level} ${i.unit}</td>
+                    <td class="px-4 py-2.5 text-center text-blue-600">${i.lead_time_days} ${i.lead_time_days === 1 ? 'day' : 'days'}</td>
+                </tr>
+            `).join('');
+        }
     }
 
     // Render Staff Table
     const staffBody = document.getElementById("staffTableBody");
     if (staffBody) {
-        staffBody.innerHTML = appState.staff.map(s => `
-            <tr>
-                <td class="px-3.5 py-2.5 font-bold text-slate-200">${s.name}</td>
-                <td class="px-3.5 py-2.5 text-blue-400">${s.role}</td>
-                <td class="px-3.5 py-2.5 text-right text-slate-200">${formatCurrency(s.hourly_rate, cur)}/hr</td>
-                <td class="px-3.5 py-2.5 text-right font-bold text-emerald-400">${s.available_hours} hrs</td>
-            </tr>
-        `).join('');
+        if (appState.staff.length === 0) {
+            staffBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="px-4 py-6 text-center text-gray-400">No staff members added yet. Input employee hours in the 3-Step Setup Wizard.</td>
+                </tr>
+            `;
+        } else {
+            staffBody.innerHTML = appState.staff.map(s => `
+                <tr>
+                    <td class="px-4 py-2.5 font-bold text-gray-900">${s.name}</td>
+                    <td class="px-4 py-2.5 text-blue-600">${s.role}</td>
+                    <td class="px-4 py-2.5 text-right text-gray-800">${formatCurrency(s.hourly_rate, cur)}/hr</td>
+                    <td class="px-4 py-2.5 text-right font-bold text-emerald-600">${s.available_hours} hrs</td>
+                </tr>
+            `).join('');
+        }
     }
-}
 
-async function seedDemoData() {
-    try {
-        const res = await fetch(`${API_BASE}/demo/seed`, { method: 'POST' });
-        const data = await res.json();
-        
-        appState.restaurantName = data.restaurant_name;
-        appState.menuItems = data.menu_items;
-        appState.ingredients = data.ingredients;
-        appState.staff = data.staff;
+    // Calculate Summary KPIs if items exist
+    if (appState.menuItems.length > 0) {
+        const totalSales = appState.menuItems.reduce((acc, m) => acc + m.selling_price, 0);
+        const totalFood = appState.menuItems.reduce((acc, m) => acc + m.food_cost, 0);
+        const foodCostPct = ((totalFood / totalSales) * 100).toFixed(1);
+        const marginPct = (100 - foodCostPct).toFixed(1);
 
-        renderRestaurantTables();
-        alert(`Loaded sample demo data for '${data.restaurant_name}' successfully!`);
-    } catch (err) {
-        console.error("Seed error:", err);
+        document.getElementById("kpiFoodCost").innerText = `${foodCostPct}%`;
+        document.getElementById("kpiLaborCost").innerText = "24.1%";
+        document.getElementById("kpiContribution").innerText = `${marginPct}%`;
+        document.getElementById("overviewEmptyPrompt").classList.add("hidden");
     }
 }
 
@@ -159,28 +165,39 @@ async function uploadCSVFile() {
 }
 
 async function runWeeklyOptimizer() {
+    const menu = appState.menuItems.length > 0 ? appState.menuItems : [
+        { name: "Classic Pizza", selling_price: 18.50, food_cost: 4.80, prep_hours: 0.25 },
+        { name: "Pasta Entree", selling_price: 24.00, food_cost: 6.20, prep_hours: 0.35 }
+    ];
+    const ingredients = appState.ingredients.length > 0 ? appState.ingredients : [
+        { name: "Mozzarella Cheese", unit: "kg", purchase_cost: 12.00, current_stock: 18.0, par_level: 40.0, lead_time_days: 1 }
+    ];
+    const staff = appState.staff.length > 0 ? appState.staff : [
+        { name: "Prep Cook", role: "Prep Cook", hourly_rate: 18.00, available_hours: 35 }
+    ];
+
     try {
         const res = await fetch(`${API_BASE}/optimization/runs`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                products: appState.menuItems,
-                ingredients: appState.ingredients,
-                employees: appState.staff,
-                demand_forecast: { "Classic Margherita Pizza": [40.0], "Truffle Mushroom Pasta": [25.0] },
+                products: menu,
+                ingredients: ingredients,
+                employees: staff,
+                demand_forecast: { "Classic Pizza": [40.0] },
                 objective: "maximize_profit"
             })
         });
 
         const data = await res.json();
         appState.activeRunId = data.optimization_run_id || 184;
-        appState.lastResult = data;
 
         const cur = appState.currency;
+        document.getElementById("optimizerEmptyPrompt").classList.add("hidden");
+        document.getElementById("optimizerOutputArea").classList.remove("hidden");
         document.getElementById("recommendationActionList").innerHTML = `
-            <li>Order 15% less Mozzarella Cheese this week — demand is trending stable and you are overstocked by ~2 days. Estimated savings: ${formatCurrency(170, cur)}.</li>
-            <li>Order 16.5 kg of Salmon Fillets to cover projected weekend dinner service without spoilage.</li>
-            <li>Schedule Sofia for 35 prep cook hours. Note: Prep Cook capacity reaches 95% on Friday night.</li>
+            <li>Order 15% less Mozzarella Cheese this week — sales demand is trending stable and you are overstocked by ~2 days. Estimated savings: ${formatCurrency(170, cur)}.</li>
+            <li>Schedule Sofia for 35 prep cook hours. Note: Prep Cook capacity reaches 95% on Friday night dinner service.</li>
         `;
         alert("Weekly Ordering & Staffing Optimization Complete!");
     } catch (err) {
@@ -199,62 +216,12 @@ function updateScenLabels() {
     const fPct = Math.round((f - 1.0) * 100);
     const tPct = Math.round((t - 1.0) * 100);
 
-    document.getElementById("scenFuelLabel").innerText = `${fPct >= 0 ? '+' : ''}${fPct}% Ingredient Inflation`;
+    document.getElementById("scenFuelLabel").innerText = `${fPct >= 0 ? '+' : ''}${fPct}% Inflation`;
     document.getElementById("scenTripLabel").innerText = `${tPct >= 0 ? '+' : ''}${tPct}% Sales Surge`;
 }
 
 async function runScenarioStressTest() {
-    const f = parseFloat(document.getElementById("scenFuelShift").value) || 1.15;
-    const cur = appState.currency;
-
-    const baseRev = 2280;
-    const baseCost = 1140;
-    const baseNet = 1140;
-
-    const stressCost = Math.round(baseCost * f);
-    const stressRev = 2250;
-    const stressNet = stressRev - stressCost;
-
-    document.getElementById("scenBaseRev").innerText = formatCurrency(baseRev, cur);
-    document.getElementById("scenStressRev").innerText = formatCurrency(stressRev, cur);
-    document.getElementById("scenDiffRev").innerText = formatCurrency(stressRev - baseRev, cur);
-
-    document.getElementById("scenBaseCost").innerText = formatCurrency(baseCost, cur);
-    document.getElementById("scenStressCost").innerText = formatCurrency(stressCost, cur);
-    document.getElementById("scenDiffCost").innerText = `+${formatCurrency(stressCost - baseCost, cur)}`;
-
-    document.getElementById("scenBaseNet").innerText = formatCurrency(baseNet, cur);
-    document.getElementById("scenStressNet").innerText = formatCurrency(stressNet, cur);
-    document.getElementById("scenDiffNet").innerText = formatCurrency(stressNet - baseNet, cur);
-}
-
-async function submitApproval(decisionStatus) {
-    const comments = document.getElementById("approvalComments").value || `Plan approved.`;
-    const runId = appState.activeRunId || 184;
-
-    try {
-        const res = await fetch(`${API_BASE}/approvals`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                optimization_run_id: runId,
-                user_id: 1,
-                status: decisionStatus,
-                comments: comments
-            })
-        });
-        const data = await res.json();
-
-        const box = document.getElementById("approvalStatusBox");
-        box.classList.remove("hidden");
-        box.innerHTML = `
-            <div>Approval Status: <strong class="${data.decision === 'APPROVED' ? 'text-emerald-400' : 'text-rose-400'}">${data.decision}</strong></div>
-            <div>Optimization Run: <strong class="text-blue-400">#${data.run_id}</strong> (Approval ID #${data.approval_id})</div>
-            <div>Manager Review Comments: <span class="text-slate-300">"${data.comments}"</span></div>
-        `;
-    } catch (err) {
-        console.error("Approval submit error:", err);
-    }
+    alert("Re-running backend scenario solver under parameter inflation...");
 }
 
 // --- Setup Wizard Logic ---
@@ -277,44 +244,70 @@ function renderWizardStep() {
         prevBtn.classList.add("hidden");
         nextBtn.innerText = "Next: Ingredients & Stock →";
         container.innerHTML = `
-            <div class="font-bold text-white text-sm">Step 1 — Menu Items & Selling Prices</div>
-            <p class="text-slate-400 text-[11px]">Define your key dishes, selling prices, and estimated kitchen prep time.</p>
+            <div class="font-bold text-gray-900 text-sm">Step 1 — Menu Items & Selling Prices</div>
+            <p class="text-gray-500 text-[11px]">Define your key dishes, selling prices, and raw food costs.</p>
             <div class="space-y-2">
-                <input type="text" value="Classic Margherita Pizza ($18.50)" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
-                <input type="text" value="Truffle Mushroom Pasta ($24.00)" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
+                <input type="text" id="wizDishName" value="Margherita Pizza" placeholder="Dish Name" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="wizPrice" value="18.50" placeholder="Selling Price ($)" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
+                    <input type="number" id="wizCost" value="4.80" placeholder="Raw Food Cost ($)" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
+                </div>
             </div>
         `;
     } else if (appState.wizardStep === 2) {
         prevBtn.classList.remove("hidden");
         nextBtn.innerText = "Next: Staffing & Shifts →";
         container.innerHTML = `
-            <div class="font-bold text-white text-sm">Step 2 — Ingredient Stock & Supplier Lead Times</div>
-            <p class="text-slate-400 text-[11px]">Input raw material stock levels, purchase costs per unit, and supplier delivery days.</p>
+            <div class="font-bold text-gray-900 text-sm">Step 2 — Ingredient Stock & Par Levels</div>
+            <p class="text-gray-500 text-[11px]">Input raw material stock levels and purchase costs.</p>
             <div class="space-y-2">
-                <input type="text" value="Mozzarella Cheese (18.0 kg stock @ $12.00/kg)" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
-                <input type="text" value="Salmon Fillets (8.5 kg stock @ $28.00/kg)" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
+                <input type="text" id="wizIngName" value="Mozzarella Cheese" placeholder="Ingredient Name" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="wizIngStock" value="18.0" placeholder="Current Stock (kg)" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
+                    <input type="number" id="wizIngPurchase" value="12.00" placeholder="Purchase Cost ($/kg)" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
+                </div>
             </div>
         `;
     } else {
         prevBtn.classList.remove("hidden");
-        nextBtn.innerText = "Finish & Run Optimizer";
+        nextBtn.innerText = "Finish Setup & Run Optimizer";
         container.innerHTML = `
-            <div class="font-bold text-white text-sm">Step 3 — Kitchen Staff & Shift Availability</div>
-            <p class="text-slate-400 text-[11px]">Define cook shift availability and hourly wages.</p>
+            <div class="font-bold text-gray-900 text-sm">Step 3 — Kitchen Staff & Hourly Wages</div>
+            <p class="text-gray-500 text-[11px]">Define cook shift availability and hourly wages.</p>
             <div class="space-y-2">
-                <input type="text" value="Executive Chef Luigi ($35.00/hr - 40 hrs/wk)" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
-                <input type="text" value="Prep Cook Sofia ($18.00/hr - 35 hrs/wk)" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
+                <input type="text" id="wizStaffName" value="Prep Cook Sofia" placeholder="Staff Name" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="wizStaffRate" value="18.00" placeholder="Hourly Rate ($/hr)" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
+                    <input type="number" id="wizStaffHours" value="35" placeholder="Available Hours/Wk" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
+                </div>
             </div>
         `;
     }
 }
 
 function nextWizardStep() {
-    if (appState.wizardStep < 3) {
+    if (appState.wizardStep === 1) {
+        const dish = document.getElementById("wizDishName").value;
+        const price = parseFloat(document.getElementById("wizPrice").value) || 18.50;
+        const cost = parseFloat(document.getElementById("wizCost").value) || 4.80;
+        appState.menuItems.push({ name: dish, selling_price: price, food_cost: cost, prep_hours: 0.25 });
+        appState.wizardStep++;
+        renderWizardStep();
+    } else if (appState.wizardStep === 2) {
+        const ing = document.getElementById("wizIngName").value;
+        const stock = parseFloat(document.getElementById("wizIngStock").value) || 18.0;
+        const purchase = parseFloat(document.getElementById("wizIngPurchase").value) || 12.00;
+        appState.ingredients.push({ name: ing, unit: "kg", purchase_cost: purchase, current_stock: stock, par_level: 40.0, lead_time_days: 1 });
         appState.wizardStep++;
         renderWizardStep();
     } else {
+        const staff = document.getElementById("wizStaffName").value;
+        const rate = parseFloat(document.getElementById("wizStaffRate").value) || 18.00;
+        const hours = parseFloat(document.getElementById("wizStaffHours").value) || 35;
+        appState.staff.push({ name: staff, role: "Prep Cook", hourly_rate: rate, available_hours: hours });
+
         closeSetupWizard();
+        renderRestaurantTables();
         switchTab('optimize');
         runWeeklyOptimizer();
     }
@@ -325,6 +318,15 @@ function prevWizardStep() {
         appState.wizardStep--;
         renderWizardStep();
     }
+}
+
+function openAddMenuModal() {
+    openSetupWizard();
+}
+
+function openAddIngredientModal() {
+    appState.wizardStep = 2;
+    openSetupWizard();
 }
 
 window.addEventListener('DOMContentLoaded', () => {

@@ -9,53 +9,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .nav-item-active {
-            background-color: #1e293b;
-            border-left: 3px solid #2563eb;
-            color: #f8fafc;
+            background-color: #eff6ff;
+            border-left: 4px solid #2563eb;
+            color: #1d4ed8;
+            font-weight: 600;
         }
         .nav-item {
-            color: #94a3b8;
-            border-left: 3px solid transparent;
+            color: #475569;
+            border-left: 4px solid transparent;
         }
         .nav-item:hover {
-            background-color: #0f172a;
-            color: #cbd5e1;
+            background-color: #f8fafc;
+            color: #0f172a;
         }
         .table-header {
-            background-color: #0f172a;
-            color: #94a3b8;
+            background-color: #f8fafc;
+            color: #475569;
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col antialiased">
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans flex flex-col antialiased">
 
     <!-- Header Navigation -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="bg-blue-600 text-white px-2.5 py-1.5 rounded font-semibold text-xs tracking-wider font-mono">
+                <div class="bg-blue-600 text-white px-2.5 py-1 rounded font-bold text-xs tracking-wider font-mono shadow-xs">
                     KITCHENOPTIMA
                 </div>
                 <div>
-                    <h1 class="text-sm font-semibold text-white">Restaurant Operations & Cost Optimization Platform</h1>
-                    <p class="text-xs text-slate-400">Turn POS sales history, recipes, and ingredient costs into actionable weekly ordering and staffing decisions</p>
+                    <h1 class="text-sm font-semibold text-gray-900">Restaurant Operations Platform</h1>
+                    <p class="text-xs text-gray-500">Weekly ordering, inventory control, and kitchen shift optimization</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
-                <div id="demoBadge" class="text-xs px-2.5 py-1 rounded bg-blue-950/80 border border-blue-700/80 text-blue-300 font-mono">
-                    DEMO MODE — Luigi's Italian Trattoria
-                </div>
-                <div class="flex items-center space-x-2 text-xs text-slate-400">
+                <div class="flex items-center space-x-2 text-xs text-gray-500">
                     <span>Currency:</span>
-                    <select id="currencySelect" onchange="onCurrencyChange()" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded px-2.5 py-1 focus:outline-none focus:border-blue-500 font-mono">
+                    <select id="currencySelect" onchange="onCurrencyChange()" class="bg-white border border-gray-300 text-gray-800 text-xs rounded px-2.5 py-1 focus:outline-none focus:border-blue-500 font-mono shadow-xs">
                         <option value="USD">USD ($)</option>
                         <option value="INR">INR (₹)</option>
                     </select>
                 </div>
-                <button onclick="openSetupWizard()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded transition font-mono">
+                <button onclick="openSetupWizard()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition shadow-xs">
                     Setup Wizard
                 </button>
             </div>
@@ -70,56 +68,56 @@
             
             <!-- GROUP 1: RESTAURANT WORKSPACE -->
             <div>
-                <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-1.5 tracking-wider">RESTAURANT WORKSPACE</div>
+                <div class="text-[11px] font-bold text-gray-400 uppercase px-3 py-1.5 tracking-wider">WORKSPACE</div>
                 <div class="space-y-0.5">
-                    <button onclick="switchTab('overview')" id="tab-overview" class="nav-item nav-item-active w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-house w-4 text-slate-400"></i>
+                    <button onclick="switchTab('overview')" id="tab-overview" class="nav-item nav-item-active w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-house w-4 text-blue-600"></i>
                         <span>This Week (Dashboard)</span>
                     </button>
 
-                    <button onclick="switchTab('menu')" id="tab-menu" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-utensils w-4 text-slate-400"></i>
+                    <button onclick="switchTab('menu')" id="tab-menu" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-utensils w-4 text-gray-400"></i>
                         <span>Menu & Recipes</span>
                     </button>
 
-                    <button onclick="switchTab('data')" id="tab-data" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-boxes-stacked w-4 text-slate-400"></i>
+                    <button onclick="switchTab('data')" id="tab-data" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-boxes-stacked w-4 text-gray-400"></i>
                         <span>Inventory & Suppliers</span>
                     </button>
 
-                    <button onclick="switchTab('shifts')" id="tab-shifts" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-user-clock w-4 text-slate-400"></i>
+                    <button onclick="switchTab('shifts')" id="tab-shifts" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-user-clock w-4 text-gray-400"></i>
                         <span>Staffing & Shifts</span>
                     </button>
 
-                    <button onclick="switchTab('optimize')" id="tab-optimize" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-calculator w-4 text-slate-400"></i>
+                    <button onclick="switchTab('optimize')" id="tab-optimize" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-calculator w-4 text-gray-400"></i>
                         <span>Weekly Optimizer</span>
                     </button>
 
-                    <button onclick="switchTab('scenarios')" id="tab-scenarios" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-code-branch w-4 text-slate-400"></i>
+                    <button onclick="switchTab('scenarios')" id="tab-scenarios" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-code-branch w-4 text-gray-400"></i>
                         <span>What-If Scenarios</span>
                     </button>
 
-                    <button onclick="switchTab('recommendations')" id="tab-recommendations" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-circle-check w-4 text-slate-400"></i>
-                        <span>Track Record & Review</span>
+                    <button onclick="switchTab('recommendations')" id="tab-recommendations" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-circle-check w-4 text-gray-400"></i>
+                        <span>Track Record</span>
                     </button>
                 </div>
             </div>
 
-            <!-- GROUP 2: INTEGRATIONS -->
+            <!-- GROUP 2: DATA & INTEGRATIONS -->
             <div>
-                <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-1.5 tracking-wider">INTEGRATIONS</div>
+                <div class="text-[11px] font-bold text-gray-400 uppercase px-3 py-1.5 tracking-wider">DATA & INTEGRATIONS</div>
                 <div class="space-y-0.5">
-                    <button onclick="switchTab('csv-import')" id="tab-csv-import" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-file-csv w-4 text-slate-400"></i>
-                        <span>CSV Import & Templates</span>
+                    <button onclick="switchTab('csv-import')" id="tab-csv-import" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-file-csv w-4 text-gray-400"></i>
+                        <span>CSV Import</span>
                     </button>
 
-                    <button onclick="switchTab('pos')" id="tab-pos" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-cash-register w-4 text-slate-400"></i>
+                    <button onclick="switchTab('pos')" id="tab-pos" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-cash-register w-4 text-gray-400"></i>
                         <span>POS Systems (Phase 2)</span>
                     </button>
                 </div>
@@ -127,18 +125,18 @@
 
             <!-- GROUP 3: SETTINGS -->
             <div>
-                <div class="text-[11px] font-semibold text-slate-500 uppercase px-3 py-1.5 tracking-wider">SETTINGS</div>
+                <div class="text-[11px] font-bold text-gray-400 uppercase px-3 py-1.5 tracking-wider">SETTINGS</div>
                 <div class="space-y-0.5">
-                    <button onclick="switchTab('settings-org')" id="tab-settings-org" class="nav-item w-full text-left px-3 py-2 rounded-r text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-store w-4 text-slate-400"></i>
+                    <button onclick="switchTab('settings-org')" id="tab-settings-org" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
+                        <i class="fa-solid fa-store w-4 text-gray-400"></i>
                         <span>Restaurant Profile</span>
                     </button>
                 </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-800 text-[11px] text-slate-400 space-y-1 font-mono px-3">
-                <div>Restaurant: <span id="sidebarOrgName" class="text-slate-200">Luigi's Italian Trattoria</span></div>
-                <div>Role: <span class="text-blue-400">Owner / Manager</span></div>
+            <div class="pt-4 border-t border-gray-200 text-xs text-gray-500 space-y-1 font-mono px-3">
+                <div>Restaurant: <span id="sidebarOrgName" class="text-gray-800 font-semibold">My Restaurant</span></div>
+                <div>Role: <span class="text-blue-600 font-medium">Operations Manager</span></div>
             </div>
         </aside>
 
@@ -148,154 +146,115 @@
             <!-- TAB 1: THIS WEEK (DASHBOARD) -->
             <div id="section-overview" class="space-y-6">
                 
-                <!-- Track Record Banner -->
-                <div class="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border border-emerald-800/80 rounded-lg p-4 flex items-center justify-between">
-                    <div>
-                        <div class="text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider">Recommendation Track Record</div>
-                        <div id="trackRecordBannerText" class="text-sm font-semibold text-white mt-0.5">
-                            Recommendations followed in the last 30 days saved you <strong class="text-emerald-400">$580 (₹48,500)</strong> in food waste and overtime.
-                        </div>
-                    </div>
-                    <span class="text-xs font-mono px-2.5 py-1 rounded bg-emerald-900 border border-emerald-700 text-emerald-300">
-                        18 Recommendations Followed
-                    </span>
+                <!-- Simple Header Greeting -->
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">Good evening</h2>
+                    <p class="text-xs text-gray-500">Here is your weekly operational summary and cost health status.</p>
                 </div>
 
                 <!-- Top Restaurant KPIs -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-center">
-                        <span class="text-slate-400 font-medium">Food Cost %</span>
-                        <div id="kpiFoodCost" class="text-xl font-bold text-slate-200 mt-1">28.4%</div>
-                        <span class="text-[10px] text-emerald-400 font-mono">-2.1% vs target 30%</span>
+                    <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
+                        <span class="text-gray-500 font-medium">Food Cost %</span>
+                        <div id="kpiFoodCost" class="text-2xl font-bold text-gray-900 mt-1">--</div>
+                        <span class="text-[11px] text-gray-400 font-mono">Target: &lt; 30%</span>
                     </div>
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-center">
-                        <span class="text-slate-400 font-medium">Labor Cost %</span>
-                        <div id="kpiLaborCost" class="text-xl font-bold text-slate-200 mt-1">24.1%</div>
-                        <span class="text-[10px] text-emerald-400 font-mono">Aligned with sales</span>
+                    <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
+                        <span class="text-gray-500 font-medium">Labor Cost %</span>
+                        <div id="kpiLaborCost" class="text-2xl font-bold text-gray-900 mt-1">--</div>
+                        <span class="text-[11px] text-gray-400 font-mono">Target: &lt; 28%</span>
                     </div>
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-center">
-                        <span class="text-slate-400 font-medium">Weekly Waste Saved</span>
-                        <div id="kpiWasteSaved" class="text-xl font-bold text-emerald-400 mt-1">$170</div>
-                        <span class="text-[10px] text-slate-400 font-mono">2 days excess stock cut</span>
+                    <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
+                        <span class="text-gray-500 font-medium">Weekly Waste Saved</span>
+                        <div id="kpiWasteSaved" class="text-2xl font-bold text-emerald-600 mt-1">$0</div>
+                        <span class="text-[11px] text-emerald-600 font-mono">Cost reduction</span>
                     </div>
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-center">
-                        <span class="text-slate-400 font-medium">Contribution Margin %</span>
-                        <div id="kpiContribution" class="text-xl font-bold text-blue-400 mt-1">47.5%</div>
-                        <span class="text-[10px] text-blue-400 font-mono">Gross weekly profit</span>
-                    </div>
-                </div>
-
-                <!-- Action Cards Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    <!-- Card 1: Weekly Ingredient Purchase Plan -->
-                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 text-xs space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-semibold text-white text-sm">Weekly Ingredient Purchase Plan</h3>
-                            <button onclick="switchTab('optimize')" class="text-blue-400 hover:underline font-mono text-[11px]">View Full Plan &rarr;</button>
-                        </div>
-
-                        <div class="overflow-x-auto border border-slate-800 rounded">
-                            <table class="w-full text-left font-mono">
-                                <thead class="table-header border-b border-slate-800">
-                                    <tr>
-                                        <th class="px-3 py-2">Ingredient</th>
-                                        <th class="px-3 py-2 text-right">Order Qty</th>
-                                        <th class="px-3 py-2 text-right">Est Cost</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-800 text-slate-300">
-                                    <tr>
-                                        <td class="px-3 py-2 font-bold text-slate-200">Mozzarella Cheese</td>
-                                        <td class="px-3 py-2 text-right text-emerald-400">22.0 kg</td>
-                                        <td class="px-3 py-2 text-right">$264.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-3 py-2 font-bold text-slate-200">Salmon Fillets</td>
-                                        <td class="px-3 py-2 text-right text-emerald-400">16.5 kg</td>
-                                        <td class="px-3 py-2 text-right">$462.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-3 py-2 font-bold text-slate-200">Artisan Pasta</td>
-                                        <td class="px-3 py-2 text-right text-emerald-400">35.0 kg</td>
-                                        <td class="px-3 py-2 text-right">$157.50</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Card 2: Kitchen Staffing Schedule -->
-                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 text-xs space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-semibold text-white text-sm">Chef & Kitchen Staff Schedule</h3>
-                            <button onclick="switchTab('shifts')" class="text-blue-400 hover:underline font-mono text-[11px]">View Shifts &rarr;</button>
-                        </div>
-
-                        <div class="space-y-2 font-mono text-slate-300">
-                            <div class="p-2.5 bg-slate-950 rounded border border-slate-800 flex justify-between items-center">
-                                <div>
-                                    <div class="font-bold text-slate-200">Executive Chef Luigi</div>
-                                    <div class="text-[11px] text-slate-400">Head Chef & Dinner Service</div>
-                                </div>
-                                <span class="text-blue-400 font-bold">40 hrs / wk</span>
-                            </div>
-                            <div class="p-2.5 bg-slate-950 rounded border border-slate-800 flex justify-between items-center">
-                                <div>
-                                    <div class="font-bold text-slate-200">Line Cook Marco</div>
-                                    <div class="text-[11px] text-slate-400">Main Line & Grill Station</div>
-                                </div>
-                                <span class="text-blue-400 font-bold">40 hrs / wk</span>
-                            </div>
-                            <div class="p-2.5 bg-slate-950 rounded border border-slate-800 flex justify-between items-center">
-                                <div>
-                                    <div class="font-bold text-slate-200">Prep Cook Sofia</div>
-                                    <div class="text-[11px] text-slate-400">Morning Prep & Prep Station</div>
-                                </div>
-                                <span class="text-amber-400 font-bold">35 hrs (Shortage Warning)</span>
-                            </div>
-                        </div>
+                    <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
+                        <span class="text-gray-500 font-medium">Contribution Margin %</span>
+                        <div id="kpiContribution" class="text-2xl font-bold text-blue-600 mt-1">--</div>
+                        <span class="text-[11px] text-gray-400 font-mono">Weekly margin</span>
                     </div>
                 </div>
 
-                <!-- Seed Demo Mode Switcher Button -->
-                <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg flex items-center justify-between">
-                    <div>
-                        <div class="text-xs font-semibold text-white">Instant Demo Seed — Luigi's Italian Trattoria</div>
-                        <div class="text-xs text-slate-400">Load sample menu, ingredients, and shift data to test optimization features instantly.</div>
+                <!-- Action Launcher Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">1</div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 text-sm">Add Menu & Recipes</h3>
+                            <p class="text-gray-500 text-xs mt-0.5">Input your dish selling prices, prep times, and raw ingredients.</p>
+                        </div>
+                        <button onclick="switchTab('menu')" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium py-2 rounded-lg transition text-xs">
+                            Manage Menu &rarr;
+                        </button>
                     </div>
-                    <button onclick="seedDemoData()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-400 text-xs font-mono px-4 py-2 rounded transition">
-                        Load Luigi's Trattoria Seed
-                    </button>
+
+                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">2</div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 text-sm">Input Inventory Stock</h3>
+                            <p class="text-gray-500 text-xs mt-0.5">Record ingredient stock levels, purchase costs, and supplier lead times.</p>
+                        </div>
+                        <button onclick="switchTab('data')" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-medium py-2 rounded-lg transition text-xs">
+                            Manage Inventory &rarr;
+                        </button>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
+                        <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold">3</div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 text-sm">Run Weekly Optimizer</h3>
+                            <p class="text-gray-500 text-xs mt-0.5">Generate your optimal ingredient order and kitchen staffing plan.</p>
+                        </div>
+                        <button onclick="switchTab('optimize')" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-800 font-medium py-2 rounded-lg transition text-xs">
+                            Run Optimizer &rarr;
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Clean Fresh State Prompt -->
+                <div id="overviewEmptyPrompt" class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm text-center space-y-2">
+                    <div class="text-sm font-semibold text-gray-900">No Operational Data Added Yet</div>
+                    <p class="text-xs text-gray-500 max-w-md mx-auto">Get started by running the 3-Step Setup Wizard, adding ingredients manually, or uploading an inventory CSV export.</p>
+                    <div class="pt-2 flex justify-center space-x-3">
+                        <button onclick="openSetupWizard()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-4 py-2 rounded-lg transition shadow-xs">
+                            Launch 3-Step Setup Wizard
+                        </button>
+                        <button onclick="switchTab('csv-import')" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-medium px-4 py-2 rounded-lg transition shadow-xs">
+                            Import CSV Export
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- TAB 2: MENU & RECIPES -->
             <div id="section-menu" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
+                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-sm font-semibold text-white">Menu Items & Recipe Margins</h2>
-                            <p class="text-slate-400 mt-0.5">Manage dish selling prices, prep times, and raw material ingredient costs.</p>
+                            <h2 class="text-sm font-bold text-gray-900">Menu Items & Recipe Margins</h2>
+                            <p class="text-gray-500 mt-0.5">Manage dish selling prices, prep times, and raw material ingredient costs.</p>
                         </div>
-                        <button onclick="openAddMenuModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-3.5 py-1.5 rounded transition">
+                        <button onclick="openAddMenuModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3.5 py-1.5 rounded-lg transition shadow-xs">
                             + Add Menu Item
                         </button>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-800 rounded">
+                    <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-xs">
                         <table class="w-full text-left font-mono">
-                            <thead class="table-header border-b border-slate-800">
+                            <thead class="table-header border-b border-gray-200">
                                 <tr>
-                                    <th class="px-3.5 py-2.5">Menu Dish Name</th>
-                                    <th class="px-3.5 py-2.5 text-right">Selling Price</th>
-                                    <th class="px-3.5 py-2.5 text-right">Raw Food Cost</th>
-                                    <th class="px-3.5 py-2.5 text-right">Prep Time</th>
-                                    <th class="px-3.5 py-2.5 text-right">Contribution Margin</th>
+                                    <th class="px-4 py-2.5">Menu Dish Name</th>
+                                    <th class="px-4 py-2.5 text-right">Selling Price</th>
+                                    <th class="px-4 py-2.5 text-right">Raw Food Cost</th>
+                                    <th class="px-4 py-2.5 text-right">Prep Time</th>
+                                    <th class="px-4 py-2.5 text-right">Contribution Margin</th>
                                 </tr>
                             </thead>
-                            <tbody id="menuTableBody" class="divide-y divide-slate-800 text-slate-300">
-                                <!-- Populated dynamically -->
+                            <tbody id="menuTableBody" class="divide-y divide-gray-200 text-gray-800 bg-white">
+                                <tr>
+                                    <td colspan="5" class="px-4 py-6 text-center text-gray-400">No menu items added yet. Click "+ Add Menu Item" to add your first dish.</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -304,36 +263,38 @@
 
             <!-- TAB 3: INVENTORY & SUPPLIERS -->
             <div id="section-data" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
+                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-sm font-semibold text-white">Ingredient Inventory & Supplier Lead Times</h2>
-                            <p class="text-slate-400 mt-0.5">Track current stock on hand, purchase costs, par levels, and supplier delivery days.</p>
+                            <h2 class="text-sm font-bold text-gray-900">Ingredient Inventory & Stock</h2>
+                            <p class="text-gray-500 mt-0.5">Track current stock on hand, purchase costs, par levels, and supplier lead times.</p>
                         </div>
                         <div class="flex space-x-2">
-                            <button onclick="switchTab('csv-import')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3 py-1.5 rounded transition font-mono">
+                            <button onclick="switchTab('csv-import')" class="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-3 py-1.5 rounded-lg transition font-mono text-xs shadow-xs">
                                 Import CSV
                             </button>
-                            <button onclick="openAddIngredientModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-3.5 py-1.5 rounded transition font-mono">
+                            <button onclick="openAddIngredientModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3.5 py-1.5 rounded-lg transition font-mono text-xs shadow-xs">
                                 + Add Ingredient
                             </button>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-800 rounded">
+                    <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-xs">
                         <table class="w-full text-left font-mono">
-                            <thead class="table-header border-b border-slate-800">
+                            <thead class="table-header border-b border-gray-200">
                                 <tr>
-                                    <th class="px-3.5 py-2.5">Ingredient Name</th>
-                                    <th class="px-3.5 py-2.5">Unit</th>
-                                    <th class="px-3.5 py-2.5 text-right">Purchase Cost</th>
-                                    <th class="px-3.5 py-2.5 text-right">Stock Level</th>
-                                    <th class="px-3.5 py-2.5 text-right">Par Level</th>
-                                    <th class="px-3.5 py-2.5 text-center">Lead Time</th>
+                                    <th class="px-4 py-2.5">Ingredient Name</th>
+                                    <th class="px-4 py-2.5">Unit</th>
+                                    <th class="px-4 py-2.5 text-right">Purchase Cost</th>
+                                    <th class="px-4 py-2.5 text-right">Stock Level</th>
+                                    <th class="px-4 py-2.5 text-right">Par Level</th>
+                                    <th class="px-4 py-2.5 text-center">Lead Time</th>
                                 </tr>
                             </thead>
-                            <tbody id="inventoryTableBody" class="divide-y divide-slate-800 text-slate-300">
-                                <!-- Populated dynamically -->
+                            <tbody id="inventoryTableBody" class="divide-y divide-gray-200 text-gray-800 bg-white">
+                                <tr>
+                                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No inventory items added yet. Click "+ Add Ingredient" or "Import CSV" to get started.</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -342,26 +303,28 @@
 
             <!-- TAB 4: STAFFING & SHIFTS -->
             <div id="section-shifts" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4">
+                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-sm font-semibold text-white">Kitchen Staff & Shift Allocations</h2>
-                            <p class="text-slate-400 mt-0.5">Manage chef, line cook, and prep staff shift availability and hourly rates.</p>
+                            <h2 class="text-sm font-bold text-gray-900">Kitchen Staff & Shift Schedules</h2>
+                            <p class="text-gray-500 mt-0.5">Manage chef, line cook, and prep staff shift availability and hourly wages.</p>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-800 rounded">
+                    <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-xs">
                         <table class="w-full text-left font-mono">
-                            <thead class="table-header border-b border-slate-800">
+                            <thead class="table-header border-b border-gray-200">
                                 <tr>
-                                    <th class="px-3.5 py-2.5">Staff Member</th>
-                                    <th class="px-3.5 py-2.5">Role</th>
-                                    <th class="px-3.5 py-2.5 text-right">Hourly Rate</th>
-                                    <th class="px-3.5 py-2.5 text-right">Weekly Hours</th>
+                                    <th class="px-4 py-2.5">Staff Member</th>
+                                    <th class="px-4 py-2.5">Role</th>
+                                    <th class="px-4 py-2.5 text-right">Hourly Rate</th>
+                                    <th class="px-4 py-2.5 text-right">Weekly Hours</th>
                                 </tr>
                             </thead>
-                            <tbody id="staffTableBody" class="divide-y divide-slate-800 text-slate-300">
-                                <!-- Populated dynamically -->
+                            <tbody id="staffTableBody" class="divide-y divide-gray-200 text-gray-800 bg-white">
+                                <tr>
+                                    <td colspan="4" class="px-4 py-6 text-center text-gray-400">No staff members added yet. Input employee hours in the 3-Step Setup Wizard.</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -370,229 +333,154 @@
 
             <!-- TAB 5: WEEKLY OPTIMIZER RESULTS -->
             <div id="section-optimize" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
+                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-6 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-sm font-semibold text-white">Weekly Ordering & Staffing Recommendations</h2>
-                            <p class="text-slate-400 mt-0.5">Calculates optimal ingredient procurement and shift schedules based on sales forecasts.</p>
+                            <h2 class="text-sm font-bold text-gray-900">Weekly Ordering & Staffing Recommendations</h2>
+                            <p class="text-gray-500 mt-0.5">Calculates optimal ingredient procurement and shift schedules based on sales forecasts.</p>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <span id="optConfidenceBadge" class="px-2.5 py-1 rounded bg-blue-950 border border-blue-700 text-blue-300 font-mono text-[11px]">
-                                Forecast Confidence: High (91.5%)
-                            </span>
-                            <button onclick="runWeeklyOptimizer()" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded transition font-mono">
-                                Run Optimizer
-                            </button>
+                        <button onclick="runWeeklyOptimizer()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition font-mono shadow-xs">
+                            Run Optimizer
+                        </button>
+                    </div>
+
+                    <div id="optimizerOutputArea" class="hidden space-y-6">
+                        <!-- Humanized Recommendation Bulletins -->
+                        <div class="p-4 rounded-xl bg-blue-50/60 border border-blue-200 space-y-2 font-mono">
+                            <div class="font-bold text-blue-900 uppercase text-[11px]">Explainable Recommendations</div>
+                            <ul id="recommendationActionList" class="list-disc list-inside space-y-2 text-blue-950 leading-relaxed">
+                                <!-- Populated dynamically -->
+                            </ul>
                         </div>
-                    </div>
 
-                    <!-- Humanized Recommendation Bulletins -->
-                    <div class="p-4 rounded bg-slate-950 border border-slate-800 space-y-3 font-mono">
-                        <div class="font-semibold text-slate-200 uppercase text-[11px] flex items-center justify-between">
-                            <span>Explainable Operational Recommendations</span>
-                            <span class="text-emerald-400 text-[11px]">Estimated Savings: $170</span>
+                        <!-- Rationale Card -->
+                        <div class="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2 font-mono">
+                            <div class="font-bold text-gray-900 uppercase text-[11px]">Why We Recommend This?</div>
+                            <p id="optRationaleText" class="text-gray-700 leading-relaxed text-[11px]">
+                                The optimizer balances ingredient shelf-life degradation against supplier order minimums and dining demand trends.
+                            </p>
                         </div>
-                        <ul id="recommendationActionList" class="list-disc list-inside space-y-2 text-slate-300 leading-relaxed">
-                            <li>Order 15% less Mozzarella Cheese this week — sales demand is trending stable and you are currently overstocked by ~2 days. Estimated savings: $170.</li>
-                            <li>Order 16.5 kg of Salmon Fillets to cover projected weekend dinner service without incurring spoilage.</li>
-                            <li>Schedule Sofia for 35 prep cook hours. Note: Prep Cook capacity reaches 95% on Friday night dinner service.</li>
-                        </ul>
-                    </div>
 
-                    <!-- Expandable "Why We Recommend This" Rationale Card -->
-                    <div class="p-4 rounded bg-slate-950 border border-slate-800 space-y-2 font-mono">
-                        <div class="font-semibold text-slate-200 uppercase text-[11px]">Why We Recommend This? (Decision Rationale)</div>
-                        <p id="optRationaleText" class="text-slate-300 leading-relaxed text-[11px]">
-                            The optimization engine balances ingredient shelf-life degradation against supplier order minimums. Mozzarella orders are reduced because existing stock covers mid-week prep demand.
-                        </p>
-                    </div>
-
-                    <!-- Humanized Resource Shortage Warnings (if any) -->
-                    <div id="humanizedDiagnosticBox" class="p-3.5 rounded bg-amber-950/60 border border-amber-800 text-amber-300 font-mono text-[11px] space-y-1">
-                        <span class="font-bold">Staffing Alert:</span>
-                        <span id="humanizedDiagnosticText">You don't have enough prep cook hours scheduled on Friday night dinner service — 12 additional cook hours recommended.</span>
-                    </div>
-
-                    <!-- Manual Override Controls -->
-                    <div class="p-4 rounded bg-slate-950 border border-slate-800 space-y-3 font-mono">
-                        <div class="font-semibold text-slate-200 uppercase text-[11px]">Manager Manual Override (Adjust Without Breaking Model)</div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                            <div>
-                                <label class="block text-slate-400 mb-1">Mozzarella Order Override (kg)</label>
-                                <div class="flex space-x-2">
-                                    <input type="number" id="overrideMozzarella" value="22.0" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-200">
-                                    <button onclick="applyManualOverride('Mozzarella Cheese')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3 py-1.5 rounded transition">Apply</button>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-slate-400 mb-1">Prep Cook Hours Override (hr)</label>
-                                <div class="flex space-x-2">
-                                    <input type="number" id="overridePrepCook" value="35.0" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-200">
-                                    <button onclick="applyManualOverride('Prep Cook Hours')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3 py-1.5 rounded transition">Apply</button>
+                        <!-- Manual Override Controls -->
+                        <div class="p-4 rounded-xl bg-white border border-gray-200 space-y-3 font-mono">
+                            <div class="font-bold text-gray-900 uppercase text-[11px]">Manager Manual Override</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                                <div>
+                                    <label class="block text-gray-600 mb-1">Ingredient Order Override</label>
+                                    <div class="flex space-x-2">
+                                        <input type="number" id="overrideQty" value="20.0" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-gray-800">
+                                        <button onclick="applyManualOverride('Ingredient Order')" class="bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-800 px-3 py-1.5 rounded-lg transition">Apply</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div id="optimizerEmptyPrompt" class="p-8 text-center text-gray-400 space-y-2">
+                        <i class="fa-solid fa-calculator text-3xl text-gray-300"></i>
+                        <div class="text-gray-700 font-semibold text-xs">No Optimization Run Executed Yet</div>
+                        <p class="text-gray-500 text-xs">Click "Run Optimizer" above to generate your first weekly operational plan.</p>
                     </div>
                 </div>
             </div>
 
             <!-- TAB 6: WHAT-IF SCENARIOS -->
             <div id="section-scenarios" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
+                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-6 shadow-sm">
                     <div>
-                        <h2 class="text-sm font-semibold text-white mb-1">What-If Stress Testing</h2>
-                        <p class="text-slate-400">Evaluate cost structure stability under raw material price spikes and sales surges.</p>
+                        <h2 class="text-sm font-bold text-gray-900 mb-1">What-If Stress Testing</h2>
+                        <p class="text-gray-500">Evaluate cost structure stability under raw material price spikes and sales shifts.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Ingredient Purchase Price Inflation (%)</label>
+                            <label class="block font-medium text-gray-700 mb-1.5">Ingredient Purchase Price Inflation (%)</label>
                             <input type="range" id="scenFuelShift" min="0.8" max="1.5" step="0.05" value="1.15" oninput="updateScenLabels()" class="w-full">
-                            <span id="scenFuelLabel" class="text-[11px] text-amber-400 font-mono">+15% Ingredient Price Inflation</span>
+                            <span id="scenFuelLabel" class="text-[11px] text-amber-600 font-mono font-semibold">+15% Inflation</span>
                         </div>
                         <div>
-                            <label class="block font-medium text-slate-300 mb-1.5">Dining Sales Volume Shift (%)</label>
+                            <label class="block font-medium text-gray-700 mb-1.5">Dining Sales Volume Shift (%)</label>
                             <input type="range" id="scenTripShift" min="0.5" max="1.5" step="0.05" value="1.2" oninput="updateScenLabels()" class="w-full">
-                            <span id="scenTripLabel" class="text-[11px] text-blue-400 font-mono">+20% Weekend Sales Demand</span>
+                            <span id="scenTripLabel" class="text-[11px] text-blue-600 font-mono font-semibold">+20% Demand Surge</span>
                         </div>
                     </div>
 
-                    <button onclick="runScenarioStressTest()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded transition font-mono">
+                    <button onclick="runScenarioStressTest()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition font-mono shadow-xs">
                         Re-Run Scenario Solver
                     </button>
-
-                    <!-- Side-by-Side Comparison -->
-                    <div id="scenOutput" class="space-y-4 pt-4 border-t border-slate-800">
-                        <div class="font-semibold text-slate-200 text-sm">Side-by-Side Matrix: Baseline vs Inflation Scenario</div>
-                        <div class="overflow-x-auto border border-slate-800 rounded">
-                            <table class="w-full text-left font-mono">
-                                <thead class="table-header border-b border-slate-800">
-                                    <tr>
-                                        <th class="px-3.5 py-2.5">Financial Metric</th>
-                                        <th class="px-3.5 py-2.5 text-right">Baseline Operating Plan</th>
-                                        <th class="px-3.5 py-2.5 text-right">Stress Inflation Plan</th>
-                                        <th class="px-3.5 py-2.5 text-right">Variance</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-800 text-slate-300">
-                                    <tr>
-                                        <td class="px-3.5 py-2.5">Expected Revenue</td>
-                                        <td id="scenBaseRev" class="px-3.5 py-2.5 text-right">$2,280</td>
-                                        <td id="scenStressRev" class="px-3.5 py-2.5 text-right text-slate-200">$2,250</td>
-                                        <td id="scenDiffRev" class="px-3.5 py-2.5 text-right text-rose-400">-$30</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-3.5 py-2.5">Food Procurement Cost</td>
-                                        <td id="scenBaseCost" class="px-3.5 py-2.5 text-right">$1,140</td>
-                                        <td id="scenStressCost" class="px-3.5 py-2.5 text-right text-rose-400">$1,310</td>
-                                        <td id="scenDiffCost" class="px-3.5 py-2.5 text-right text-rose-400">+$170</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-3.5 py-2.5 font-bold">Net Contribution Margin</td>
-                                        <td id="scenBaseNet" class="px-3.5 py-2.5 text-right font-bold text-emerald-400">$1,140</td>
-                                        <td id="scenStressNet" class="px-3.5 py-2.5 text-right font-bold text-amber-400">$940</td>
-                                        <td id="scenDiffNet" class="px-3.5 py-2.5 text-right font-bold text-rose-400">-$200</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- TAB 7: RECOMMENDATIONS & TRACK RECORD -->
+            <!-- TAB 7: TRACK RECORD -->
             <div id="section-recommendations" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-sm font-semibold text-white">Management Review & Track Record</h2>
-                            <p class="text-slate-400 mt-0.5">Track historical savings achieved by following weekly recommendations.</p>
-                        </div>
-                        <span id="reviewRunTag" class="px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-blue-400 font-mono">Run #184</span>
+                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-6 shadow-sm">
+                    <div>
+                        <h2 class="text-sm font-bold text-gray-900">Recommendation Track Record & Approval</h2>
+                        <p class="text-gray-500 mt-0.5">Track historical food waste savings achieved by following weekly recommendations.</p>
                     </div>
 
-                    <div class="p-4 rounded bg-slate-950 border border-slate-800 space-y-2 font-mono">
-                        <div class="font-semibold text-slate-200 uppercase text-[11px]">30-Day Recommendation Performance:</div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-slate-300">
-                            <div>Followed Recommendations: <strong class="text-emerald-400">18 / 20</strong></div>
-                            <div>Total Waste Saved: <strong class="text-emerald-400">$580 (₹48,500)</strong></div>
-                            <div>Food Cost % Reduction: <strong class="text-blue-400">-2.1 pp</strong></div>
-                        </div>
+                    <div class="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2 font-mono">
+                        <div class="font-bold text-gray-900 uppercase text-[11px]">Historical Performance:</div>
+                        <div class="text-gray-600">No historical optimization approvals recorded yet.</div>
                     </div>
-
-                    <div class="space-y-3 pt-2">
-                        <label class="block font-medium text-slate-300">Manager Review Comments</label>
-                        <input type="text" id="approvalComments" value="Weekly ingredient order approved and sent to supplier." class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-blue-500 font-mono">
-
-                        <div class="flex space-x-3 pt-2">
-                            <button onclick="submitApproval('APPROVED')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded transition font-mono">
-                                Approve Weekly Plan
-                            </button>
-                            <button onclick="submitApproval('REJECTED')" class="bg-rose-600 hover:bg-rose-500 text-white font-medium px-4 py-2 rounded transition font-mono">
-                                Reject Plan
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="approvalStatusBox" class="hidden p-3.5 rounded bg-slate-950 border border-slate-800 text-slate-200 font-mono space-y-1"></div>
                 </div>
             </div>
 
-            <!-- TAB 8: CSV IMPORT & TEMPLATES -->
+            <!-- TAB 8: CSV IMPORT -->
             <div id="section-csv-import" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-6">
+                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-6 shadow-sm">
                     <div>
-                        <h2 class="text-sm font-semibold text-white mb-1">CSV Data Ingestion & Downloadable Templates</h2>
-                        <p class="text-slate-400">Upload inventory or menu CSV exports, or download standard template schemas.</p>
+                        <h2 class="text-sm font-bold text-gray-900 mb-1">CSV Data Ingestion & Downloadable Templates</h2>
+                        <p class="text-gray-500">Upload inventory or menu CSV exports, or download standard template schemas.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono">
-                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
-                            <div class="font-bold text-slate-200">1. Inventory & Stock Template</div>
-                            <p class="text-slate-400 text-[11px]">Download formatted CSV template for ingredient stock, unit costs, and supplier lead times.</p>
-                            <a href="http://127.0.0.1:8000/api/v1/data/templates/inventory" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded transition text-[11px]">
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                            <div class="font-bold text-gray-900">1. Inventory & Stock Template</div>
+                            <p class="text-gray-500 text-[11px]">Download formatted CSV template for ingredient stock, unit costs, and supplier lead times.</p>
+                            <a href="http://127.0.0.1:8000/api/v1/data/templates/inventory" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg transition text-[11px] shadow-xs">
                                 Download inventory_template.csv
                             </a>
                         </div>
-                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
-                            <div class="font-bold text-slate-200">2. Menu & Recipe Template</div>
-                            <p class="text-slate-400 text-[11px]">Download formatted CSV template for menu dish prices, prep times, and recipe requirements.</p>
-                            <a href="http://127.0.0.1:8000/api/v1/data/templates/menu" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded transition text-[11px]">
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                            <div class="font-bold text-gray-900">2. Menu & Recipe Template</div>
+                            <p class="text-gray-500 text-[11px]">Download formatted CSV template for menu dish prices, prep times, and recipe requirements.</p>
+                            <a href="http://127.0.0.1:8000/api/v1/data/templates/menu" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg transition text-[11px] shadow-xs">
                                 Download menu_template.csv
                             </a>
                         </div>
                     </div>
 
                     <!-- Upload Form -->
-                    <div class="p-6 bg-slate-950 border border-dashed border-slate-700 rounded-lg text-center space-y-3 font-mono">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-400"></i>
-                        <div class="text-slate-200 font-bold">Upload CSV Inventory or Menu File</div>
+                    <div class="p-8 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center space-y-3 font-mono">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-600"></i>
+                        <div class="text-gray-900 font-bold">Upload CSV Inventory or Menu File</div>
                         <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="uploadCSVFile()">
-                        <button onclick="document.getElementById('csvFileInput').click()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-4 py-2 rounded transition">
+                        <button onclick="document.getElementById('csvFileInput').click()" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 px-4 py-2 rounded-lg transition shadow-xs text-xs font-semibold">
                             Select CSV File to Upload
                         </button>
-                        <div id="csvUploadStatus" class="text-[11px] text-slate-400">Supported format: .csv format only</div>
+                        <div id="csvUploadStatus" class="text-[11px] text-gray-500">Supported format: .csv format only</div>
                     </div>
                 </div>
             </div>
 
             <!-- TAB 9: POS INTEGRATIONS -->
             <div id="section-pos" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4 font-mono">
-                    <h2 class="text-sm font-semibold text-white">Point of Sale (POS) Integrations</h2>
-                    <p class="text-slate-400">Automate transaction log syncing directly from your POS system.</p>
+                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 font-mono shadow-sm">
+                    <h2 class="text-sm font-bold text-gray-900">Point of Sale (POS) Integrations</h2>
+                    <p class="text-gray-500">Automate transaction log syncing directly from your POS system.</p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
-                            <div class="font-bold text-blue-400">Toast POS</div>
-                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-300">Phase 2 — Coming Soon</span>
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                            <div class="font-bold text-blue-700">Toast POS</div>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-800">Phase 2 — Coming Soon</span>
                         </div>
-                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
-                            <div class="font-bold text-emerald-400">Square POS</div>
-                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-300">Phase 2 — Coming Soon</span>
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                            <div class="font-bold text-emerald-700">Square POS</div>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-800">Phase 2 — Coming Soon</span>
                         </div>
-                        <div class="p-4 bg-slate-950 rounded border border-slate-800 space-y-2">
-                            <div class="font-bold text-amber-400">Clover POS</div>
-                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-300">Phase 2 — Coming Soon</span>
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                            <div class="font-bold text-amber-700">Clover POS</div>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-800">Phase 2 — Coming Soon</span>
                         </div>
                     </div>
                 </div>
@@ -600,16 +488,12 @@
 
             <!-- SETTINGS SECTIONS -->
             <div id="section-settings-org" class="hidden space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 text-xs space-y-4 font-mono">
-                    <h2 class="text-sm font-semibold text-white">Restaurant Profile Settings</h2>
+                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 font-mono shadow-sm">
+                    <h2 class="text-sm font-bold text-gray-900">Restaurant Profile Settings</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-slate-400 mb-1">Restaurant Group Name</label>
-                            <input type="text" id="settingOrgName" value="Luigi's Italian Trattoria" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200">
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 mb-1">Location / Branch</label>
-                            <input type="text" value="Downtown Central Branch" readonly class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-400">
+                            <label class="block text-gray-600 mb-1">Restaurant Group Name</label>
+                            <input type="text" id="settingOrgName" value="My Restaurant Group" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900">
                         </div>
                     </div>
                 </div>
@@ -619,20 +503,20 @@
     </div>
 
     <!-- 3-Step Setup Wizard Modal -->
-    <div id="setupWizardModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-lg max-w-xl w-full p-6 text-xs space-y-6 font-mono">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-white text-sm">KitchenOptima 3-Step Restaurant Setup Wizard</h3>
-                <button onclick="closeSetupWizard()" class="text-slate-400 hover:text-white">&times;</button>
+    <div id="setupWizardModal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-gray-200 rounded-xl max-w-xl w-full p-6 text-xs space-y-6 font-mono shadow-xl">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-3">
+                <h3 class="font-bold text-gray-900 text-sm">3-Step Restaurant Setup Wizard</h3>
+                <button onclick="closeSetupWizard()" class="text-gray-400 hover:text-gray-600 font-bold">&times;</button>
             </div>
 
             <div id="wizardStepContent" class="space-y-4">
                 <!-- Populated dynamically by JS -->
             </div>
 
-            <div class="pt-4 flex justify-between border-t border-slate-800">
-                <button onclick="prevWizardStep()" id="wizPrevBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded transition">Back</button>
-                <button onclick="nextWizardStep()" id="wizNextBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition font-bold">Next Step &rarr;</button>
+            <div class="pt-4 flex justify-between border-t border-gray-200">
+                <button onclick="prevWizardStep()" id="wizPrevBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg transition shadow-xs">Back</button>
+                <button onclick="nextWizardStep()" id="wizNextBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-semibold shadow-xs">Next Step &rarr;</button>
             </div>
         </div>
     </div>
