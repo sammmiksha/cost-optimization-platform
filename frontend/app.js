@@ -602,6 +602,76 @@ function removeStaffMember(idx) {
     }
 }
 
+// --- Sidebar Toggle & Recipe Link UI Helpers ---
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebarNav");
+    if (!sidebar) return;
+    sidebar.classList.toggle("hidden");
+}
+
+function toggleDishRecipe(idx) {
+    const breakdownEl = document.getElementById(`recipe-breakdown-${idx}`);
+    const arrowEl = document.getElementById(`recipe-arrow-${idx}`);
+    if (breakdownEl) breakdownEl.classList.toggle("hidden");
+    if (arrowEl) arrowEl.classList.toggle("rotate-90");
+}
+
+function openLinkIngredientModal(dishName) {
+    document.getElementById("linkDishNameInput").value = dishName;
+    const select = document.getElementById("linkIngredientSelect");
+    if (select) {
+        if (appState.ingredients.length === 0) {
+            select.innerHTML = `<option value="">No inventory ingredients found. Please add inventory ingredients first.</option>`;
+        } else {
+            select.innerHTML = appState.ingredients.map(i => `<option value="${i.name}">${i.name} (${formatCurrency(i.purchase_cost, appState.currency)}/${i.unit})</option>`).join('');
+        }
+    }
+    document.getElementById("linkIngredientModal").classList.remove("hidden");
+}
+
+function closeLinkIngredientModal() {
+    document.getElementById("linkIngredientModal").classList.add("hidden");
+}
+
+function saveDishIngredientLink(e) {
+    e.preventDefault();
+    const dish_name = document.getElementById("linkDishNameInput").value;
+    const ingredient_name = document.getElementById("linkIngredientSelect").value;
+    const quantity_required = parseFloat(document.getElementById("linkQtyInput").value) || 0.25;
+    const unit = document.getElementById("linkUnitInput").value || 'kg';
+
+    if (!ingredient_name) {
+        alert("Please select an ingredient from inventory.");
+        return;
+    }
+
+    if (!appState.recipes) appState.recipes = [];
+    const existingIdx = appState.recipes.findIndex(r => 
+        r.dish_name.toLowerCase() === dish_name.toLowerCase() && 
+        r.ingredient_name.toLowerCase() === ingredient_name.toLowerCase()
+    );
+
+    const recipeObj = { dish_name, ingredient_name, quantity_required, unit };
+    if (existingIdx >= 0) {
+        appState.recipes[existingIdx] = recipeObj;
+    } else {
+        appState.recipes.push(recipeObj);
+    }
+
+    saveStateToLocalStorage();
+    closeLinkIngredientModal();
+    renderRestaurantTables();
+}
+
+function removeRecipeLink(dishName, ingName) {
+    if (!appState.recipes) return;
+    appState.recipes = appState.recipes.filter(r => 
+        !(r.dish_name.toLowerCase() === dishName.toLowerCase() && r.ingredient_name.toLowerCase() === ingName.toLowerCase())
+    );
+    saveStateToLocalStorage();
+    renderRestaurantTables();
+}
+
 // --- Dynamic Recipe Cost Link Helper ---
 function getCalculatedFoodCost(dish) {
     if (!dish) return 0;
@@ -627,7 +697,7 @@ function getCalculatedFoodCost(dish) {
 function renderRestaurantTables() {
     const cur = appState.currency;
 
-    // Render Menu Table
+    // Render Menu Table with Expandable Recipe Ingredient Breakdown
     const menuBody = document.getElementById("menuTableBody");
     if (menuBody) {
         if (appState.menuItems.length === 0) {
@@ -637,17 +707,89 @@ function renderRestaurantTables() {
                 </tr>
             `;
         } else {
-            menuBody.innerHTML = appState.menuItems.map(m => {
+            menuBody.innerHTML = appState.menuItems.map((m, idx) => {
                 const foodCost = getCalculatedFoodCost(m);
                 const margin = (m.selling_price - foodCost);
                 const marginPct = m.selling_price > 0 ? ((margin / m.selling_price) * 100).toFixed(1) : 0;
+                
+                const isMarginLow = marginPct < 65.0 || (m.selling_price > 0 && (foodCost / m.selling_price) > 0.35);
+                const marginBadgeHtml = isMarginLow 
+                    ? `<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-bold block mt-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Margin Decreasing</span>`
+                    : `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold block mt-1"><i class="fa-solid fa-circle-check mr-1"></i>Healthy Margin</span>`;
+
+                const linkedRecipes = (appState.recipes || []).filter(r => r.dish_name.toLowerCase() === m.name.toLowerCase());
+                const recipeCount = linkedRecipes.length;
+
+                let recipeRowsHtml = "";
+                if (recipeCount === 0) {
+                    recipeRowsHtml = `<div class="text-gray-400 py-1.5 italic font-mono text-[11px]">No ingredients linked to this dish yet. Click "+ Link Ingredient to Dish" below.</div>`;
+                } else {
+                    recipeRowsHtml = `
+                        <table class="w-full text-left font-mono text-[11px] bg-white border border-gray-200 rounded-lg overflow-hidden my-1">
+                            <thead class="bg-gray-100 text-gray-600 font-semibold">
+                                <tr>
+                                    <th class="px-3 py-1.5">Linked Ingredient</th>
+                                    <th class="px-3 py-1.5 text-right">Qty / Portion</th>
+                                    <th class="px-3 py-1.5 text-right">Unit Purchase Cost</th>
+                                    <th class="px-3 py-1.5 text-right">Cost Contribution</th>
+                                    <th class="px-3 py-1.5 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-gray-800">
+                                ${linkedRecipes.map(r => {
+                                    const ing = appState.ingredients.find(i => i.name.toLowerCase() === r.ingredient_name.toLowerCase());
+                                    const unitCost = ing ? ing.purchase_cost : 0.0;
+                                    const itemCost = unitCost * r.quantity_required;
+                                    return `
+                                        <tr>
+                                            <td class="px-3 py-1.5 font-bold text-gray-900">${r.ingredient_name}</td>
+                                            <td class="px-3 py-1.5 text-right text-gray-700">${r.quantity_required} ${r.unit}</td>
+                                            <td class="px-3 py-1.5 text-right text-gray-500">${formatCurrency(unitCost, cur)}/${r.unit}</td>
+                                            <td class="px-3 py-1.5 text-right text-rose-600 font-bold">${formatCurrency(itemCost, cur)}</td>
+                                            <td class="px-3 py-1.5 text-center">
+                                                <button onclick="removeRecipeLink('${m.name.replace(/'/g, "\\'")}', '${r.ingredient_name.replace(/'/g, "\\'")}')" class="text-rose-600 hover:text-rose-800 text-[11px] px-1.5 py-0.5 rounded hover:bg-rose-50 transition" title="Remove ingredient link">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+
                 return `
-                    <tr>
-                        <td class="px-4 py-2.5 font-bold text-gray-900">${m.name}</td>
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-2.5 font-bold text-gray-900">
+                            <button onclick="toggleDishRecipe(${idx})" class="text-left font-bold text-gray-900 hover:text-blue-600 focus:outline-none flex items-center space-x-2">
+                                <i id="recipe-arrow-${idx}" class="fa-solid fa-chevron-right text-xs text-gray-400 transition-transform duration-200"></i>
+                                <span>${m.name}</span>
+                                <span class="bg-gray-100 text-gray-600 text-[10px] font-normal px-2 py-0.5 rounded-full border border-gray-200">${recipeCount} ingredients</span>
+                            </button>
+                        </td>
                         <td class="px-4 py-2.5 text-right font-bold text-gray-800">${formatCurrency(m.selling_price, cur)}</td>
-                        <td class="px-4 py-2.5 text-right text-rose-600">${formatCurrency(foodCost, cur)}</td>
+                        <td class="px-4 py-2.5 text-right text-rose-600 font-bold">${formatCurrency(foodCost, cur)}</td>
                         <td class="px-4 py-2.5 text-right text-gray-500">${m.prep_hours} hr</td>
-                        <td class="px-4 py-2.5 text-right text-emerald-600 font-bold">${formatCurrency(margin, cur)} (${marginPct}%)</td>
+                        <td class="px-4 py-2.5 text-right text-emerald-600 font-bold">
+                            <div>${formatCurrency(margin, cur)} (${marginPct}%)</div>
+                            ${marginBadgeHtml}
+                        </td>
+                    </tr>
+                    <tr id="recipe-breakdown-${idx}" class="bg-slate-50/90 hidden border-b border-gray-200">
+                        <td colspan="5" class="px-6 py-3">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-xs text-gray-700 uppercase tracking-wider font-mono">
+                                        <i class="fa-solid fa-list-check text-blue-600 mr-1.5"></i>Ingredient Recipe Breakdown for '${m.name}'
+                                    </span>
+                                    <button onclick="openLinkIngredientModal('${m.name.replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-3 py-1 rounded-lg transition font-mono shadow-xs">
+                                        + Link Ingredient to Dish
+                                    </button>
+                                </div>
+                                ${recipeRowsHtml}
+                            </div>
+                        </td>
                     </tr>
                 `;
             }).join('');
