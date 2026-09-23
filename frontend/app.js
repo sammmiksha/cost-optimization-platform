@@ -3,7 +3,7 @@ const API_BASE = "http://127.0.0.1:8000/api/v1";
 let appState = {
     user: null,
     restaurantName: "My Restaurant",
-    currency: "USD",
+    currency: "INR",
     horizon: "weekly", // 'daily', 'weekly', 'monthly'
     activeRunId: null,
     wizardStep: 1,
@@ -11,6 +11,7 @@ let appState = {
     menuItems: [],
     ingredients: [],
     staff: [],
+    recipes: [],
     trackRecord: {
         followed_30d: 0,
         saved_usd: 0.00,
@@ -18,19 +19,48 @@ let appState = {
     }
 };
 
-function formatCurrency(val, currency = "USD") {
+function saveStateToLocalStorage() {
+    try {
+        localStorage.setItem("kitchenoptima_ingredients", JSON.stringify(appState.ingredients));
+        localStorage.setItem("kitchenoptima_menuItems", JSON.stringify(appState.menuItems));
+        localStorage.setItem("kitchenoptima_staff", JSON.stringify(appState.staff));
+        localStorage.setItem("kitchenoptima_recipes", JSON.stringify(appState.recipes || []));
+        if (appState.currency) localStorage.setItem("kitchenoptima_currency", appState.currency);
+    } catch (e) {
+        console.error("Error saving state to localStorage:", e);
+    }
+}
+
+function loadStateFromLocalStorage() {
+    try {
+        const ing = localStorage.getItem("kitchenoptima_ingredients");
+        if (ing) appState.ingredients = JSON.parse(ing);
+        const menu = localStorage.getItem("kitchenoptima_menuItems");
+        if (menu) appState.menuItems = JSON.parse(menu);
+        const stf = localStorage.getItem("kitchenoptima_staff");
+        if (stf) appState.staff = JSON.parse(stf);
+        const rec = localStorage.getItem("kitchenoptima_recipes");
+        if (rec) appState.recipes = JSON.parse(rec);
+        const cur = localStorage.getItem("kitchenoptima_currency");
+        if (cur) appState.currency = cur;
+    } catch (e) {
+        console.error("Error loading state from localStorage:", e);
+    }
+}
+
+function formatCurrency(val, currency = appState.currency) {
     if (val === undefined || val === null || isNaN(val)) return "--";
+    const num = Number(val);
     if (currency === "INR") {
-        const inrVal = val * 83.5;
-        if (inrVal >= 10000000) {
-            return `₹${(inrVal / 10000000).toFixed(2)} Crore`;
-        } else if (inrVal >= 100000) {
-            return `₹${(inrVal / 100000).toFixed(2)} Lakh`;
+        if (num >= 10000000) {
+            return `₹${(num / 10000000).toFixed(2)} Cr`;
+        } else if (num >= 100000) {
+            return `₹${(num / 100000).toFixed(2)} Lakh`;
         } else {
-            return `₹${inrVal.toLocaleString('en-IN')}`;
+            return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
     } else {
-        return `$${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 }
 
@@ -84,12 +114,19 @@ function setHorizon(h) {
 
 function onCurrencyChange() {
     appState.currency = document.getElementById("currencySelect").value;
+    saveStateToLocalStorage();
     renderRestaurantTables();
 }
 
 // --- Auth & Onboarding Flow ---
 
 function initAuth() {
+    loadStateFromLocalStorage();
+    const curSelect = document.getElementById("currencySelect");
+    if (curSelect && appState.currency) {
+        curSelect.value = appState.currency;
+    }
+
     const token = localStorage.getItem("kitchenoptima_token");
     const userStr = localStorage.getItem("kitchenoptima_user");
 
@@ -305,6 +342,7 @@ function parseAndLoadCSVRecords(records) {
 
     let addedIngredients = 0;
     let addedMenuItems = 0;
+    let addedRecipes = 0;
 
     records.forEach(row => {
         const normalized = {};
@@ -315,8 +353,28 @@ function parseAndLoadCSVRecords(records) {
             }
         }
 
+        // Check if row is a recipe link item (e.g., dish name + ingredient name + quantity required)
+        if ((normalized.dishname || normalized.menudishname || normalized.menuitem) && (normalized.ingredientname || normalized.ingredient) && (normalized.quantityrequired || normalized.quantity || normalized.qty)) {
+            const dish_name = normalized.dishname || normalized.menudishname || normalized.menuitem;
+            const ingredient_name = normalized.ingredientname || normalized.ingredient;
+            const quantity_required = parseFloat(normalized.quantityrequired || normalized.quantity || normalized.qty || 1.0);
+            const unit = normalized.unit || 'kg';
+
+            if (!appState.recipes) appState.recipes = [];
+            const existingIdx = appState.recipes.findIndex(r => 
+                r.dish_name.toLowerCase() === dish_name.toLowerCase() && 
+                r.ingredient_name.toLowerCase() === ingredient_name.toLowerCase()
+            );
+            const recipeObj = { dish_name, ingredient_name, quantity_required, unit };
+            if (existingIdx >= 0) {
+                appState.recipes[existingIdx] = recipeObj;
+            } else {
+                appState.recipes.push(recipeObj);
+            }
+            addedRecipes++;
+        }
         // Check if row is an ingredient item
-        if (normalized.ingredientname || normalized.ingredient || (normalized.unit && (normalized.purchasecost || normalized.cost))) {
+        else if (normalized.ingredientname || normalized.ingredient || (normalized.unit && (normalized.purchasecost || normalized.cost))) {
             const name = normalized.ingredientname || normalized.ingredient || normalized.name || 'Unnamed Ingredient';
             const unit = normalized.unit || 'kg';
             const purchase_cost = parseFloat(normalized.purchasecost || normalized.cost || normalized.price || 0.0);
@@ -353,6 +411,7 @@ function parseAndLoadCSVRecords(records) {
         }
     });
 
+    saveStateToLocalStorage();
     renderRestaurantTables();
 }
 
@@ -429,6 +488,11 @@ async function loadSampleDatasetAndFinish() {
             { name: "Marco Bianco", role: "Line Cook", shift: "Evening", hourly_rate: 20.00, available_hours: 40 },
             { name: "Giulia Romano", role: "Server", shift: "Evening", hourly_rate: 15.00, available_hours: 30 }
         ];
+        appState.recipes = [
+            { dish_name: "Margherita Pizza", ingredient_name: "Mozzarella Cheese", quantity_required: 0.2, unit: "kg" },
+            { dish_name: "Margherita Pizza", ingredient_name: "Italian Flour (00)", quantity_required: 0.3, unit: "kg" }
+        ];
+        saveStateToLocalStorage();
         alert("Sample Luigi's Italian Trattoria dataset loaded!");
     } catch (err) {
         console.error("Sample seed error:", err);
@@ -458,6 +522,7 @@ async function saveMenuItem(e) {
 
     const newItem = { name, selling_price: price, food_cost: cost, prep_hours: prep };
     appState.menuItems.push(newItem);
+    saveStateToLocalStorage();
 
     try {
         await fetch(`${API_BASE}/data/manual-menu-item`, {
@@ -491,6 +556,7 @@ async function saveIngredient(e) {
 
     const newIng = { name, unit, purchase_cost: cost, current_stock: stock, par_level: par, lead_time_days: lead };
     appState.ingredients.push(newIng);
+    saveStateToLocalStorage();
 
     try {
         await fetch(`${API_BASE}/data/manual-ingredient`, {
@@ -522,6 +588,7 @@ function saveStaffMember(e) {
     const hours = parseFloat(document.getElementById("staffHoursInput").value) || 35;
 
     appState.staff.push({ name, role, shift, hourly_rate: rate, available_hours: hours });
+    saveStateToLocalStorage();
 
     closeAddStaffModal();
     renderRestaurantTables();
@@ -530,8 +597,29 @@ function saveStaffMember(e) {
 function removeStaffMember(idx) {
     if (idx >= 0 && idx < appState.staff.length) {
         appState.staff.splice(idx, 1);
+        saveStateToLocalStorage();
         renderRestaurantTables();
     }
+}
+
+// --- Dynamic Recipe Cost Link Helper ---
+function getCalculatedFoodCost(dish) {
+    if (!dish) return 0;
+    if (!appState.recipes || appState.recipes.length === 0) {
+        return dish.food_cost || 0;
+    }
+    const linkedRecipes = appState.recipes.filter(r => r.dish_name.toLowerCase() === dish.name.toLowerCase());
+    if (linkedRecipes.length === 0) {
+        return dish.food_cost || 0;
+    }
+    let calculatedCost = 0;
+    linkedRecipes.forEach(r => {
+        const ing = appState.ingredients.find(i => i.name.toLowerCase() === r.ingredient_name.toLowerCase());
+        if (ing) {
+            calculatedCost += (ing.purchase_cost || 0) * (r.quantity_required || 0);
+        }
+    });
+    return calculatedCost > 0 ? calculatedCost : (dish.food_cost || 0);
 }
 
 // --- Table Rendering Functions ---
@@ -550,13 +638,14 @@ function renderRestaurantTables() {
             `;
         } else {
             menuBody.innerHTML = appState.menuItems.map(m => {
-                const margin = (m.selling_price - m.food_cost);
+                const foodCost = getCalculatedFoodCost(m);
+                const margin = (m.selling_price - foodCost);
                 const marginPct = m.selling_price > 0 ? ((margin / m.selling_price) * 100).toFixed(1) : 0;
                 return `
                     <tr>
                         <td class="px-4 py-2.5 font-bold text-gray-900">${m.name}</td>
                         <td class="px-4 py-2.5 text-right font-bold text-gray-800">${formatCurrency(m.selling_price, cur)}</td>
-                        <td class="px-4 py-2.5 text-right text-rose-600">${formatCurrency(m.food_cost, cur)}</td>
+                        <td class="px-4 py-2.5 text-right text-rose-600">${formatCurrency(foodCost, cur)}</td>
                         <td class="px-4 py-2.5 text-right text-gray-500">${m.prep_hours} hr</td>
                         <td class="px-4 py-2.5 text-right text-emerald-600 font-bold">${formatCurrency(margin, cur)} (${marginPct}%)</td>
                     </tr>
@@ -624,8 +713,8 @@ function renderRestaurantTables() {
 
     if (appState.menuItems.length > 0) {
         const totalSales = appState.menuItems.reduce((acc, m) => acc + m.selling_price, 0);
-        const totalFood = appState.menuItems.reduce((acc, m) => acc + m.food_cost, 0);
-        const foodCostPct = ((totalFood / totalSales) * 100).toFixed(1);
+        const totalFood = appState.menuItems.reduce((acc, m) => acc + getCalculatedFoodCost(m), 0);
+        const foodCostPct = totalSales > 0 ? ((totalFood / totalSales) * 100).toFixed(1) : 0;
         const marginPct = (100 - foodCostPct).toFixed(1);
 
         document.getElementById("kpiFoodCost").innerText = `${foodCostPct}%`;
@@ -638,13 +727,16 @@ function renderRestaurantTables() {
 
         if (rankedBody) {
             const sortedDishes = [...appState.menuItems].sort((a, b) => {
-                const marginA = (a.selling_price - a.food_cost) / a.selling_price;
-                const marginB = (b.selling_price - b.food_cost) / b.selling_price;
+                const costA = getCalculatedFoodCost(a);
+                const costB = getCalculatedFoodCost(b);
+                const marginA = a.selling_price > 0 ? (a.selling_price - costA) / a.selling_price : 0;
+                const marginB = b.selling_price > 0 ? (b.selling_price - costB) / b.selling_price : 0;
                 return marginB - marginA;
             });
 
             rankedBody.innerHTML = sortedDishes.map(d => {
-                const profit = d.selling_price - d.food_cost;
+                const cost = getCalculatedFoodCost(d);
+                const profit = d.selling_price - cost;
                 const pct = d.selling_price > 0 ? ((profit / d.selling_price) * 100).toFixed(1) : 0;
                 let badgeClass = "bg-blue-100 text-blue-800";
                 let badgeText = "Healthy Margin";
@@ -661,7 +753,7 @@ function renderRestaurantTables() {
                     <tr>
                         <td class="px-4 py-2.5 font-bold text-gray-900">${d.name}</td>
                         <td class="px-4 py-2.5 text-right">${formatCurrency(d.selling_price, cur)}</td>
-                        <td class="px-4 py-2.5 text-right text-rose-600">${formatCurrency(d.food_cost, cur)}</td>
+                        <td class="px-4 py-2.5 text-right text-rose-600">${formatCurrency(cost, cur)}</td>
                         <td class="px-4 py-2.5 text-right font-bold text-emerald-600">${formatCurrency(profit, cur)}</td>
                         <td class="px-4 py-2.5 text-right font-bold text-blue-600">${pct}%</td>
                         <td class="px-4 py-2.5 text-center">
@@ -816,6 +908,7 @@ function nextWizardStep() {
         const price = parseFloat(document.getElementById("wizPrice").value) || 18.50;
         const cost = parseFloat(document.getElementById("wizCost").value) || 4.80;
         appState.menuItems.push({ name: dish, selling_price: price, food_cost: cost, prep_hours: 0.25 });
+        saveStateToLocalStorage();
         appState.wizardStep++;
         renderWizardStep();
     } else if (appState.wizardStep === 2) {
@@ -823,6 +916,7 @@ function nextWizardStep() {
         const stock = parseFloat(document.getElementById("wizIngStock").value) || 18.0;
         const purchase = parseFloat(document.getElementById("wizIngPurchase").value) || 12.00;
         appState.ingredients.push({ name: ing, unit: "kg", purchase_cost: purchase, current_stock: stock, par_level: 40.0, lead_time_days: 1 });
+        saveStateToLocalStorage();
         appState.wizardStep++;
         renderWizardStep();
     } else {
@@ -830,6 +924,7 @@ function nextWizardStep() {
         const rate = parseFloat(document.getElementById("wizStaffRate").value) || 18.00;
         const hours = parseFloat(document.getElementById("wizStaffHours").value) || 35;
         appState.staff.push({ name: staff, role: "Prep Cook", shift: "Morning", hourly_rate: rate, available_hours: hours });
+        saveStateToLocalStorage();
 
         closeSetupWizard();
         renderRestaurantTables();

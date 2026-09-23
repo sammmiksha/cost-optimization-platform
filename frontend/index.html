@@ -182,6 +182,9 @@
                         <a href="/api/v1/data/templates/menu" target="_blank" class="border border-gray-300 bg-white text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100">
                             Download Menu Template
                         </a>
+                        <a href="/api/v1/data/templates/recipes" target="_blank" class="border border-gray-300 bg-white text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100">
+                            Download Recipe Link Template
+                        </a>
                     </div>
                     <p id="obCsvStatus" class="text-xs font-mono text-emerald-600 font-bold"></p>
                 </div>
@@ -222,8 +225,8 @@
                     <div class="flex items-center space-x-2 text-xs text-gray-500">
                         <span>Currency:</span>
                         <select id="currencySelect" onchange="onCurrencyChange()" class="bg-white border border-gray-300 text-gray-800 text-xs rounded px-2.5 py-1 focus:outline-none focus:border-blue-500 font-mono shadow-xs">
+                            <option value="INR" selected>INR (₹)</option>
                             <option value="USD">USD ($)</option>
-                            <option value="INR">INR (₹)</option>
                         </select>
                     </div>
                     <div class="text-xs text-gray-600 font-medium flex items-center space-x-2 border-l pl-4 border-gray-200">
@@ -250,7 +253,7 @@
                 <div class="space-y-0.5">
                     <button onclick="switchTab('overview')" id="tab-overview" class="nav-item nav-item-active w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
                         <i class="fa-solid fa-house w-4 text-blue-600"></i>
-                        <span>This Week (Dashboard)</span>
+                        <span>Dashboard</span>
                     </button>
 
                     <button onclick="switchTab('menu')" id="tab-menu" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
@@ -439,6 +442,15 @@
 
             <!-- TAB 2: MENU & RECIPES -->
             <div id="section-menu" class="hidden space-y-6">
+                <!-- Page Guide Banner -->
+                <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-4 text-xs text-blue-950 font-mono space-y-1">
+                    <div class="font-bold flex items-center space-x-2 text-blue-900">
+                        <i class="fa-solid fa-utensils text-blue-600"></i>
+                        <span>PAGE PURPOSE: MENU & RECIPE MARGINS</span>
+                    </div>
+                    <p class="leading-relaxed">Defines dish selling prices and links menu dishes to raw ingredient stock. When raw material purchase costs change in inventory, food costs and dish margins recalculate automatically.</p>
+                </div>
+
                 <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
@@ -473,6 +485,15 @@
 
             <!-- TAB 3: INVENTORY & SUPPLIERS -->
             <div id="section-data" class="hidden space-y-6">
+                <!-- Page Guide Banner -->
+                <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-4 text-xs text-blue-950 font-mono space-y-1">
+                    <div class="font-bold flex items-center space-x-2 text-blue-900">
+                        <i class="fa-solid fa-boxes-stacked text-blue-600"></i>
+                        <span>PAGE PURPOSE: INGREDIENT INVENTORY & STOCK LEDGER</span>
+                    </div>
+                    <p class="leading-relaxed">Manages raw ingredient purchase costs, current stock on hand, par levels, and supplier lead times. Persists inventory stock automatically on your device and server.</p>
+                </div>
+
                 <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
@@ -513,6 +534,14 @@
 
             <!-- TAB 4: STAFFING & SHIFTS -->
             <div id="section-shifts" class="hidden space-y-6">
+                <!-- Page Guide Banner -->
+                <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-4 text-xs text-blue-950 font-mono space-y-1">
+                    <div class="font-bold flex items-center space-x-2 text-blue-900">
+                        <i class="fa-solid fa-user-clock text-blue-600"></i>
+                        <span>PAGE PURPOSE: KITCHEN & SERVICE STAFF ROSTER</span>
+                    </div>
+                    <p class="leading-relaxed">Schedules chef, line cook, and server shift availability (Morning/Afternoon/Evening/Night) and sets hourly wages to optimize kitchen labor cost ratio.</p>
+                </div>
                 <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
@@ -599,35 +628,17 @@
                 </div>
             </div>
 
-            <!-- TAB 6: WHAT-IF SCENARIOS -->
-            <div id="section-scenarios" class="hidden space-y-6">
-                <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-6 shadow-sm">
-                    <div>
-                        <h2 class="text-sm font-bold text-gray-900 mb-1">What-If Stress Testing</h2>
-                        <p class="text-gray-500">Evaluate cost structure stability under raw material price spikes and sales shifts.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-medium text-gray-700 mb-1.5">Ingredient Purchase Price Inflation (%)</label>
-                            <input type="range" id="scenFuelShift" min="0.8" max="1.5" step="0.05" value="1.15" oninput="updateScenLabels()" class="w-full">
-                            <span id="scenFuelLabel" class="text-[11px] text-amber-600 font-mono font-semibold">+15% Inflation</span>
-                        </div>
-                        <div>
-                            <label class="block font-medium text-gray-700 mb-1.5">Dining Sales Volume Shift (%)</label>
-                            <input type="range" id="scenTripShift" min="0.5" max="1.5" step="0.05" value="1.2" oninput="updateScenLabels()" class="w-full">
-                            <span id="scenTripLabel" class="text-[11px] text-blue-600 font-mono font-semibold">+20% Demand Surge</span>
-                        </div>
-                    </div>
-
-                    <button onclick="runScenarioStressTest()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition font-mono shadow-xs">
-                        Re-Run Scenario Solver
-                    </button>
-                </div>
-            </div>
-
-            <!-- TAB 7: TRACK RECORD -->
+            <!-- TAB 6: TRACK RECORD -->
             <div id="section-recommendations" class="hidden space-y-6">
+                <!-- Page Guide Banner -->
+                <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-4 text-xs text-blue-950 font-mono space-y-1">
+                    <div class="font-bold flex items-center space-x-2 text-blue-900">
+                        <i class="fa-solid fa-circle-check text-blue-600"></i>
+                        <span>PAGE PURPOSE: RECOMMENDATION TRACK RECORD & APPROVALS</span>
+                    </div>
+                    <p class="leading-relaxed">Tracks historical realized food waste savings vs projected savings from approved recommendations over time.</p>
+                </div>
+
                 <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-6 shadow-sm">
                     <div>
                         <h2 class="text-sm font-bold text-gray-900">Recommendation Track Record & Approval</h2>
@@ -641,27 +652,43 @@
                 </div>
             </div>
 
-            <!-- TAB 8: CSV IMPORT -->
+            <!-- TAB 7: CSV IMPORT -->
             <div id="section-csv-import" class="hidden space-y-6">
+                <!-- Page Guide Banner -->
+                <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-4 text-xs text-blue-950 font-mono space-y-1">
+                    <div class="font-bold flex items-center space-x-2 text-blue-900">
+                        <i class="fa-solid fa-file-csv text-blue-600"></i>
+                        <span>PAGE PURPOSE: BULK CSV DATA IMPORT</span>
+                    </div>
+                    <p class="leading-relaxed">Upload bulk CSV files for Ingredient Stock, Menu Prices, or Recipe Ingredient Links, or download sample CSV templates.</p>
+                </div>
+
                 <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-6 shadow-sm">
                     <div>
                         <h2 class="text-sm font-bold text-gray-900 mb-1">CSV Data Ingestion & Downloadable Templates</h2>
-                        <p class="text-gray-500">Upload inventory or menu CSV exports, or download standard template schemas.</p>
+                        <p class="text-gray-500">Upload inventory, menu, or recipe link CSV exports, or download standard template schemas.</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
                         <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
-                            <div class="font-bold text-gray-900">1. Inventory & Stock Template</div>
-                            <p class="text-gray-500 text-[11px]">Download formatted CSV template for ingredient stock, unit costs, and supplier lead times.</p>
-                            <a href="http://127.0.0.1:8000/api/v1/data/templates/inventory" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg transition text-[11px] shadow-xs">
+                            <div class="font-bold text-gray-900">1. Inventory Stock</div>
+                            <p class="text-gray-500 text-[11px]">CSV template for ingredient stock, unit costs, and lead times.</p>
+                            <a href="/api/v1/data/templates/inventory" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition text-[11px] shadow-xs">
                                 Download inventory_template.csv
                             </a>
                         </div>
                         <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
-                            <div class="font-bold text-gray-900">2. Menu & Recipe Template</div>
-                            <p class="text-gray-500 text-[11px]">Download formatted CSV template for menu dish prices, prep times, and recipe requirements.</p>
-                            <a href="http://127.0.0.1:8000/api/v1/data/templates/menu" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg transition text-[11px] shadow-xs">
+                            <div class="font-bold text-gray-900">2. Menu & Prices</div>
+                            <p class="text-gray-500 text-[11px]">CSV template for menu dish prices and prep times.</p>
+                            <a href="/api/v1/data/templates/menu" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition text-[11px] shadow-xs">
                                 Download menu_template.csv
+                            </a>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                            <div class="font-bold text-gray-900">3. Recipe Ingredient Link</div>
+                            <p class="text-gray-500 text-[11px]">CSV template mapping dishes to raw ingredient quantities.</p>
+                            <a href="/api/v1/data/templates/recipes" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition text-[11px] shadow-xs">
+                                Download recipes_template.csv
                             </a>
                         </div>
                     </div>
@@ -669,7 +696,7 @@
                     <!-- Upload Form -->
                     <div class="p-8 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center space-y-3 font-mono">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-600"></i>
-                        <div class="text-gray-900 font-bold">Upload CSV Inventory or Menu File</div>
+                        <div class="text-gray-900 font-bold">Upload CSV Inventory, Menu, or Recipe Link File</div>
                         <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="uploadCSVFile()">
                         <button onclick="document.getElementById('csvFileInput').click()" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 px-4 py-2 rounded-lg transition shadow-xs text-xs font-semibold">
                             Select CSV File to Upload

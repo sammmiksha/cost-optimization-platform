@@ -64,12 +64,20 @@ def download_csv_template(template_name: str):
         filename = "inventory_template.csv"
     elif template_name == "menu":
         writer.writerow(["Menu Item Name", "Selling Price", "Prep Time (Hours)", "Primary Ingredient", "Ingredient Quantity Required"])
-        writer.writerow(["Classic Burger", "450.00", "0.25", "Beef Patty", "0.20"])
-        writer.writerow(["Grilled Salmon", "850.00", "0.35", "Salmon Fillet", "0.25"])
-        writer.writerow(["Artisan Pasta", "550.00", "0.30", "Pasta", "0.18"])
+        writer.writerow(["Pasta with Red Sauce", "450.00", "0.35", "Pasta Noodles", "0.25"])
+        writer.writerow(["Classic Margherita Pizza", "450.00", "0.25", "Mozzarella Cheese", "0.18"])
+        writer.writerow(["Grilled Salmon Entree", "850.00", "0.35", "Salmon Fillets", "0.25"])
         filename = "menu_template.csv"
+    elif template_name == "recipes":
+        writer.writerow(["Menu Dish Name", "Ingredient Name", "Quantity Required", "Unit"])
+        writer.writerow(["Pasta with Red Sauce", "Pasta Noodles", "0.25", "kg"])
+        writer.writerow(["Pasta with Red Sauce", "Tomato Sauce", "0.15", "kg"])
+        writer.writerow(["Pasta with Red Sauce", "Olive Oil", "0.02", "liters"])
+        writer.writerow(["Classic Margherita Pizza", "Mozzarella Cheese", "0.18", "kg"])
+        writer.writerow(["Classic Margherita Pizza", "Italian Flour (00)", "0.18", "kg"])
+        filename = "recipes_template.csv"
     else:
-        raise HTTPException(status_code=400, detail="Invalid template requested. Use 'inventory' or 'menu'.")
+        raise HTTPException(status_code=400, detail="Invalid template requested. Use 'inventory', 'menu', or 'recipes'.")
 
     output.seek(0)
     return StreamingResponse(
