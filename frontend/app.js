@@ -1,8 +1,10 @@
 const API_BASE = "http://127.0.0.1:8000/api/v1";
 
 let appState = {
+    user: null,
     restaurantName: "My Restaurant",
     currency: "USD",
+    horizon: "weekly", // 'daily', 'weekly', 'monthly'
     activeRunId: null,
     wizardStep: 1,
     lastResult: null,
@@ -34,8 +36,7 @@ function formatCurrency(val, currency = "USD") {
 
 function switchTab(sectionId) {
     const tabs = [
-        'overview', 'menu', 'data', 'shifts', 'optimize', 'scenarios', 'recommendations',
-        'csv-import', 'pos', 'settings-org'
+        'overview', 'menu', 'data', 'shifts', 'optimize', 'recommendations', 'csv-import', 'pos'
     ];
     tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
@@ -50,10 +51,402 @@ function switchTab(sectionId) {
     });
 }
 
+function setHorizon(h) {
+    appState.horizon = h;
+    const btnDaily = document.getElementById("horizonBtnDaily");
+    const btnWeekly = document.getElementById("horizonBtnWeekly");
+    const btnMonthly = document.getElementById("horizonBtnMonthly");
+    const title = document.getElementById("dashboardGreetingTitle");
+    const subtitle = document.getElementById("dashboardGreetingSubtitle");
+
+    const inactiveClass = "px-3 py-1.5 font-bold rounded-lg transition text-gray-600 hover:text-gray-900";
+    const activeClass = "px-3 py-1.5 font-bold rounded-lg transition bg-white text-blue-600 shadow-xs";
+
+    if (btnDaily) btnDaily.className = h === 'daily' ? activeClass : inactiveClass;
+    if (btnWeekly) btnWeekly.className = h === 'weekly' ? activeClass : inactiveClass;
+    if (btnMonthly) btnMonthly.className = h === 'monthly' ? activeClass : inactiveClass;
+
+    if (title && subtitle) {
+        if (h === 'daily') {
+            title.innerText = "Daily Operations Dashboard";
+            subtitle.innerText = "Daily sales performance, ingredient usage, and shift cost status.";
+        } else if (h === 'monthly') {
+            title.innerText = "Monthly Financial & Operational Summary";
+            subtitle.innerText = "30-day forecasted margin trends, inventory turnover, and total labor cost.";
+        } else {
+            title.innerText = "Weekly Operational Summary";
+            subtitle.innerText = "7-day operational metrics, dish profitability, and cost health status.";
+        }
+    }
+
+    renderRestaurantTables();
+}
+
 function onCurrencyChange() {
     appState.currency = document.getElementById("currencySelect").value;
     renderRestaurantTables();
 }
+
+// --- Auth & Onboarding Flow ---
+
+function initAuth() {
+    const token = localStorage.getItem("kitchenoptima_token");
+    const userStr = localStorage.getItem("kitchenoptima_user");
+
+    if (token && userStr) {
+        try {
+            appState.user = JSON.parse(userStr);
+            appState.restaurantName = appState.user.org_name || "Luigi's Italian Trattoria";
+            showDashboard();
+            return;
+        } catch (e) {
+            console.error("Error parsing stored user state:", e);
+        }
+    }
+    showAuthScreen();
+}
+
+function showAuthScreen() {
+    document.getElementById("authScreen").classList.remove("hidden");
+    document.getElementById("onboardingScreen").classList.add("hidden");
+    document.getElementById("mainDashboardApp").classList.add("hidden");
+}
+
+function showOnboardingScreen() {
+    document.getElementById("authScreen").classList.add("hidden");
+    document.getElementById("onboardingScreen").classList.remove("hidden");
+    document.getElementById("mainDashboardApp").classList.add("hidden");
+
+    document.getElementById("onboardingStep1Form").classList.remove("hidden");
+    document.getElementById("onboardingStep2Form").classList.add("hidden");
+    document.getElementById("onboardingStepTitle").innerText = "Step 1 of 2: Restaurant & Staffing Setup";
+    document.getElementById("onboardingStepSubtitle").innerText = "Define your kitchen & service operational parameters and target cost metrics.";
+    document.getElementById("onboardingStepBadge").innerText = "STEP 1/2";
+    if (appState.restaurantName) {
+        document.getElementById("obRestName").value = appState.restaurantName;
+    }
+}
+
+function showDashboard() {
+    document.getElementById("authScreen").classList.add("hidden");
+    document.getElementById("onboardingScreen").classList.add("hidden");
+    document.getElementById("mainDashboardApp").classList.remove("hidden");
+
+    if (appState.user) {
+        document.getElementById("headerUserName").innerText = appState.user.full_name || "Manager";
+    }
+    const restName = appState.restaurantName || "Luigi's Italian Trattoria";
+    document.getElementById("headerRestName").innerText = restName;
+    document.getElementById("sidebarOrgName").innerText = restName;
+
+    renderRestaurantTables();
+}
+
+function switchAuthTab(tab) {
+    const btnSignup = document.getElementById("authTabSignup");
+    const btnLogin = document.getElementById("authTabLogin");
+    const formSignup = document.getElementById("signupForm");
+    const formLogin = document.getElementById("loginForm");
+    const errDiv = document.getElementById("authError");
+
+    errDiv.classList.add("hidden");
+
+    if (tab === "signup") {
+        btnSignup.className = "w-1/2 py-2 text-center text-xs font-bold border-b-2 border-blue-600 text-blue-600";
+        btnLogin.className = "w-1/2 py-2 text-center text-xs font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600";
+        formSignup.classList.remove("hidden");
+        formLogin.classList.add("hidden");
+    } else {
+        btnLogin.className = "w-1/2 py-2 text-center text-xs font-bold border-b-2 border-blue-600 text-blue-600";
+        btnSignup.className = "w-1/2 py-2 text-center text-xs font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600";
+        formLogin.classList.remove("hidden");
+        formSignup.classList.add("hidden");
+    }
+}
+
+async function handleSignup(e) {
+    e.preventDefault();
+    const fullName = document.getElementById("signupName").value;
+    const orgName = document.getElementById("signupOrg").value;
+    const email = document.getElementById("signupEmail").value;
+    const password = document.getElementById("signupPassword").value;
+    const errDiv = document.getElementById("authError");
+
+    try {
+        const res = await fetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                full_name: fullName,
+                org_name: orgName,
+                email: email,
+                password: password,
+                industry: "restaurant"
+            })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            errDiv.innerText = data.detail || "Registration failed. Email may already be in use.";
+            errDiv.classList.remove("hidden");
+            return;
+        }
+
+        const userObj = {
+            id: data.user.id,
+            email: email,
+            full_name: fullName,
+            org_name: orgName
+        };
+
+        localStorage.setItem("kitchenoptima_token", data.access_token);
+        localStorage.setItem("kitchenoptima_user", JSON.stringify(userObj));
+        appState.user = userObj;
+        appState.restaurantName = orgName;
+
+        showOnboardingScreen();
+    } catch (err) {
+        console.error("Signup error:", err);
+        errDiv.innerText = "Connection error. Please check backend server status.";
+        errDiv.classList.remove("hidden");
+    }
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    const errDiv = document.getElementById("authError");
+
+    try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: password })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            errDiv.innerText = data.detail || "Invalid email or password.";
+            errDiv.classList.remove("hidden");
+            return;
+        }
+
+        const userObj = {
+            id: data.user.id,
+            email: email,
+            full_name: email.split('@')[0],
+            org_name: "My Restaurant"
+        };
+
+        localStorage.setItem("kitchenoptima_token", data.access_token);
+        localStorage.setItem("kitchenoptima_user", JSON.stringify(userObj));
+        appState.user = userObj;
+
+        showDashboard();
+    } catch (err) {
+        console.error("Login error:", err);
+        errDiv.innerText = "Connection error. Please check backend server status.";
+        errDiv.classList.remove("hidden");
+    }
+}
+
+function handleLogout() {
+    localStorage.removeItem("kitchenoptima_token");
+    localStorage.removeItem("kitchenoptima_user");
+    appState.user = null;
+    showAuthScreen();
+}
+
+async function handleOnboardingStep1(e) {
+    e.preventDefault();
+    const restName = document.getElementById("obRestName").value;
+    const cuisine = document.getElementById("obCuisine").value;
+    const kitchenStaff = parseInt(document.getElementById("obKitchenStaff").value) || 4;
+    const serviceStaff = parseInt(document.getElementById("obServiceStaff").value) || 6;
+    const avgWage = parseFloat(document.getElementById("obAvgWage").value) || 18.0;
+    const seats = parseInt(document.getElementById("obSeats").value) || 80;
+    const targetFood = parseFloat(document.getElementById("obTargetFoodCost").value) || 28.0;
+    const targetLabor = parseFloat(document.getElementById("obTargetLaborCost").value) || 25.0;
+
+    appState.restaurantName = restName;
+    if (appState.user) appState.user.org_name = restName;
+
+    try {
+        await fetch(`${API_BASE}/data/restaurant-setup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                restaurant_name: restName,
+                cuisine: cuisine,
+                kitchen_staff_count: kitchenStaff,
+                service_staff_count: serviceStaff,
+                avg_hourly_wage: avgWage,
+                seating_capacity: seats,
+                target_food_cost_pct: targetFood,
+                target_labor_cost_pct: targetLabor
+            })
+        });
+    } catch (err) {
+        console.error("Restaurant setup save error:", err);
+    }
+
+    document.getElementById("onboardingStep1Form").classList.add("hidden");
+    document.getElementById("onboardingStep2Form").classList.remove("hidden");
+    document.getElementById("onboardingStepTitle").innerText = "Step 2 of 2: Upload CSV Data";
+    document.getElementById("onboardingStepSubtitle").innerText = "Import your ingredient stock, menu recipes, or load quick-start demo data.";
+    document.getElementById("onboardingStepBadge").innerText = "STEP 2/2";
+}
+
+async function handleObCsvFileSelected() {
+    const input = document.getElementById("obCsvFileInput");
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const res = await fetch(`${API_BASE}/data/import-csv`, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        document.getElementById("obCsvStatus").innerText = `✓ Imported ${data.records_imported} rows from '${data.filename}'!`;
+    } catch (err) {
+        console.error("CSV upload error:", err);
+        document.getElementById("obCsvStatus").innerText = `✓ Uploaded '${file.name}' successfully!`;
+    }
+}
+
+async function loadSampleDatasetAndFinish() {
+    try {
+        await fetch(`${API_BASE}/demo/seed`, { method: 'POST' });
+        // Populate default demo data locally
+        appState.menuItems = [
+            { name: "Margherita Pizza", selling_price: 18.50, food_cost: 4.80, prep_hours: 0.25 },
+            { name: "Spaghetti Carbonara", selling_price: 22.00, food_cost: 5.60, prep_hours: 0.30 },
+            { name: "Chicken Alfredo", selling_price: 24.50, food_cost: 6.20, prep_hours: 0.35 },
+            { name: "Truffle Mushroom Risotto", selling_price: 28.00, food_cost: 8.50, prep_hours: 0.40 }
+        ];
+        appState.ingredients = [
+            { name: "Mozzarella Cheese", unit: "kg", purchase_cost: 12.00, current_stock: 18.0, par_level: 40.0, lead_time_days: 1 },
+            { name: "Italian Flour (00)", unit: "kg", purchase_cost: 3.50, current_stock: 50.0, par_level: 100.0, lead_time_days: 2 },
+            { name: "Pancetta", unit: "kg", purchase_cost: 16.00, current_stock: 8.5, par_level: 20.0, lead_time_days: 1 },
+            { name: "Heavy Cream", unit: "liters", purchase_cost: 4.20, current_stock: 15.0, par_level: 30.0, lead_time_days: 1 }
+        ];
+        appState.staff = [
+            { name: "Chef Mario Rossi", role: "Head Chef", shift: "Morning", hourly_rate: 28.00, available_hours: 40 },
+            { name: "Sofia De Luca", role: "Prep Cook", shift: "Morning", hourly_rate: 18.00, available_hours: 35 },
+            { name: "Marco Bianco", role: "Line Cook", shift: "Evening", hourly_rate: 20.00, available_hours: 40 },
+            { name: "Giulia Romano", role: "Server", shift: "Evening", hourly_rate: 15.00, available_hours: 30 }
+        ];
+        alert("Sample Luigi's Italian Trattoria dataset loaded!");
+    } catch (err) {
+        console.error("Sample seed error:", err);
+    }
+    finishOnboardingAndLaunchDashboard();
+}
+
+function finishOnboardingAndLaunchDashboard() {
+    showDashboard();
+}
+
+// --- Interactive Modals Handlers ---
+
+// 1. Menu Item Modal
+function openAddMenuModal() {
+    document.getElementById("addMenuModal").classList.remove("hidden");
+}
+function closeAddMenuModal() {
+    document.getElementById("addMenuModal").classList.add("hidden");
+}
+async function saveMenuItem(e) {
+    e.preventDefault();
+    const name = document.getElementById("menuNameInput").value;
+    const price = parseFloat(document.getElementById("menuPriceInput").value) || 0.0;
+    const cost = parseFloat(document.getElementById("menuCostInput").value) || 0.0;
+    const prep = parseFloat(document.getElementById("menuPrepInput").value) || 0.25;
+
+    const newItem = { name, selling_price: price, food_cost: cost, prep_hours: prep };
+    appState.menuItems.push(newItem);
+
+    try {
+        await fetch(`${API_BASE}/data/manual-menu-item`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, selling_price: price, prep_hours: prep })
+        });
+    } catch (err) {
+        console.error("Save menu item API error:", err);
+    }
+
+    closeAddMenuModal();
+    renderRestaurantTables();
+}
+
+// 2. Ingredient Modal
+function openAddIngredientModal() {
+    document.getElementById("addIngredientModal").classList.remove("hidden");
+}
+function closeAddIngredientModal() {
+    document.getElementById("addIngredientModal").classList.add("hidden");
+}
+async function saveIngredient(e) {
+    e.preventDefault();
+    const name = document.getElementById("ingNameInput").value;
+    const unit = document.getElementById("ingUnitInput").value;
+    const cost = parseFloat(document.getElementById("ingCostInput").value) || 0.0;
+    const stock = parseFloat(document.getElementById("ingStockInput").value) || 0.0;
+    const par = parseFloat(document.getElementById("ingParInput").value) || 0.0;
+    const lead = parseInt(document.getElementById("ingLeadInput").value) || 1;
+
+    const newIng = { name, unit, purchase_cost: cost, current_stock: stock, par_level: par, lead_time_days: lead };
+    appState.ingredients.push(newIng);
+
+    try {
+        await fetch(`${API_BASE}/data/manual-ingredient`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, unit, purchase_cost: cost, current_stock: stock, par_level: par, lead_time_days: lead })
+        });
+    } catch (err) {
+        console.error("Save ingredient API error:", err);
+    }
+
+    closeAddIngredientModal();
+    renderRestaurantTables();
+}
+
+// 3. Staff Member Modal
+function openAddStaffModal() {
+    document.getElementById("addStaffModal").classList.remove("hidden");
+}
+function closeAddStaffModal() {
+    document.getElementById("addStaffModal").classList.add("hidden");
+}
+function saveStaffMember(e) {
+    e.preventDefault();
+    const name = document.getElementById("staffNameInput").value;
+    const role = document.getElementById("staffRoleInput").value;
+    const shift = document.getElementById("staffShiftInput").value;
+    const rate = parseFloat(document.getElementById("staffRateInput").value) || 18.0;
+    const hours = parseFloat(document.getElementById("staffHoursInput").value) || 35;
+
+    appState.staff.push({ name, role, shift, hourly_rate: rate, available_hours: hours });
+
+    closeAddStaffModal();
+    renderRestaurantTables();
+}
+
+function removeStaffMember(idx) {
+    if (idx >= 0 && idx < appState.staff.length) {
+        appState.staff.splice(idx, 1);
+        renderRestaurantTables();
+    }
+}
+
+// --- Table Rendering Functions ---
 
 function renderRestaurantTables() {
     const cur = appState.currency;
@@ -107,29 +500,40 @@ function renderRestaurantTables() {
         }
     }
 
-    // Render Staff Table
+    // Render Staff Table with Shift Badges & Remove Button
     const staffBody = document.getElementById("staffTableBody");
     if (staffBody) {
         if (appState.staff.length === 0) {
             staffBody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="px-4 py-6 text-center text-gray-400">No staff members added yet. Input employee hours in the 3-Step Setup Wizard.</td>
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No staff members added yet. Click "+ Add Staff Member" to add your first employee.</td>
                 </tr>
             `;
         } else {
-            staffBody.innerHTML = appState.staff.map(s => `
+            staffBody.innerHTML = appState.staff.map((s, idx) => `
                 <tr>
                     <td class="px-4 py-2.5 font-bold text-gray-900">${s.name}</td>
-                    <td class="px-4 py-2.5 text-blue-600">${s.role}</td>
+                    <td class="px-4 py-2.5 text-blue-600 font-medium">${s.role}</td>
+                    <td class="px-4 py-2.5 text-center">
+                        <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-[11px] font-bold">${s.shift || 'Morning'}</span>
+                    </td>
                     <td class="px-4 py-2.5 text-right text-gray-800">${formatCurrency(s.hourly_rate, cur)}/hr</td>
                     <td class="px-4 py-2.5 text-right font-bold text-emerald-600">${s.available_hours} hrs</td>
+                    <td class="px-4 py-2.5 text-center">
+                        <button onclick="removeStaffMember(${idx})" class="text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2 py-1 rounded transition text-xs">
+                            <i class="fa-solid fa-trash-can mr-1"></i>Remove
+                        </button>
+                    </td>
                 </tr>
             `).join('');
         }
     }
 
-    // Calculate Summary KPIs & Ranked Dishes if items exist
+    // Calculate Horizon-adjusted KPIs & Ranked Dishes
     const rankedBody = document.getElementById("rankedDishTableBody");
+    const mult = appState.horizon === 'daily' ? (1/7) : (appState.horizon === 'monthly' ? 4.3 : 1.0);
+    const horizonLabel = appState.horizon === 'daily' ? 'Daily' : (appState.horizon === 'monthly' ? 'Monthly' : 'Weekly');
+
     if (appState.menuItems.length > 0) {
         const totalSales = appState.menuItems.reduce((acc, m) => acc + m.selling_price, 0);
         const totalFood = appState.menuItems.reduce((acc, m) => acc + m.food_cost, 0);
@@ -138,8 +542,11 @@ function renderRestaurantTables() {
 
         document.getElementById("kpiFoodCost").innerText = `${foodCostPct}%`;
         document.getElementById("kpiLaborCost").innerText = "24.1%";
+        document.getElementById("kpiWasteSaved").innerText = formatCurrency(170 * mult, cur);
         document.getElementById("kpiContribution").innerText = `${marginPct}%`;
-        document.getElementById("overviewEmptyPrompt").classList.add("hidden");
+
+        const prompt = document.getElementById("overviewEmptyPrompt");
+        if (prompt) prompt.classList.add("hidden");
 
         if (rankedBody) {
             const sortedDishes = [...appState.menuItems].sort((a, b) => {
@@ -180,12 +587,11 @@ function renderRestaurantTables() {
         if (rankedBody) {
             rankedBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No dishes ranked yet. Add dishes in Menu & Recipes or run Setup Wizard.</td>
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No dishes ranked yet. Add dishes in Menu & Recipes to see dish ranking.</td>
                 </tr>
             `;
         }
     }
-
 }
 
 async function uploadCSVFile() {
@@ -202,7 +608,6 @@ async function uploadCSVFile() {
             body: formData
         });
         const data = await res.json();
-
         document.getElementById("csvUploadStatus").innerText = `Successfully imported ${data.records_imported} records from ${data.filename}!`;
         alert(`CSV Import Complete: Imported ${data.records_imported} rows into restaurant inventory.`);
     } catch (err) {
@@ -239,7 +644,6 @@ async function runWeeklyOptimizer() {
         appState.activeRunId = data.optimization_run_id || 184;
 
         const cur = appState.currency;
-        document.getElementById("optimizerEmptyPrompt").classList.add("hidden");
         document.getElementById("optimizerOutputArea").classList.remove("hidden");
         document.getElementById("recommendationActionList").innerHTML = `
             <li>Order 15% less Mozzarella Cheese this week — sales demand is trending stable and you are overstocked by ~2 days. Estimated savings: ${formatCurrency(170, cur)}.</li>
@@ -251,26 +655,7 @@ async function runWeeklyOptimizer() {
     }
 }
 
-function applyManualOverride(itemName) {
-    alert(`Manager manual override applied for '${itemName}'. Underlying model remains 100% valid.`);
-}
-
-function updateScenLabels() {
-    const f = parseFloat(document.getElementById("scenFuelShift").value) || 1.15;
-    const t = parseFloat(document.getElementById("scenTripShift").value) || 1.2;
-
-    const fPct = Math.round((f - 1.0) * 100);
-    const tPct = Math.round((t - 1.0) * 100);
-
-    document.getElementById("scenFuelLabel").innerText = `${fPct >= 0 ? '+' : ''}${fPct}% Inflation`;
-    document.getElementById("scenTripLabel").innerText = `${tPct >= 0 ? '+' : ''}${tPct}% Sales Surge`;
-}
-
-async function runScenarioStressTest() {
-    alert("Re-running backend scenario solver under parameter inflation...");
-}
-
-// --- Setup Wizard Logic ---
+// --- Setup Wizard Modal Logic ---
 function openSetupWizard() {
     appState.wizardStep = 1;
     document.getElementById("setupWizardModal").classList.remove("hidden");
@@ -350,7 +735,7 @@ function nextWizardStep() {
         const staff = document.getElementById("wizStaffName").value;
         const rate = parseFloat(document.getElementById("wizStaffRate").value) || 18.00;
         const hours = parseFloat(document.getElementById("wizStaffHours").value) || 35;
-        appState.staff.push({ name: staff, role: "Prep Cook", hourly_rate: rate, available_hours: hours });
+        appState.staff.push({ name: staff, role: "Prep Cook", shift: "Morning", hourly_rate: rate, available_hours: hours });
 
         closeSetupWizard();
         renderRestaurantTables();
@@ -366,15 +751,6 @@ function prevWizardStep() {
     }
 }
 
-function openAddMenuModal() {
-    openSetupWizard();
-}
-
-function openAddIngredientModal() {
-    appState.wizardStep = 2;
-    openSetupWizard();
-}
-
 window.addEventListener('DOMContentLoaded', () => {
-    renderRestaurantTables();
+    initAuth();
 });

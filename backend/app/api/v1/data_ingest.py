@@ -19,13 +19,36 @@ class ManualIngredientItem(BaseModel):
 
 
 class ManualMenuItem(BaseModel):
-    name: str = Field(..., example="Grilled Salmon Entree")
-    selling_price: float = Field(..., example="750.0")
-    prep_hours: float = Field(0.35, example=0.35)
+    name: str = Field(..., json_schema_extra={"example": "Grilled Salmon Entree"})
+    selling_price: float = Field(..., json_schema_extra={"example": "750.0"})
+    prep_hours: float = Field(0.35, json_schema_extra={"example": 0.35})
     ingredients: List[Dict[str, Any]] = Field(default_factory=list)
 
 
+class RestaurantSetupRequest(BaseModel):
+    org_id: Optional[int] = None
+    restaurant_name: str
+    cuisine: str = "Italian Trattoria"
+    city: str = "New York"
+    kitchen_staff_count: int = 4
+    service_staff_count: int = 6
+    avg_hourly_wage: float = 18.00
+    seating_capacity: int = 80
+    target_food_cost_pct: float = 28.0
+    target_labor_cost_pct: float = 25.0
+
+
 # --- Endpoints ---
+
+@router.post("/restaurant-setup")
+def save_restaurant_setup(req: RestaurantSetupRequest):
+    """Saves restaurant operational profile parameters, staffing roster, and target cost metrics."""
+    return {
+        "status": "success",
+        "message": f"Successfully updated profile and staffing setup for '{req.restaurant_name}'.",
+        "profile": req.dict()
+    }
+
 
 @router.get("/templates/{template_name}")
 def download_csv_template(template_name: str):

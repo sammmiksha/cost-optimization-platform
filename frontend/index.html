@@ -33,32 +33,210 @@
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen font-sans flex flex-col antialiased">
 
-    <!-- Header Navigation -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-blue-600 text-white px-2.5 py-1 rounded font-bold text-xs tracking-wider font-mono shadow-xs">
+    <!-- 1. AUTHENTICATION LANDING SCREEN (LOGIN / SIGN UP FIRST) -->
+    <div id="authScreen" class="min-h-screen flex flex-col items-center justify-center px-4 bg-gray-50">
+        <div class="max-w-md w-full bg-white rounded-2xl border border-gray-200 p-8 shadow-sm space-y-6">
+            <div class="text-center space-y-2">
+                <div class="inline-block bg-blue-600 text-white px-3 py-1 rounded font-bold text-xs tracking-wider font-mono">
                     KITCHENOPTIMA
                 </div>
-                <div>
-                    <h1 class="text-sm font-semibold text-gray-900">Restaurant Operations Platform</h1>
-                    <p class="text-xs text-gray-500">Weekly ordering, inventory control, and kitchen shift optimization</p>
-                </div>
+                <h2 class="text-xl font-bold text-gray-900">Restaurant Operations Platform</h2>
+                <p class="text-xs text-gray-500">Sign in to your account or create a new restaurant workspace</p>
             </div>
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2 text-xs text-gray-500">
-                    <span>Currency:</span>
-                    <select id="currencySelect" onchange="onCurrencyChange()" class="bg-white border border-gray-300 text-gray-800 text-xs rounded px-2.5 py-1 focus:outline-none focus:border-blue-500 font-mono shadow-xs">
-                        <option value="USD">USD ($)</option>
-                        <option value="INR">INR (₹)</option>
-                    </select>
-                </div>
-                <button onclick="openSetupWizard()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition shadow-xs">
-                    Setup Wizard
+
+            <!-- Auth Tabs -->
+            <div class="flex border-b border-gray-200">
+                <button id="authTabSignup" onclick="switchAuthTab('signup')" class="w-1/2 py-2 text-center text-xs font-bold border-b-2 border-blue-600 text-blue-600">
+                    Sign Up
+                </button>
+                <button id="authTabLogin" onclick="switchAuthTab('login')" class="w-1/2 py-2 text-center text-xs font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600">
+                    Log In
                 </button>
             </div>
+
+            <!-- Sign Up Form -->
+            <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="signupName" required placeholder="Chef Mario Rossi" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Restaurant / Business Name</label>
+                    <input type="text" id="signupOrg" required placeholder="Luigi's Italian Trattoria" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Work Email</label>
+                    <input type="email" id="signupEmail" required placeholder="mario@trattoria.com" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="signupPassword" required placeholder="••••••••" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition shadow-xs">
+                    Create Account & Continue to Operational Setup →
+                </button>
+            </form>
+
+            <!-- Log In Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 text-xs hidden">
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Work Email</label>
+                    <input type="email" id="loginEmail" required placeholder="mario@trattoria.com" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition shadow-xs">
+                    Sign In to Dashboard →
+                </button>
+            </form>
+
+            <div id="authError" class="hidden text-center text-xs text-rose-600 font-medium"></div>
         </div>
-    </header>
+    </div>
+
+    <!-- 2. POST-SIGNUP OPERATIONAL SETUP & CSV IMPORT SCREEN -->
+    <div id="onboardingScreen" class="min-h-screen flex flex-col items-center justify-center px-4 bg-gray-50 hidden">
+        <div class="max-w-2xl w-full bg-white rounded-2xl border border-gray-200 p-8 shadow-sm space-y-6">
+            
+            <!-- Step Indicator Header -->
+            <div class="flex items-center justify-between border-b border-gray-200 pb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900" id="onboardingStepTitle">Step 1 of 2: Restaurant & Staffing Setup</h2>
+                    <p class="text-xs text-gray-500" id="onboardingStepSubtitle">Define your kitchen & service operational parameters and target cost metrics.</p>
+                </div>
+                <span class="bg-blue-100 text-blue-800 text-xs font-mono font-bold px-2.5 py-1 rounded-full" id="onboardingStepBadge">STEP 1/2</span>
+            </div>
+
+            <!-- Step 1 Form: Restaurant Profile & Staffing -->
+            <form id="onboardingStep1Form" onsubmit="handleOnboardingStep1(event)" class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Restaurant Name</label>
+                        <input type="text" id="obRestName" required placeholder="Luigi's Italian Trattoria" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Cuisine / Concept Type</label>
+                        <select id="obCuisine" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                            <option value="Italian Trattoria">Italian Trattoria / Bistro</option>
+                            <option value="Fast Casual">Fast Casual / Gourmet Burgers</option>
+                            <option value="Fine Dining">Fine Dining & Steakhouse</option>
+                            <option value="Pizzeria">Pizzeria & Pasta House</option>
+                            <option value="Bakery / Cafe">Bakery & Breakfast Cafe</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Kitchen Staff Count</label>
+                        <input type="number" id="obKitchenStaff" value="4" min="1" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Service / FOH Staff Count</label>
+                        <input type="number" id="obServiceStaff" value="6" min="1" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Avg Hourly Wage ($/hr)</label>
+                        <input type="number" id="obAvgWage" value="18.00" step="0.5" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Seating Capacity</label>
+                        <input type="number" id="obSeats" value="80" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Target Food Cost %</label>
+                        <input type="number" id="obTargetFoodCost" value="28.0" step="0.5" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Target Labor Cost %</label>
+                        <input type="number" id="obTargetLaborCost" value="25.0" step="0.5" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition shadow-xs">
+                    Save Profile & Proceed to Data Upload →
+                </button>
+            </form>
+
+            <!-- Step 2 Form: CSV Import / Sample Data -->
+            <div id="onboardingStep2Form" class="space-y-6 text-xs hidden">
+                <div class="border border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 space-y-3">
+                    <i class="fa-solid fa-file-csv text-3xl text-blue-600"></i>
+                    <div>
+                        <p class="font-bold text-gray-900 text-sm">Upload Restaurant Data (.CSV)</p>
+                        <p class="text-gray-500 text-xs">Import your ingredient inventory, menu recipes, or sales history.</p>
+                    </div>
+                    <input type="file" id="obCsvFileInput" accept=".csv" class="hidden" onchange="handleObCsvFileSelected()">
+                    <div class="flex items-center justify-center space-x-3">
+                        <button onclick="document.getElementById('obCsvFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition">
+                            Select CSV File
+                        </button>
+                        <a href="/api/v1/data/templates/inventory" target="_blank" class="border border-gray-300 bg-white text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100">
+                            Download Inventory Template
+                        </a>
+                        <a href="/api/v1/data/templates/menu" target="_blank" class="border border-gray-300 bg-white text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100">
+                            Download Menu Template
+                        </a>
+                    </div>
+                    <p id="obCsvStatus" class="text-xs font-mono text-emerald-600 font-bold"></p>
+                </div>
+
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-gray-200"></div>
+                    <span class="flex-shrink mx-4 text-gray-400 font-mono text-[11px]">OR LOAD QUICK START DATA</span>
+                    <div class="flex-grow border-t border-gray-200"></div>
+                </div>
+
+                <button onclick="loadSampleDatasetAndFinish()" class="w-full border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-2.5 rounded-lg transition">
+                    ⚡ Load Sample Restaurant Dataset (Luigi's Trattoria Demo)
+                </button>
+
+                <button onclick="finishOnboardingAndLaunchDashboard()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition shadow-xs">
+                    Complete Setup & Launch Dashboard →
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. MAIN DASHBOARD WORKSPACE (HIDDEN UNTIL AUTHENTICATED) -->
+    <div id="mainDashboardApp" class="hidden flex-1 flex flex-col">
+        <!-- Header Navigation -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+            <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-600 text-white px-2.5 py-1 rounded font-bold text-xs tracking-wider font-mono shadow-xs">
+                        KITCHENOPTIMA
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-semibold text-gray-900" id="headerRestName">Restaurant Operations Platform</h1>
+                        <p class="text-xs text-gray-500">Weekly ordering, inventory control, and kitchen shift optimization</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                        <span>Currency:</span>
+                        <select id="currencySelect" onchange="onCurrencyChange()" class="bg-white border border-gray-300 text-gray-800 text-xs rounded px-2.5 py-1 focus:outline-none focus:border-blue-500 font-mono shadow-xs">
+                            <option value="USD">USD ($)</option>
+                            <option value="INR">INR (₹)</option>
+                        </select>
+                    </div>
+                    <div class="text-xs text-gray-600 font-medium flex items-center space-x-2 border-l pl-4 border-gray-200">
+                        <i class="fa-solid fa-user-circle text-gray-400 text-sm"></i>
+                        <span id="headerUserName">Manager</span>
+                    </div>
+                    <button onclick="handleLogout()" class="border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-medium px-3 py-1.5 rounded-lg transition">
+                        Log Out
+                    </button>
+                </div>
+            </div>
+        </header>
+
 
     <!-- Main Workspace Layout -->
     <div class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 grid grid-cols-12 gap-6">
@@ -95,11 +273,6 @@
                         <span>Weekly Optimizer</span>
                     </button>
 
-                    <button onclick="switchTab('scenarios')" id="tab-scenarios" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-code-branch w-4 text-gray-400"></i>
-                        <span>What-If Scenarios</span>
-                    </button>
-
                     <button onclick="switchTab('recommendations')" id="tab-recommendations" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
                         <i class="fa-solid fa-circle-check w-4 text-gray-400"></i>
                         <span>Track Record</span>
@@ -123,17 +296,6 @@
                 </div>
             </div>
 
-            <!-- GROUP 3: SETTINGS -->
-            <div>
-                <div class="text-[11px] font-bold text-gray-400 uppercase px-3 py-1.5 tracking-wider">SETTINGS</div>
-                <div class="space-y-0.5">
-                    <button onclick="switchTab('settings-org')" id="tab-settings-org" class="nav-item w-full text-left px-3 py-2 rounded-r-lg text-xs font-medium flex items-center space-x-3 transition">
-                        <i class="fa-solid fa-store w-4 text-gray-400"></i>
-                        <span>Restaurant Profile</span>
-                    </button>
-                </div>
-            </div>
-
             <div class="pt-4 border-t border-gray-200 text-xs text-gray-500 space-y-1 font-mono px-3">
                 <div>Restaurant: <span id="sidebarOrgName" class="text-gray-800 font-semibold">My Restaurant</span></div>
                 <div>Role: <span class="text-blue-600 font-medium">Operations Manager</span></div>
@@ -146,10 +308,25 @@
             <!-- TAB 1: THIS WEEK (DASHBOARD) -->
             <div id="section-overview" class="space-y-6">
                 
-                <!-- Simple Header Greeting -->
-                <div>
-                    <h2 class="text-lg font-bold text-gray-900">Good evening</h2>
-                    <p class="text-xs text-gray-500">Here is your weekly operational summary and cost health status.</p>
+                <!-- Simple Header Greeting with Time Horizon Filter -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900" id="dashboardGreetingTitle">Dashboard Overview</h2>
+                        <p class="text-xs text-gray-500" id="dashboardGreetingSubtitle">Operational metrics, dish profitability, and cost health status.</p>
+                    </div>
+
+                    <!-- Time Horizon Selector (Daily, Weekly, Monthly) -->
+                    <div class="flex items-center space-x-1 bg-gray-200/70 p-1 rounded-xl font-mono text-xs shadow-xs">
+                        <button onclick="setHorizon('daily')" id="horizonBtnDaily" class="px-3 py-1.5 font-bold rounded-lg transition text-gray-600 hover:text-gray-900">
+                            Daily
+                        </button>
+                        <button onclick="setHorizon('weekly')" id="horizonBtnWeekly" class="px-3 py-1.5 font-bold rounded-lg transition bg-white text-blue-600 shadow-xs">
+                            Weekly
+                        </button>
+                        <button onclick="setHorizon('monthly')" id="horizonBtnMonthly" class="px-3 py-1.5 font-bold rounded-lg transition text-gray-600 hover:text-gray-900">
+                            Monthly
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Top Restaurant KPIs -->
@@ -339,9 +516,12 @@
                 <div class="bg-white border border-gray-200 rounded-xl p-6 text-xs space-y-4 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-sm font-bold text-gray-900">Kitchen Staff & Shift Schedules</h2>
-                            <p class="text-gray-500 mt-0.5">Manage chef, line cook, and prep staff shift availability and hourly wages.</p>
+                            <h2 class="text-sm font-bold text-gray-900">Kitchen & Service Staff Roster</h2>
+                            <p class="text-gray-500 mt-0.5">Manage chef, line cook, and server shift schedules and hourly wage rates.</p>
                         </div>
+                        <button onclick="openAddStaffModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3.5 py-1.5 rounded-lg transition shadow-xs font-mono">
+                            + Add Staff Member
+                        </button>
                     </div>
 
                     <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-xs">
@@ -350,13 +530,15 @@
                                 <tr>
                                     <th class="px-4 py-2.5">Staff Member</th>
                                     <th class="px-4 py-2.5">Role</th>
-                                    <th class="px-4 py-2.5 text-right">Hourly Rate</th>
+                                    <th class="px-4 py-2.5 text-center">Shift Schedule</th>
+                                    <th class="px-4 py-2.5 text-right">Hourly Rate / Wage</th>
                                     <th class="px-4 py-2.5 text-right">Weekly Hours</th>
+                                    <th class="px-4 py-2.5 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="staffTableBody" class="divide-y divide-gray-200 text-gray-800 bg-white">
                                 <tr>
-                                    <td colspan="4" class="px-4 py-6 text-center text-gray-400">No staff members added yet. Input employee hours in the 3-Step Setup Wizard.</td>
+                                    <td colspan="6" class="px-4 py-6 text-center text-gray-400">No staff members added yet. Click "+ Add Staff Member" to add your first employee.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -534,6 +716,7 @@
 
         </main>
     </div>
+    </div> <!-- Close mainDashboardApp -->
 
     <!-- 3-Step Setup Wizard Modal -->
     <div id="setupWizardModal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
@@ -551,6 +734,142 @@
                 <button onclick="prevWizardStep()" id="wizPrevBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg transition shadow-xs">Back</button>
                 <button onclick="nextWizardStep()" id="wizNextBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-semibold shadow-xs">Next Step &rarr;</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Dedicated Add Menu Item Modal -->
+    <div id="addMenuModal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-gray-200 rounded-xl max-w-md w-full p-6 text-xs space-y-4 font-mono shadow-xl">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-3">
+                <h3 class="font-bold text-gray-900 text-sm">+ Add New Menu Item</h3>
+                <button onclick="closeAddMenuModal()" class="text-gray-400 hover:text-gray-600 font-bold text-base">&times;</button>
+            </div>
+            <form onsubmit="saveMenuItem(event)" class="space-y-3">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Dish Name</label>
+                    <input type="text" id="menuNameInput" required placeholder="e.g. Margherita Pizza" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Selling Price</label>
+                        <input type="number" id="menuPriceInput" required step="0.5" placeholder="18.50" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Raw Food Cost</label>
+                        <input type="number" id="menuCostInput" required step="0.1" placeholder="4.80" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Prep Time (Hours)</label>
+                    <input type="number" id="menuPrepInput" value="0.25" step="0.05" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                </div>
+                <div class="pt-3 flex justify-end space-x-2 border-t border-gray-200">
+                    <button type="button" onclick="closeAddMenuModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg transition">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-semibold">Save Dish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dedicated Add Ingredient Modal -->
+    <div id="addIngredientModal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-gray-200 rounded-xl max-w-md w-full p-6 text-xs space-y-4 font-mono shadow-xl">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-3">
+                <h3 class="font-bold text-gray-900 text-sm">+ Add New Ingredient</h3>
+                <button onclick="closeAddIngredientModal()" class="text-gray-400 hover:text-gray-600 font-bold text-base">&times;</button>
+            </div>
+            <form onsubmit="saveIngredient(event)" class="space-y-3">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Ingredient Name</label>
+                    <input type="text" id="ingNameInput" required placeholder="e.g. Mozzarella Cheese" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Unit of Measure</label>
+                        <select id="ingUnitInput" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                            <option value="kg">kg</option>
+                            <option value="liters">liters</option>
+                            <option value="units">units</option>
+                            <option value="cans">cans</option>
+                            <option value="grams">grams</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Purchase Cost</label>
+                        <input type="number" id="ingCostInput" required step="0.5" placeholder="12.00" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Current Stock</label>
+                        <input type="number" id="ingStockInput" value="18.0" step="0.5" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Par Level</label>
+                        <input type="number" id="ingParInput" value="40.0" step="0.5" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Lead Time (Days)</label>
+                        <input type="number" id="ingLeadInput" value="1" min="1" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                </div>
+                <div class="pt-3 flex justify-end space-x-2 border-t border-gray-200">
+                    <button type="button" onclick="closeAddIngredientModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg transition">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-semibold">Save Ingredient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dedicated Add Staff Member Modal -->
+    <div id="addStaffModal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-gray-200 rounded-xl max-w-md w-full p-6 text-xs space-y-4 font-mono shadow-xl">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-3">
+                <h3 class="font-bold text-gray-900 text-sm">+ Add Staff Member</h3>
+                <button onclick="closeAddStaffModal()" class="text-gray-400 hover:text-gray-600 font-bold text-base">&times;</button>
+            </div>
+            <form onsubmit="saveStaffMember(event)" class="space-y-3">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Staff Member Full Name</label>
+                    <input type="text" id="staffNameInput" required placeholder="e.g. Sofia Rossi" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Role</label>
+                        <select id="staffRoleInput" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                            <option value="Head Chef">Head Chef</option>
+                            <option value="Line Cook">Line Cook</option>
+                            <option value="Prep Cook">Prep Cook</option>
+                            <option value="Server">Server</option>
+                            <option value="Dishwasher">Dishwasher</option>
+                            <option value="Manager">Manager</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Shift Schedule</label>
+                        <select id="staffShiftInput" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                            <option value="Morning">Morning Shift</option>
+                            <option value="Afternoon">Afternoon Shift</option>
+                            <option value="Evening">Evening Shift</option>
+                            <option value="Night">Night Shift</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Hourly Wage ($/hr or ₹/hr)</label>
+                        <input type="number" id="staffRateInput" required step="0.5" value="18.00" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Weekly Hours</label>
+                        <input type="number" id="staffHoursInput" required value="35" min="1" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none">
+                    </div>
+                </div>
+                <div class="pt-3 flex justify-end space-x-2 border-t border-gray-200">
+                    <button type="button" onclick="closeAddStaffModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg transition">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-semibold">Save Employee</button>
+                </div>
+            </form>
         </div>
     </div>
 
